@@ -22,6 +22,14 @@ webhook:
     create: true
     failurePolicy: Fail
 
+config:
+  create: true
+  data: {}
+    #INHERITED_ANNOTATIONS: categories
+    #INHERITED_LABELS: environment, workload, app
+    #EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
+  name: postgresql-operator-controller-manager-config
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

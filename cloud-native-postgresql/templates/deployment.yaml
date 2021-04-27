@@ -29,7 +29,7 @@ spec:
       containers:
       - args:
         - --enable-leader-election
-        - --config-map-name=postgresql-operator-controller-manager-config
+        - --config-map-name={{ .Values.config.name }}
         command:
         - /manager
         env:
