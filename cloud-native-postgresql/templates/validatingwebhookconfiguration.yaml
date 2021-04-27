@@ -1,0 +1,131 @@
+{{- if .Values.webhook.validating.create }}
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: postgresql-operator-validating-webhook-configuration
+  labels:
+    control-plane: controller-manager
+    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+webhooks:
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-backup
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vbackup.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - backups
+  sideEffects: None
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-cluster
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vcluster.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusters
+  sideEffects: None
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vscheduledbackup.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - scheduledbackups
+  sideEffects: None
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-backup
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vbackupv1alpha1.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - backups
+  sideEffects: None
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-cluster
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vclusterv1alpha1.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - clusters
+  sideEffects: None
+- admissionReviewVersions:
+  - v1beta1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-scheduledbackup
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vscheduledbackupv1alpha1.kb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1alpha1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - scheduledbackups
+  sideEffects: None
+{{- end }}
