@@ -1,4 +1,4 @@
-{{- if .Values.serviceAccount.create -}}
+{{- if .Values.serviceAccount.create }}
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -7,7 +7,7 @@ metadata:
   labels:
     control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
+  {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -22,7 +22,7 @@ metadata:
   labels:
     control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
+  {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -285,7 +285,7 @@ metadata:
   labels:
     control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
+  {{- with .Values.commonAnnotations.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}

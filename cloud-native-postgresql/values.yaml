@@ -30,11 +30,12 @@ config:
     #EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
   name: postgresql-operator-controller-manager-config
 
+# additinal arguments to be added to the operator's args list
+additionalArgs:  []
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
-  annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
@@ -45,6 +46,8 @@ rbac:
 
 # Annotations to be added to the pod
 podAnnotations: {}
+# annotations to be added to all other resources
+commonAnnotations: {}
 
 # Security Context for the whole pod
 podSecurityContext:
