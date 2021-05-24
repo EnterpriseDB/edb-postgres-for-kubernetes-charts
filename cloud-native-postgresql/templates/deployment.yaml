@@ -6,6 +6,10 @@ metadata:
   labels:
     control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -29,7 +33,12 @@ spec:
       containers:
       - args:
         - --enable-leader-election
-        - --config-map-name=postgresql-operator-controller-manager-config
+        {{- with .Values.config.name }}
+        - --config-map-name={{ . }}
+        {{- end }}
+        {{-  range .Values.additionaArgs }}
+        - {{ . }}
+        {{- end }}
         command:
         - /manager
         env:

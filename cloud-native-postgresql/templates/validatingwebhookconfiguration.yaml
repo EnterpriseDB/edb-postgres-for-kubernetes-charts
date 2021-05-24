@@ -7,6 +7,10 @@ metadata:
   labels:
     control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 webhooks:
 - admissionReviewVersions:
   - v1beta1
