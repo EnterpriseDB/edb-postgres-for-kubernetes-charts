@@ -4,11 +4,11 @@
 
 Cloud Native Postgresql Helm Chart
 
-**Homepage:** <https://github.com/EnterpriseDB/cloud-native-postgresql>
+**Homepage:** <https://github.com/EnterpriseDB/cloud-native-postgresql-helm>
 
 ## Source Code
 
-* <https://github.com/EnterpriseDB/cloud-native-postgresql.git>
+* <https://github.com/EnterpriseDB/cloud-native-postgresql-helm.git>
 
 ## Values
 
