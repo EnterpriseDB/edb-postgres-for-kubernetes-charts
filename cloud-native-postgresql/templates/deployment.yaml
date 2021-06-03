@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   name: {{ include "cloud-native-postgresql.fullname" . }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -14,7 +13,6 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      control-plane: controller-manager
       {{- include "cloud-native-postgresql.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -23,7 +21,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        control-plane: controller-manager
+        app.kubernetes.io/name: cloud-native-postgresql
         {{- include "cloud-native-postgresql.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -32,6 +30,7 @@ spec:
       {{- end }}
       containers:
       - args:
+        - controller
         - --enable-leader-election
         {{- with .Values.config.name }}
         - --config-map-name={{ . }}
@@ -57,6 +56,9 @@ spec:
             scheme: HTTPS
         name: manager
         ports:
+        - containerPort: 8080
+          name: metrics
+          protocol: TCP
         - containerPort: 9443
           name: webhook-server
           protocol: TCP
@@ -67,6 +69,11 @@ spec:
             scheme: HTTPS
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /controller
+          name: scratch-data
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "cloud-native-postgresql.serviceAccountName" . }}
@@ -83,3 +90,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+      - emptyDir: {}
+        name: scratch-data
+

@@ -4,7 +4,6 @@ kind: Service
 metadata:
   name: {{ .Values.service.name }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -17,5 +16,4 @@ spec:
     targetPort: webhook-server
     name: webhook-server
   selector:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.selectorLabels" . | nindent 4 }}

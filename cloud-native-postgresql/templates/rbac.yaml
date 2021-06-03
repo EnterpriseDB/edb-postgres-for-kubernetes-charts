@@ -5,7 +5,6 @@ kind: ServiceAccount
 metadata:
   name: {{ include "cloud-native-postgresql.serviceAccountName" . }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -20,7 +19,6 @@ kind: ClusterRole
 metadata:
   name: {{ include "cloud-native-postgresql.fullname" . }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
@@ -283,7 +281,6 @@ kind: ClusterRoleBinding
 metadata:
   name: {{ include "cloud-native-postgresql.fullname" . }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations.annotations }}
   annotations:

@@ -5,7 +5,6 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: postgresql-operator-validating-webhook-configuration
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.rbac.annotations }}
   annotations:
