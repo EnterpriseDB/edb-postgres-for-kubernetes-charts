@@ -1,161 +1,135 @@
 {
-  "$schema": "http://json-schema.org/schema#",
-  "type": "object",
-  "required": [
-    "config",
-    "image",
-    "rbac",
-    "replicaCount",
-    "service",
-    "serviceAccount",
-    "webhook"
-  ],
-  "properties": {
-    "affinity": {
-      "type": "object"
-    },
-    "additionalArgs": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "commonAnnotations": {
-      "type": "object"
-    },
-    "config": {
-      "type": "object",
-      "required": [
-        "create",
-        "name",
-        "data"
-      ],
-      "properties": {
-        "create": {
-          "type": "boolean"
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "additionalArgs": {
+            "type": "array"
         },
-        "data": {
-          "type": "object"
+        "affinity": {
+            "type": "object"
         },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "fullnameOverride": {
-      "type": "string"
-    },
-    "image": {
-      "type": "object",
-      "properties": {
-        "pullPolicy": {
-          "type": "string"
+        "commonAnnotations": {
+            "type": "object"
         },
-        "repository": {
-          "type": "string"
-        },
-        "tag": {
-          "type": "string"
-        }
-      }
-    },
-    "imagePullSecrets": {
-      "type": "array"
-    },
-    "nameOverride": {
-      "type": "string"
-    },
-    "nodeSelector": {
-      "type": "object"
-    },
-    "podAnnotations": {
-      "type": "object"
-    },
-    "podSecurityContext": {
-      "type": "object"
-    },
-    "rbac": {
-      "type": "object",
-      "properties": {
-        "create": {
-          "type": "boolean"
-        }
-      }
-    },
-    "replicaCount": {
-      "type": "integer"
-    },
-    "resources": {
-      "type": "object"
-    },
-    "service": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "port": {
-          "type": "integer"
-        },
-        "type": {
-          "type": "string"
-        }
-      }
-    },
-    "serviceAccount": {
-      "type": "object",
-      "required": [
-        "create",
-        "name"
-      ],
-      "properties": {
-        "create": {
-          "type": "boolean"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "tolerations": {
-      "type": "array"
-    },
-    "webhook": {
-      "type": "object",
-      "properties": {
-        "mutating": {
-          "type": "object",
-          "required": [
-            "create",
-            "failurePolicy"
-          ],
-          "properties": {
-            "create": {
-              "type": "boolean"
-            },
-            "failurePolicy": {
-              "type": "string",
-              "pattern": "^(Fail|Ignore)$"
+        "config": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "name": {
+                    "type": "string"
+                }
             }
-          }
         },
-        "validating": {
-          "type": "object",
-          "required": [
-            "create",
-            "failurePolicy"
-          ],
-          "properties": {
-            "create": {
-              "type": "boolean"
-            },
-            "failurePolicy": {
-              "type": "string",
-              "pattern": "^(Fail|Ignore)$"
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "pullPolicy": {
+                    "type": "string"
+                },
+                "repository": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                }
             }
-          }
+        },
+        "imagePullSecrets": {
+            "type": "array"
+        },
+        "nameOverride": {
+            "type": "string"
+        },
+        "nodeSelector": {
+            "type": "object"
+        },
+        "podAnnotations": {
+            "type": "object"
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "properties": {
+                "runAsUser": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rbac": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "replicaCount": {
+            "type": "integer"
+        },
+        "resources": {
+            "type": "object"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tolerations": {
+            "type": "array"
+        },
+        "webhook": {
+            "type": "object",
+            "properties": {
+                "mutating": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "failurePolicy": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "validating": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "failurePolicy": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }

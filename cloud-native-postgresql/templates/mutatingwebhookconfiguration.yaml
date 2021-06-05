@@ -9,7 +9,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
 webhooks:
 - admissionReviewVersions:

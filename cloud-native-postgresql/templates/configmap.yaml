@@ -4,7 +4,6 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.config.name }}
   labels:
-    control-plane: controller-manager
     {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
