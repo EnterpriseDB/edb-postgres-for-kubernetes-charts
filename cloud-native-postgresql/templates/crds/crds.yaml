@@ -12,6 +12,313 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: backups.postgresql.k8s.enterprisedb.io
+spec:
+  conversion:
+    strategy: None
+  group: postgresql.k8s.enterprisedb.io
+  names:
+    kind: Backup
+    listKind: BackupList
+    plural: backups
+    singular: backup
+  preserveUnknownFields: false
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .spec.cluster.name
+      name: Cluster
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.error
+      name: Error
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Backup is the Schema for the backups API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'Specification of the desired behavior of the backup. More
+              info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              cluster:
+                description: The cluster to backup
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+            type: object
+          status:
+            description: 'Most recently observed status of the backup. This data may
+              not be up to date. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              backupId:
+                description: The ID of the Barman backup
+                type: string
+              beginLSN:
+                description: The starting xlog
+                type: string
+              beginWal:
+                description: The starting WAL
+                type: string
+              commandError:
+                description: The backup command output in case of error
+                type: string
+              commandOutput:
+                description: Unused. Retained for compatibility with old versions.
+                type: string
+              destinationPath:
+                description: The path where to store the backup (i.e. s3://bucket/path/to/folder)
+                  this path, with different destination folders, will be used for
+                  WALs and for data
+                type: string
+              encryption:
+                description: Encryption method required to S3 API
+                type: string
+              endLSN:
+                description: The ending xlog
+                type: string
+              endWal:
+                description: The ending WAL
+                type: string
+              endpointURL:
+                description: Endpoint to be used to upload data to the cloud, overriding
+                  the automatic endpoint discovery
+                type: string
+              error:
+                description: The detected error
+                type: string
+              phase:
+                description: The last backup status
+                type: string
+              s3Credentials:
+                description: The credentials to use to upload data to S3
+                properties:
+                  accessKeyId:
+                    description: The reference to the access key id
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  secretAccessKey:
+                    description: The reference to the secret access key
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                required:
+                - accessKeyId
+                - secretAccessKey
+                type: object
+              serverName:
+                description: The server name on S3, the cluster name is used if this
+                  parameter is omitted
+                type: string
+              startedAt:
+                description: When the backup was started
+                format: date-time
+                type: string
+              stoppedAt:
+                description: When the backup was terminated
+                format: date-time
+                type: string
+            required:
+            - destinationPath
+            - s3Credentials
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .spec.cluster.name
+      name: Cluster
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.error
+      name: Error
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Backup is the Schema for the backups API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'Specification of the desired behavior of the backup. More
+              info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              cluster:
+                description: The cluster to backup
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+            type: object
+          status:
+            description: 'Most recently observed status of the backup. This data may
+              not be up to date. Populated by the system. Read-only. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              backupId:
+                description: The ID of the Barman backup
+                type: string
+              beginLSN:
+                description: The starting xlog
+                type: string
+              beginWal:
+                description: The starting WAL
+                type: string
+              commandError:
+                description: The backup command output in case of error
+                type: string
+              commandOutput:
+                description: Unused. Retained for compatibility with old versions.
+                type: string
+              destinationPath:
+                description: The path where to store the backup (i.e. s3://bucket/path/to/folder)
+                  this path, with different destination folders, will be used for
+                  WALs and for data
+                type: string
+              encryption:
+                description: Encryption method required to S3 API
+                type: string
+              endLSN:
+                description: The ending xlog
+                type: string
+              endWal:
+                description: The ending WAL
+                type: string
+              endpointURL:
+                description: Endpoint to be used to upload data to the cloud, overriding
+                  the automatic endpoint discovery
+                type: string
+              error:
+                description: The detected error
+                type: string
+              phase:
+                description: The last backup status
+                type: string
+              s3Credentials:
+                description: The credentials to use to upload data to S3
+                properties:
+                  accessKeyId:
+                    description: The reference to the access key id
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  secretAccessKey:
+                    description: The reference to the secret access key
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                required:
+                - accessKeyId
+                - secretAccessKey
+                type: object
+              serverName:
+                description: The server name on S3, the cluster name is used if this
+                  parameter is omitted
+                type: string
+              startedAt:
+                description: When the backup was started
+                format: date-time
+                type: string
+              stoppedAt:
+                description: When the backup was terminated
+                format: date-time
+                type: string
+            required:
+            - destinationPath
+            - s3Credentials
+            type: object
+        type: object
+    served: true
+    storage: false
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -87,6 +394,49 @@ spec:
                     description: 'NodeSelector is map of key-value pairs used to define
                       the nodes on which the pods can run. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/'
                     type: object
+                  tolerations:
+                    description: 'Tolerations is a list of Tolerations that should
+                      be set for all the pods, in order to allow them to run on tainted
+                      nodes. More info: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/'
+                    items:
+                      description: The pod this Toleration is attached to tolerates
+                        any taint that matches the triple <key,value,effect> using
+                        the matching operator <operator>.
+                      properties:
+                        effect:
+                          description: Effect indicates the taint effect to match.
+                            Empty means match all taint effects. When specified, allowed
+                            values are NoSchedule, PreferNoSchedule and NoExecute.
+                          type: string
+                        key:
+                          description: Key is the taint key that the toleration applies
+                            to. Empty means match all taint keys. If the key is empty,
+                            operator must be Exists; this combination means to match
+                            all values and all keys.
+                          type: string
+                        operator:
+                          description: Operator represents a key's relationship to
+                            the value. Valid operators are Exists and Equal. Defaults
+                            to Equal. Exists is equivalent to wildcard for value,
+                            so that a pod can tolerate all taints of a particular
+                            category.
+                          type: string
+                        tolerationSeconds:
+                          description: TolerationSeconds represents the period of
+                            time the toleration (which must be of effect NoExecute,
+                            otherwise this field is ignored) tolerates the taint.
+                            By default, it is not set, which means tolerate the taint
+                            forever (do not evict). Zero and negative values will
+                            be treated as 0 (evict immediately) by the system.
+                          format: int64
+                          type: integer
+                        value:
+                          description: Value is the taint value the toleration matches
+                            to. If the operator is Exists, the value should be empty,
+                            otherwise just a regular string.
+                          type: string
+                      type: object
+                    type: array
                   topologyKey:
                     description: TopologyKey to use for anti-affinity configuration.
                       See k8s documentation for more info on that
@@ -134,6 +484,7 @@ spec:
                             description: The number of parallel jobs to be used to
                               upload the backup, defaults to 2
                             format: int32
+                            minimum: 1
                             type: integer
                         type: object
                       destinationPath:
@@ -153,39 +504,27 @@ spec:
                             description: The reference to the access key id
                             properties:
                               key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
+                                description: The key to select
                                 type: string
                               name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
+                                description: Name of the referent.
                                 type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
                             required:
                             - key
+                            - name
                             type: object
                           secretAccessKey:
                             description: The reference to the secret access key
                             properties:
                               key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
+                                description: The key to select
                                 type: string
                               name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
+                                description: Name of the referent.
                                 type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
                             required:
                             - key
+                            - name
                             type: object
                         required:
                         - accessKeyId
@@ -255,10 +594,23 @@ spec:
                           will be created from scratch
                         properties:
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            description: Name of the referent.
                             type: string
+                        required:
+                        - name
                         type: object
+                    type: object
+                  pg_basebackup:
+                    description: Bootstrap the cluster taking a physical backup of
+                      another compatible PostgreSQL instance
+                    properties:
+                      source:
+                        description: The name of the server of which we need to take
+                          a physical backup
+                        minLength: 1
+                        type: string
+                    required:
+                    - source
                     type: object
                   recovery:
                     description: Bootstrap the cluster from a backup
@@ -267,15 +619,19 @@ spec:
                         description: The backup we need to restore
                         properties:
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            description: Name of the referent.
                             type: string
+                        required:
+                        - name
                         type: object
                       recoveryTarget:
-                        description: 'By default the recovery will end as soon as
-                          a consistent state is reached: in this case that means at
-                          the end of a backup. This option allows to fine tune the
-                          recovery process'
+                        description: 'By default, the recovery process applies all
+                          the available WAL files in the archive (full recovery).
+                          However, you can also end the recovery as soon as a consistent
+                          state is reached or recover to a point-in-time (PITR) by
+                          specifying a `RecoveryTarget` object, as expected by PostgreSQL
+                          (i.e., timestamp, transaction Id, LSN, ...). More info:
+                          https://www.postgresql.org/docs/current/runtime-config-wal.html#RUNTIME-CONFIG-WAL-RECOVERY-TARGET'
                         properties:
                           exclusive:
                             description: Set the target to be exclusive (defaults
@@ -308,12 +664,133 @@ spec:
                     - backup
                     type: object
                 type: object
+              certificates:
+                description: The configuration for the CA and related certificates
+                properties:
+                  serverAltDNSNames:
+                    description: The list of the server alternative DNS names to be
+                      added to the generated server TLS certificates, when required.
+                    items:
+                      type: string
+                    type: array
+                  serverCASecret:
+                    description: "The secret containing the Server CA certificate.
+                      If not defined, a new secret will be created with a self-signed
+                      CA and will be used to generate the TLS certificate ServerTLSSecret.
+                      \n Contains: \n - `ca.crt`: CA that should be used to validate
+                      the server certificate,    used as `sslrootcert` in client connection
+                      strings. - `ca.key`: key used to generate Server SSL certs,
+                      if ServerTLSSecret is provided,    this can be omitted."
+                    type: string
+                  serverTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      server TLS certificate and key that will be set as `ssl_cert_file`
+                      and `ssl_key_file` so that clients can connect to postgres securely.
+                      If not defined, ServerCASecret must provide also `ca.key` and
+                      a new secret will be created using the provided CA.
+                    type: string
+                type: object
               description:
                 description: Description of this PostgreSQL cluster
                 type: string
+              externalClusters:
+                description: The list of external clusters which are used in the configuration
+                items:
+                  description: ExternalCluster represents the connection parameters
+                    of an external server which is used in the cluster configuration
+                  properties:
+                    connectionParameters:
+                      additionalProperties:
+                        type: string
+                      description: The list of connection parameters, such as dbname,
+                        host, username, etc
+                      type: object
+                    name:
+                      description: The server name, required
+                      type: string
+                    password:
+                      description: The reference to the password to be used to connect
+                        to the server
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslCert:
+                      description: The reference to an SSL certificate to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslKey:
+                      description: The reference to an SSL private key to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslRootCert:
+                      description: The reference to an SSL CA public key to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                  required:
+                  - name
+                  type: object
+                type: array
               imageName:
-                description: Name of the container image
-                minLength: 0
+                description: Name of the container image, supporting both tags (`<image>:<tag>`)
+                  and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`)
                 type: string
               imagePullSecrets:
                 description: The list of pull secrets to be used to pull the images.
@@ -321,12 +798,14 @@ spec:
                   included.
                 items:
                   description: LocalObjectReference contains enough information to
-                    let you locate the referenced object inside the same namespace.
+                    let you locate a local object with a known type inside the same
+                    namespace
                   properties:
                     name:
-                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                        TODO: Add other useful fields. apiVersion, kind, uid?'
+                      description: Name of the referent.
                       type: string
+                  required:
+                  - name
                   type: object
                 type: array
               instances:
@@ -359,42 +838,35 @@ spec:
                   customQueriesConfigMap:
                     description: The list of config maps containing the custom queries
                     items:
-                      description: Selects a key from a ConfigMap.
+                      description: ConfigMapKeySelector contains enough information
+                        to let you locate the key of a ConfigMap
                       properties:
                         key:
-                          description: The key to select.
+                          description: The key to select
                           type: string
                         name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          description: Name of the referent.
                           type: string
-                        optional:
-                          description: Specify whether the ConfigMap or its key must
-                            be defined
-                          type: boolean
                       required:
                       - key
+                      - name
                       type: object
                     type: array
                   customQueriesSecret:
                     description: The list of secrets containing the custom queries
                     items:
-                      description: SecretKeySelector selects a key of a Secret.
+                      description: SecretKeySelector contains enough information to
+                        let you locate the key of a Secret
                       properties:
                         key:
-                          description: The key of the secret to select from.  Must
-                            be a valid secret key.
+                          description: The key to select
                           type: string
                         name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          description: Name of the referent.
                           type: string
-                        optional:
-                          description: Specify whether the Secret or its key must
-                            be defined
-                          type: boolean
                       required:
                       - key
+                      - name
                       type: object
                     type: array
                 type: object
@@ -629,9 +1101,10 @@ spec:
                   defined a new secret will be created with a randomly generated password
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    description: Name of the referent.
                     type: string
+                required:
+                - name
                 type: object
             required:
             - instances
@@ -641,6 +1114,51 @@ spec:
               may not be up to date. Populated by the system. Read-only. More info:
               https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
             properties:
+              certificates:
+                description: The configuration for the CA and related certificates,
+                  initialized with defaults.
+                properties:
+                  clientCASecret:
+                    description: "The secret containing the Client CA certificate.
+                      This secret contains a self-signed CA and is used to sign TLS
+                      certificates used for client authentication. \n Contains: \n
+                      - `ca.crt`: CA that should be used to validate the client certificate,
+                      used as `ssl_ca_file`. - `ca.key`: key used to sign client SSL
+                      certs."
+                    type: string
+                  expirations:
+                    additionalProperties:
+                      type: string
+                    description: Expiration dates for all certificates.
+                    type: object
+                  replicationTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      TLS client certificate to authenticate as `streaming_replica`
+                      user.
+                    type: string
+                  serverAltDNSNames:
+                    description: The list of the server alternative DNS names to be
+                      added to the generated server TLS certificates, when required.
+                    items:
+                      type: string
+                    type: array
+                  serverCASecret:
+                    description: "The secret containing the Server CA certificate.
+                      If not defined, a new secret will be created with a self-signed
+                      CA and will be used to generate the TLS certificate ServerTLSSecret.
+                      \n Contains: \n - `ca.crt`: CA that should be used to validate
+                      the server certificate,    used as `sslrootcert` in client connection
+                      strings. - `ca.key`: key used to generate Server SSL certs,
+                      if ServerTLSSecret is provided,    this can be omitted."
+                    type: string
+                  serverTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      server TLS certificate and key that will be set as `ssl_cert_file`
+                      and `ssl_key_file` so that clients can connect to postgres securely.
+                      If not defined, ServerCASecret must provide also `ca.key` and
+                      a new secret will be created using the provided CA.
+                    type: string
+                type: object
               currentPrimary:
                 description: Current primary instance
                 type: string
@@ -734,11 +1252,19 @@ spec:
                     description: The resource version of the "app" user secret
                     type: string
                   caSecretVersion:
-                    description: The resource version of the "ca" secret version
+                    description: Unused. Retained for compatibility with old versions.
+                    type: string
+                  clientCaSecretVersion:
+                    description: The resource version of the PostgreSQL client-side
+                      CA secret version
                     type: string
                   replicationSecretVersion:
                     description: The resource version of the "streaming_replication"
                       user secret
+                    type: string
+                  serverCaSecretVersion:
+                    description: The resource version of the PostgreSQL server-side
+                      CA secret version
                     type: string
                   serverSecretVersion:
                     description: The resource version of the PostgreSQL server-side
@@ -749,8 +1275,9 @@ spec:
                     type: string
                 required:
                 - applicationSecretVersion
-                - caSecretVersion
+                - clientCaSecretVersion
                 - replicationSecretVersion
+                - serverCaSecretVersion
                 - serverSecretVersion
                 - superuserSecretVersion
                 type: object
@@ -825,6 +1352,48 @@ spec:
                     description: 'NodeSelector is map of key-value pairs used to define
                       the nodes on which the pods can run. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/'
                     type: object
+                  tolerations:
+                    description: 'Tolerations is a list of Tolerations that should
+                      be set to all the pods for this cluster. More info: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/'
+                    items:
+                      description: The pod this Toleration is attached to tolerates
+                        any taint that matches the triple <key,value,effect> using
+                        the matching operator <operator>.
+                      properties:
+                        effect:
+                          description: Effect indicates the taint effect to match.
+                            Empty means match all taint effects. When specified, allowed
+                            values are NoSchedule, PreferNoSchedule and NoExecute.
+                          type: string
+                        key:
+                          description: Key is the taint key that the toleration applies
+                            to. Empty means match all taint keys. If the key is empty,
+                            operator must be Exists; this combination means to match
+                            all values and all keys.
+                          type: string
+                        operator:
+                          description: Operator represents a key's relationship to
+                            the value. Valid operators are Exists and Equal. Defaults
+                            to Equal. Exists is equivalent to wildcard for value,
+                            so that a pod can tolerate all taints of a particular
+                            category.
+                          type: string
+                        tolerationSeconds:
+                          description: TolerationSeconds represents the period of
+                            time the toleration (which must be of effect NoExecute,
+                            otherwise this field is ignored) tolerates the taint.
+                            By default, it is not set, which means tolerate the taint
+                            forever (do not evict). Zero and negative values will
+                            be treated as 0 (evict immediately) by the system.
+                          format: int64
+                          type: integer
+                        value:
+                          description: Value is the taint value the toleration matches
+                            to. If the operator is Exists, the value should be empty,
+                            otherwise just a regular string.
+                          type: string
+                      type: object
+                    type: array
                   topologyKey:
                     description: TopologyKey to use for anti-affinity configuration.
                       See k8s documentation for more info on that
@@ -885,39 +1454,27 @@ spec:
                             description: The reference to the access key id
                             properties:
                               key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
+                                description: The key to select
                                 type: string
                               name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
+                                description: Name of the referent.
                                 type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
                             required:
                             - key
+                            - name
                             type: object
                           secretAccessKey:
                             description: The reference to the secret access key
                             properties:
                               key:
-                                description: The key of the secret to select from.  Must
-                                  be a valid secret key.
+                                description: The key to select
                                 type: string
                               name:
-                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                                  TODO: Add other useful fields. apiVersion, kind,
-                                  uid?'
+                                description: Name of the referent.
                                 type: string
-                              optional:
-                                description: Specify whether the Secret or its key
-                                  must be defined
-                                type: boolean
                             required:
                             - key
+                            - name
                             type: object
                         required:
                         - accessKeyId
@@ -981,10 +1538,23 @@ spec:
                           will be created from scratch
                         properties:
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            description: Name of the referent.
                             type: string
+                        required:
+                        - name
                         type: object
+                    type: object
+                  pg_basebackup:
+                    description: Bootstrap the cluster taking a physical backup of
+                      another compatible PostgreSQL instance
+                    properties:
+                      source:
+                        description: The name of the server of which we need to take
+                          a physical backup
+                        minLength: 1
+                        type: string
+                    required:
+                    - source
                     type: object
                   recovery:
                     description: Bootstrap the cluster from a backup
@@ -993,15 +1563,16 @@ spec:
                         description: The backup we need to restore
                         properties:
                           name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                              TODO: Add other useful fields. apiVersion, kind, uid?'
+                            description: Name of the referent.
                             type: string
+                        required:
+                        - name
                         type: object
                       recoveryTarget:
-                        description: 'By default the recovery will end as soon as
-                          a consistent state is reached: in this case that means at
-                          the end of a backup. This option allows to fine tune the
-                          recovery process'
+                        description: 'By default, the recovery will end as soon as
+                          a consistent state is reached: in this case, that means
+                          at the end of a backup. This option allows to fine tune
+                          the recovery process'
                         properties:
                           exclusive:
                             description: Set the target to be exclusive (defaults
@@ -1034,25 +1605,148 @@ spec:
                     - backup
                     type: object
                 type: object
+              certificates:
+                description: The configuration for the CA and related certificates
+                properties:
+                  serverAltDNSNames:
+                    description: The list of the server alternative DNS names to be
+                      added to the generated server TLS certificates, when required.
+                    items:
+                      type: string
+                    type: array
+                  serverCASecret:
+                    description: "The secret containing the Server CA certificate.
+                      If not defined, a new secret will be created with a self-signed
+                      CA and will be used to generate the TLS certificate ServerTLSSecret.
+                      \n Contains: \n - `ca.crt`: CA that should be used to validate
+                      the server certificate,   used as `sslrootcert` in client connection
+                      strings. - `ca.key`: key used to generate Server SSL certs,
+                      if ServerTLSSecret is provided,   this can be omitted."
+                    type: string
+                  serverTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      server TLS certificate and key that will be set as `ssl_cert_file`
+                      and `ssl_key_file` so that clients can connect to postgres securely.
+                      If not defined, ServerCASecret must provide also `ca.key` and
+                      a new secret will be created using the provided CA.
+                    type: string
+                type: object
               description:
                 description: Description of this PostgreSQL cluster
                 type: string
+              externalClusters:
+                description: The list of external server which are used in the cluster
+                  configuration
+                items:
+                  description: ExternalCluster represent the connection parameters
+                    to an external server which is used in the cluster configuration
+                  properties:
+                    connectionParameters:
+                      additionalProperties:
+                        type: string
+                      description: The list of connection parameters, such as dbname,
+                        host, username, etc
+                      type: object
+                    name:
+                      description: The server name, required
+                      type: string
+                    password:
+                      description: The reference to the password to be used to connect
+                        to the server
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslCert:
+                      description: The reference to an SSL certificate to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslKey:
+                      description: The reference to an SSL private key to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                    sslRootCert:
+                      description: The reference to an SSL CA public key to be used
+                        to connect to this instance
+                      properties:
+                        key:
+                          description: The key of the secret to select from.  Must
+                            be a valid secret key.
+                          type: string
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                        optional:
+                          description: Specify whether the Secret or its key must
+                            be defined
+                          type: boolean
+                      required:
+                      - key
+                      type: object
+                  required:
+                  - name
+                  type: object
+                type: array
               imageName:
                 description: Name of the container image
-                minLength: 0
                 type: string
               imagePullSecrets:
                 description: The list of pull secrets to be used to pull the images.
-                  If the license key contains a pull secret that secret will be automatically
+                  If the license key contains a pull secret, that secret will be automatically
                   included.
                 items:
                   description: LocalObjectReference contains enough information to
-                    let you locate the referenced object inside the same namespace.
+                    let you locate a local object with a known type inside the same
+                    namespace
                   properties:
                     name:
-                      description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                        TODO: Add other useful fields. apiVersion, kind, uid?'
+                      description: Name of the referent.
                       type: string
+                  required:
+                  - name
                   type: object
                 type: array
               instances:
@@ -1085,42 +1779,35 @@ spec:
                   customQueriesConfigMap:
                     description: The list of config maps containing the custom queries
                     items:
-                      description: Selects a key from a ConfigMap.
+                      description: ConfigMapKeySelector contains enough information
+                        to let you locate key of a ConfigMap
                       properties:
                         key:
-                          description: The key to select.
+                          description: The key to select
                           type: string
                         name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          description: Name of the referent.
                           type: string
-                        optional:
-                          description: Specify whether the ConfigMap or its key must
-                            be defined
-                          type: boolean
                       required:
                       - key
+                      - name
                       type: object
                     type: array
                   customQueriesSecret:
                     description: The list of secrets containing the custom queries
                     items:
-                      description: SecretKeySelector selects a key of a Secret.
+                      description: SecretKeySelector contains enough information to
+                        let you locate key of a Secret
                       properties:
                         key:
-                          description: The key of the secret to select from.  Must
-                            be a valid secret key.
+                          description: The key to select
                           type: string
                         name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          description: Name of the referent.
                           type: string
-                        optional:
-                          description: Specify whether the Secret or its key must
-                            be defined
-                          type: boolean
                       required:
                       - key
+                      - name
                       type: object
                     type: array
                 type: object
@@ -1352,12 +2039,14 @@ spec:
                 type: object
               superuserSecret:
                 description: The secret containing the superuser password. If not
-                  defined a new secret will be created with a randomly generated password
+                  defined, a new secret will be created with a randomly generated
+                  password
                 properties:
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    description: Name of the referent.
                     type: string
+                required:
+                - name
                 type: object
             required:
             - instances
@@ -1367,6 +2056,51 @@ spec:
               may not be up to date. Populated by the system. Read-only. More info:
               https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
             properties:
+              certificates:
+                description: The configuration for the CA and related certificates,
+                  initialized with defaults.
+                properties:
+                  clientCASecret:
+                    description: "The secret containing the Client CA certificate.
+                      This secret contains a self-signed CA and is used to sign TLS
+                      certificates used for client authentication. \n Contains: \n
+                      - `ca.crt`: CA that should be used to validate the client certificate,
+                      used as `ssl_ca_file`. - `ca.key`: key used to sign client SSL
+                      certs."
+                    type: string
+                  expirations:
+                    additionalProperties:
+                      type: string
+                    description: Expiration dates for all certificates.
+                    type: object
+                  replicationTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      TLS client certificate to authenticate as `streaming_replica`
+                      user.
+                    type: string
+                  serverAltDNSNames:
+                    description: The list of the server alternative DNS names to be
+                      added to the generated server TLS certificates, when required.
+                    items:
+                      type: string
+                    type: array
+                  serverCASecret:
+                    description: "The secret containing the Server CA certificate.
+                      If not defined, a new secret will be created with a self-signed
+                      CA and will be used to generate the TLS certificate ServerTLSSecret.
+                      \n Contains: \n - `ca.crt`: CA that should be used to validate
+                      the server certificate,   used as `sslrootcert` in client connection
+                      strings. - `ca.key`: key used to generate Server SSL certs,
+                      if ServerTLSSecret is provided,   this can be omitted."
+                    type: string
+                  serverTLSSecret:
+                    description: The secret of type kubernetes.io/tls containing the
+                      server TLS certificate and key that will be set as `ssl_cert_file`
+                      and `ssl_key_file` so that clients can connect to postgres securely.
+                      If not defined, ServerCASecret must provide also `ca.key` and
+                      a new secret will be created using the provided CA.
+                    type: string
+                type: object
               currentPrimary:
                 description: Current primary instance
                 type: string
@@ -1454,11 +2188,19 @@ spec:
                     description: The resource version of the "app" user secret
                     type: string
                   caSecretVersion:
-                    description: The resource version of the "ca" secret version
+                    description: Unused. Retained for compatibility with old versions.
+                    type: string
+                  clientCaSecretVersion:
+                    description: The resource version of the PostgreSQL client-side
+                      CA secret version
                     type: string
                   replicationSecretVersion:
                     description: The resource version of the "streaming_replication"
                       user secret
+                    type: string
+                  serverCaSecretVersion:
+                    description: The resource version of the PostgreSQL server-side
+                      CA secret version
                     type: string
                   serverSecretVersion:
                     description: The resource version of the PostgreSQL server-side
@@ -1469,8 +2211,9 @@ spec:
                     type: string
                 required:
                 - applicationSecretVersion
-                - caSecretVersion
+                - clientCaSecretVersion
                 - replicationSecretVersion
+                - serverCaSecretVersion
                 - serverSecretVersion
                 - superuserSecretVersion
                 type: object
@@ -1489,6 +2232,178 @@ spec:
       scale:
         specReplicasPath: .spec.instances
         statusReplicasPath: .status.instances
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: scheduledbackups.postgresql.k8s.enterprisedb.io
+spec:
+  conversion:
+    strategy: None
+  group: postgresql.k8s.enterprisedb.io
+  names:
+    kind: ScheduledBackup
+    listKind: ScheduledBackupList
+    plural: scheduledbackups
+    singular: scheduledbackup
+  preserveUnknownFields: false
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .spec.cluster.name
+      name: Cluster
+      type: string
+    - jsonPath: .status.lastScheduleTime
+      name: Last Backup
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: ScheduledBackup is the Schema for the scheduledbackups API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'Specification of the desired behavior of the ScheduledBackup.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              cluster:
+                description: The cluster to backup
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+              schedule:
+                description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                type: string
+              suspend:
+                description: If this backup is suspended of not
+                type: boolean
+            required:
+            - schedule
+            type: object
+          status:
+            description: 'Most recently observed status of the ScheduledBackup. This
+              data may not be up to date. Populated by the system. Read-only. More
+              info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              lastCheckTime:
+                description: The latest time the schedule
+                format: date-time
+                type: string
+              lastScheduleTime:
+                description: Information when was the last time that backup was successfully
+                  scheduled.
+                format: date-time
+                type: string
+              nextScheduleTime:
+                description: Next time we will run a backup
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .spec.cluster.name
+      name: Cluster
+      type: string
+    - jsonPath: .status.lastScheduleTime
+      name: Last Backup
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ScheduledBackup is the Schema for the scheduledbackups API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: 'Specification of the desired behavior of the ScheduledBackup.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              cluster:
+                description: The cluster to backup
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+              schedule:
+                description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                type: string
+              suspend:
+                description: If this backup is suspended of not
+                type: boolean
+            required:
+            - schedule
+            type: object
+          status:
+            description: 'Most recently observed status of the ScheduledBackup. This
+              data may not be up to date. Populated by the system. Read-only. More
+              info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
+            properties:
+              lastCheckTime:
+                description: The latest time the schedule
+                format: date-time
+                type: string
+              lastScheduleTime:
+                description: Information when was the last time that backup was successfully
+                  scheduled.
+                format: date-time
+                type: string
+              nextScheduleTime:
+                description: Next time we will run a backup
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: false
+    subresources:
       status: {}
 status:
   acceptedNames:
