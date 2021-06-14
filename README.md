@@ -6,7 +6,17 @@ designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
 environments.
 
-## Deployment
+## TL;DR
+
+```console
+helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
+helm upgrade --install cnp \
+  --namespace postgresql-operator-system \
+  --create-namespace \
+  cnp/cloud-native-postgresql
+```
+
+## Deployment using local chart
 
 To deploy the operator from sources you can run the following command:
 
@@ -14,7 +24,7 @@ To deploy the operator from sources you can run the following command:
 helm upgrade --install cnp \
   --namespace postgresql-operator-system \
   --create-namespace \
-  cloud-native-postgresql
+  charts/cloud-native-postgresql
 ```
 
 ## Copyright
