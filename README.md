@@ -6,7 +6,7 @@ designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
 environments.
 
-## TL;DR
+## Deployment using the latest release
 
 ```console
 helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
