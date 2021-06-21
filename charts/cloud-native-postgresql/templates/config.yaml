@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 {{- if .Values.config.create }}
+{{- if not .Values.config.secret }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -24,5 +25,20 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
+  {{- toYaml .Values.config.data | nindent 2 }}
+{{- end }}
+{{- else -}}
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: {{ .Values.config.name }}
+  labels:
+    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+stringData:
   {{- toYaml .Values.config.data | nindent 2 }}
 {{- end }}

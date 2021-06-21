@@ -1,6 +1,16 @@
 # Cloud Native PostgreSQL release procedure
 
-**Steps:**
+## Required tools:
+
+- [helm-schemagen](https://github.com/karuppiah7890/helm-schema-gen): to generate the JSON schema for the chart's values
+- [helm-docs](https://github.com/norwoodj/helm-docs): to generate the chart's README.md
+
+## Release Checklist:
+
+- [] Update the documentation: `make docs`
+- [] Update the schema: `make schema`
+
+## Steps:
 
 The following steps assume version 0.2.0 as the one to be released. Alter the
 instructions accordingly.
