@@ -48,6 +48,7 @@ spec:
         - --enable-leader-election
         {{- with .Values.config.name }}
         - --config-map-name={{ . }}
+        - --secret-name={{ . }}
         {{- end }}
         {{-  range .Values.additionaArgs }}
         - {{ . }}
