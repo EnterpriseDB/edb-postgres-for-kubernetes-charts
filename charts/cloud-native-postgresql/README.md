@@ -1,6 +1,6 @@
 # cloud-native-postgresql
 
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.1](https://img.shields.io/badge/AppVersion-1.5.1-informational?style=flat-square)
+![Version: 0.3.2](https://img.shields.io/badge/Version-0.3.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.1](https://img.shields.io/badge/AppVersion-1.5.1-informational?style=flat-square)
 
 Cloud Native Postgresql Helm Chart
 
@@ -23,10 +23,10 @@ Cloud Native Postgresql Helm Chart
 | additionalArgs | list | `[]` | Additinal arguments to be added to the operator's args list |
 | affinity | object | `{}` | Affinity for the operator to be installed |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
-| config.create | bool | `true` | Specifies whether the specified secret should be created |
+| config.create | bool | `true` | Specifies whether the secret should be created |
 | config.data | object | `{}` |  |
 | config.name | string | `"postgresql-operator-controller-manager-config"` |  |
-| config.secret | bool | `false` | Specifies whether it should be stored in a secret instead of a configmap |
+| config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"quay.io/enterprisedb/cloud-native-postgresql"` |  |
@@ -42,7 +42,7 @@ Cloud Native Postgresql Helm Chart
 | service.name | string | `"postgresql-operator-webhook-service"` | DO NOT CHANGE THE SERVICE NAME as it is currently used to generate the certificate and can not be configured |
 | service.port | int | `443` |  |
 | service.type | string | `"ClusterIP"` |  |
-| serviceAccount.create | bool | `true` | Specifies whether the specified service account should be created |
+| serviceAccount.create | bool | `true` | Specifies whether the service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | Tolerations for the operator to be installed |
 | webhook.mutating.create | bool | `true` |  |

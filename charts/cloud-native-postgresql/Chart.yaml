@@ -18,7 +18,7 @@ description: Cloud Native Postgresql Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 
 type: application
-version: "0.3.1"
+version: "0.3.2"
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
