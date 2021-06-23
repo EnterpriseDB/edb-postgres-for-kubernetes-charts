@@ -27,6 +27,16 @@ helm upgrade --install cnp \
   charts/cloud-native-postgresql
 ```
 
+## Upgrading CRDs
+
+Helm does not support upgrading CRDs, as explained [here](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#some-caveats-and-explanations),
+therefore in order to upgrade the operator you'll need to run the following command once 
+a new chart release is available:
+
+```console
+helm template cnp cnp/cloud-native-postgresql -s templates/crds/crds.yaml --include-crds | kubectl apply -f -
+```
+
 ## Copyright
 
 `cloud-native-postgresql-helm` is distributed under Apache License 2.0.

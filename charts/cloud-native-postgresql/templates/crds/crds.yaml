@@ -927,7 +927,7 @@ spec:
                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                       x-kubernetes-int-or-string: true
                     description: 'Limits describes the maximum amount of compute resources
-                      allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                     type: object
                   requests:
                     additionalProperties:
@@ -939,7 +939,7 @@ spec:
                     description: 'Requests describes the minimum amount of compute
                       resources required. If Requests is omitted for a container,
                       it defaults to Limits if that is explicitly specified, otherwise
-                      to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                     type: object
                 type: object
               startDelay:
@@ -1004,7 +1004,7 @@ spec:
                               pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                               x-kubernetes-int-or-string: true
                             description: 'Limits describes the maximum amount of compute
-                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                             type: object
                           requests:
                             additionalProperties:
@@ -1017,7 +1017,7 @@ spec:
                               compute resources required. If Requests is omitted for
                               a container, it defaults to Limits if that is explicitly
                               specified, otherwise to an implementation-defined value.
-                              More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                             type: object
                         type: object
                       selector:
@@ -1273,13 +1273,6 @@ spec:
                   superuserSecretVersion:
                     description: The resource version of the "postgres" user secret
                     type: string
-                required:
-                - applicationSecretVersion
-                - clientCaSecretVersion
-                - replicationSecretVersion
-                - serverCaSecretVersion
-                - serverSecretVersion
-                - superuserSecretVersion
                 type: object
               targetPrimary:
                 description: Target primary instance, this is different from the previous
@@ -1868,7 +1861,7 @@ spec:
                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                       x-kubernetes-int-or-string: true
                     description: 'Limits describes the maximum amount of compute resources
-                      allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                     type: object
                   requests:
                     additionalProperties:
@@ -1880,7 +1873,7 @@ spec:
                     description: 'Requests describes the minimum amount of compute
                       resources required. If Requests is omitted for a container,
                       it defaults to Limits if that is explicitly specified, otherwise
-                      to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                      to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                     type: object
                 type: object
               startDelay:
@@ -1945,7 +1938,7 @@ spec:
                               pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                               x-kubernetes-int-or-string: true
                             description: 'Limits describes the maximum amount of compute
-                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                             type: object
                           requests:
                             additionalProperties:
@@ -1958,7 +1951,7 @@ spec:
                               compute resources required. If Requests is omitted for
                               a container, it defaults to Limits if that is explicitly
                               specified, otherwise to an implementation-defined value.
-                              More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/'
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                             type: object
                         type: object
                       selector:
@@ -2110,6 +2103,12 @@ spec:
                 items:
                   type: string
                 type: array
+              initializingPVC:
+                description: List of all the PVCs that are being initialized by this
+                  cluster
+                items:
+                  type: string
+                type: array
               instances:
                 description: Total number of instances in the cluster
                 format: int32
@@ -2209,13 +2208,6 @@ spec:
                   superuserSecretVersion:
                     description: The resource version of the "postgres" user secret
                     type: string
-                required:
-                - applicationSecretVersion
-                - clientCaSecretVersion
-                - replicationSecretVersion
-                - serverCaSecretVersion
-                - serverSecretVersion
-                - superuserSecretVersion
                 type: object
               targetPrimary:
                 description: Target primary instance, this is different from the previous
