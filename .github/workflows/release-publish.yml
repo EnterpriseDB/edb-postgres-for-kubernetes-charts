@@ -27,8 +27,8 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.REPO_GHA_PAT }}"
         run: |
-          repo=$(cut -d '/' -f 2 <<< "$GITHUB_REPOSITORY")
-          owner=$(cut -d '/' -f 1 <<< "$GITHUB_REPOSITORY")
+          repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
+          owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
           commit=$(git rev-parse HEAD)
           # upload the chart as release on github
           cr upload --owner "$owner" --repo "$repo" -c "$commit"
