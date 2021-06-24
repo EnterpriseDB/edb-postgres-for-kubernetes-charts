@@ -1,15 +1,29 @@
-{{- if .Values.webhook.mutating.create }}
+# Copyright 2021 EnterpriseDB Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if .Values.webhook.validating.create }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
-kind: MutatingWebhookConfiguration
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: postgresql-operator-mutating-webhook-configuration
-  {{- with .Values.commonAnnotations }}
+  name: postgresql-operator-validating-webhook-configuration
+  labels:
+    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
 webhooks:
 - admissionReviewVersions:
   - v1beta1
@@ -17,9 +31,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-backup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-backup
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mbackup.kb.io
+  name: vbackup.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -37,9 +51,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-cluster
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-cluster
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mcluster.kb.io
+  name: vcluster.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -57,9 +71,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mscheduledbackup.kb.io
+  name: vscheduledbackup.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -77,9 +91,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1alpha1-backup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-backup
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mbackupv1alpha1.kb.io
+  name: vbackupv1alpha1.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -97,9 +111,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1alpha1-cluster
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-cluster
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mclusterv1alpha1.kb.io
+  name: vclusterv1alpha1.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -117,9 +131,9 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1alpha1-scheduledbackup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-scheduledbackup
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mscheduledbackupv1alpha1.kb.io
+  name: vscheduledbackupv1alpha1.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -131,4 +145,4 @@ webhooks:
     resources:
     - scheduledbackups
   sideEffects: None
-  {{- end }}
+{{- end }}
