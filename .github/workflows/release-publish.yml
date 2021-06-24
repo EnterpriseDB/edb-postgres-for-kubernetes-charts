@@ -7,7 +7,10 @@ on:
 
 jobs:
   release:
-    runs-on: quay.io/helmpack/chart-releaser:v1.2.1
+    container:
+      image: quay.io/helmpack/chart-releaser:v1.2.1
+      options: --entrypoint sh
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -22,8 +25,6 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Run chart-releaser
-        with:
-          entrypoint: sh
         env:
           CR_TOKEN: "${{ secrets.REPO_GHA_PAT }}"
         run: |
@@ -33,4 +34,5 @@ jobs:
           # upload the chart as release on github
           cr upload --owner "$owner" --repo "$repo" -c "$commit"
           # update the index accordingly on branch gh-pages
+
           cr index --owner "$owner" --repo "$repo" -c "$commit" --push
