@@ -17,6 +17,6 @@ jobs:
       - name: Publish Helm charts
         uses: stefanprodan/helm-gh-pages@v1.4.1
         with:
-          helm_version: v3.4.0
+          helm_version: 3.4.0
           token: "${{ secrets.REPO_GHA_PAT }}"
 
