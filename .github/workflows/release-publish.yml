@@ -30,8 +30,9 @@ jobs:
           repo=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 2)
           owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
           commit=$(git rev-parse HEAD)
+          url="https://$owner.github.io/$repo"
           # upload the chart as release on github
-          cr upload --owner "$owner" --repo "$repo" -c "$commit"
+          cr upload --owner "$owner" --git-repo "$repo" --commit "$commit"
           # update the index accordingly on branch gh-pages
 
-          cr index --owner "$owner" --repo "$repo" -c "$commit" --push
+          cr index --owner "$owner" --git-repo "$repo" --charts-repo "$url" --push
