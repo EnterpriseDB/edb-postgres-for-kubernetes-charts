@@ -31,8 +31,13 @@ jobs:
           owner=$(echo "$GITHUB_REPOSITORY" | cut -d '/' -f 1)
           commit=$(git rev-parse HEAD)
           url="https://$owner.github.io/$repo"
+          rm -rf .cr-release-packages
+          mkdir -p .cr-release-packages
+          rm -rf .cr-index
+          mkdir -p .cr-index
+          cr package ./charts/cloud-native-postgresql --package-path .cr-release-packages
           # upload the chart as release on github
           cr upload --owner "$owner" --git-repo "$repo" --commit "$commit"
           # update the index accordingly on branch gh-pages
-
           cr index --owner "$owner" --git-repo "$repo" --charts-repo "$url" --push
+          
