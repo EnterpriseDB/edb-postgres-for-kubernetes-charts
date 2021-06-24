@@ -18,6 +18,8 @@ jobs:
           fetch-depth: 0
 
       - name: Configure Git
+        with:
+          entrypoint: sh
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
@@ -32,4 +34,5 @@ jobs:
           # upload the chart as release on github
           cr upload --owner "$owner" --repo "$repo" -c "$commit"
           # update the index accordingly on branch gh-pages
+
           cr index --owner "$owner" --repo "$repo" -c "$commit" --push
