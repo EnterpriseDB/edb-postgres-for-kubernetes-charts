@@ -1,17 +1,3 @@
-# Copyright 2021 EnterpriseDB Corporation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -394,6 +380,15 @@ spec:
                     description: 'NodeSelector is map of key-value pairs used to define
                       the nodes on which the pods can run. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/'
                     type: object
+                  podAntiAffinityType:
+                    description: 'PodAntiAffinityType allows the user to decide whether
+                      pod anti-affinity between cluster instance has to be considered
+                      a strong requirement during scheduling or not. Allowed values
+                      are: "preferred" (default if empty) or "required". Setting it
+                      to "required", could lead to instances remaining pending until
+                      new kubernetes nodes are added if all the existing nodes don''t
+                      match the required pod anti-affinity rule. More info: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity'
+                    type: string
                   tolerations:
                     description: 'Tolerations is a list of Tolerations that should
                       be set for all the pods, in order to allow them to run on tainted
@@ -896,6 +891,13 @@ spec:
               postgresql:
                 description: Configuration of the PostgreSQL server
                 properties:
+                  epas:
+                    description: EDB Postgres Advanced Server specific configurations
+                    properties:
+                      audit:
+                        description: If true enables edb_audit logging
+                        type: boolean
+                    type: object
                   parameters:
                     additionalProperties:
                       type: string
@@ -907,6 +909,17 @@ spec:
                     items:
                       type: string
                     type: array
+                  promotionTimeout:
+                    description: Specifies the maximum number of seconds to wait when
+                      promoting an instance to primary
+                    format: int32
+                    type: integer
+                  shared_preload_libraries:
+                    description: Lists of shared preload libraries to add to the default
+                      ones
+                    items:
+                      type: string
+                    type: array
                 type: object
               primaryUpdateStrategy:
                 description: 'Strategy to follow to upgrade the primary server during
@@ -914,6 +927,22 @@ spec:
                   updated: it can be automated (`unsupervised` - default) or manual
                   (`supervised`)'
                 type: string
+              replica:
+                description: Replica cluster configuration
+                properties:
+                  enabled:
+                    description: If replica mode is enabled, this cluster will be
+                      a replica of an existing cluster. A cluster of such type can
+                      be created only using bootstrap via pg_basebackup
+                    type: boolean
+                  source:
+                    description: The name of the external server which is the replication
+                      origin
+                    minLength: 1
+                    type: string
+                required:
+                - source
+                type: object
               resources:
                 description: Resources requirements of every generated Pod. Please
                   refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -1168,6 +1197,11 @@ spec:
                 items:
                   type: string
                 type: array
+              healthyPVC:
+                description: List of all the PVCs not dangling nor initializing
+                items:
+                  type: string
+                type: array
               initializingPVC:
                 description: List of all the PVCs that are being initialized by this
                   cluster
@@ -1345,6 +1379,15 @@ spec:
                     description: 'NodeSelector is map of key-value pairs used to define
                       the nodes on which the pods can run. More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/'
                     type: object
+                  podAntiAffinityType:
+                    description: 'PodAntiAffinityType allows the user to decide whether
+                      pod anti-affinity between cluster instance has to be considered
+                      a strong requirement during scheduling or not. Allowed values
+                      are: "preferred" (default if empty) or "required". Setting it
+                      to "required", could lead to instances remaining pending until
+                      new kubernetes nodes are added if all the existing nodes don''t
+                      match the required pod anti-affinity rule. More info: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity'
+                    type: string
                   tolerations:
                     description: 'Tolerations is a list of Tolerations that should
                       be set to all the pods for this cluster. More info: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/'
@@ -1830,6 +1873,13 @@ spec:
               postgresql:
                 description: Configuration of the PostgreSQL server
                 properties:
+                  epas:
+                    description: EDB Postgres Advanced Server specific configurations
+                    properties:
+                      audit:
+                        description: If true enables edb_audit logging
+                        type: boolean
+                    type: object
                   parameters:
                     additionalProperties:
                       type: string
@@ -1841,6 +1891,17 @@ spec:
                     items:
                       type: string
                     type: array
+                  promotionTimeout:
+                    description: Specifies the maximum number of seconds to wait when
+                      promoting an instance to primary
+                    format: int32
+                    type: integer
+                  shared_preload_libraries:
+                    description: Lists of shared preload libraries to add to the default
+                      ones
+                    items:
+                      type: string
+                    type: array
                 type: object
               primaryUpdateStrategy:
                 description: 'Strategy to follow to upgrade the primary server during
@@ -1848,6 +1909,22 @@ spec:
                   updated: it can be automated (`unsupervised` - default) or manual
                   (`supervised`)'
                 type: string
+              replica:
+                description: Replica cluster configuration
+                properties:
+                  enabled:
+                    description: If replica mode is enabled, this cluster will be
+                      a replica of an existing cluster. A cluster of such type can
+                      be created only using bootstrap via pg_basebackup
+                    type: boolean
+                  source:
+                    description: The name of the external server which is the replication
+                      origin
+                    minLength: 1
+                    type: string
+                required:
+                - source
+                type: object
               resources:
                 description: Resources requirements of every generated Pod. Please
                   refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
@@ -2100,6 +2177,11 @@ spec:
               danglingPVC:
                 description: List of all the PVCs created by this cluster and still
                   available which are not attached to a Pod
+                items:
+                  type: string
+                type: array
+              healthyPVC:
+                description: List of all the PVCs not dangling nor initializing
                 items:
                   type: string
                 type: array
