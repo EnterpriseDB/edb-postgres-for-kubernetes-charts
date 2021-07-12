@@ -2,6 +2,9 @@ name: linter
 
 on:
   push:
+    branches:
+      - '**'
+      - '!gh-pages'
 
 jobs:
   linter:
