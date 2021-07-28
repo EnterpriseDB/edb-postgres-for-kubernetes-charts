@@ -47,3 +47,4 @@ operator is distributed under the
 [EnterpriseDB Limited Use License](https://www.enterprisedb.com/limited-use-license).
 
 Copyright (C) 2021 EnterpriseDB Corporation.
+
