@@ -1210,6 +1210,13 @@ spec:
                           to be used by applications. Defaults to the value of the
                           `database` key.
                         type: string
+                      postInitSQL:
+                        description: List of SQL queries to be executed as a superuser
+                          immediately after the cluster has been created - to be used
+                          with extreme care (by default empty)
+                        items:
+                          type: string
+                        type: array
                       redwood:
                         description: If we need to enable/disable Redwood compatibility.
                           Requires EPAS and for EPAS defaults to true
@@ -2877,6 +2884,13 @@ spec:
                           to be used by applications. Defaults to the value of the
                           `database` key.
                         type: string
+                      postInitSQL:
+                        description: List of SQL queries to be executed as a superuser
+                          immediately after the cluster has been created - to be used
+                          with extreme care (by default empty)
+                        items:
+                          type: string
+                        type: array
                       redwood:
                         description: If we need to enable/disable Redwood compatibility.
                           Requires EPAS and for EPAS defaults to true
