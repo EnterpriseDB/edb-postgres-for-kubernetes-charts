@@ -121,6 +121,9 @@
                         }
                     }
                 },
+                "port": {
+                    "type": "integer"
+                },
                 "validating": {
                     "type": "object",
                     "properties": {
