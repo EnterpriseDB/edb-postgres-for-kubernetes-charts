@@ -50,6 +50,7 @@ spec:
         - --config-map-name={{ . }}
         - --secret-name={{ . }}
         {{- end }}
+        - --webhook-port={{ .Values.webhook.port }}
         {{-  range .Values.additionaArgs }}
         - {{ . }}
         {{- end }}
@@ -67,20 +68,20 @@ spec:
         livenessProbe:
           httpGet:
             path: /readyz
-            port: 9443
+            port: {{ .Values.webhook.port }}
             scheme: HTTPS
         name: manager
         ports:
         - containerPort: 8080
           name: metrics
           protocol: TCP
-        - containerPort: 9443
+        - containerPort: {{ .Values.webhook.port }}
           name: webhook-server
           protocol: TCP
         readinessProbe:
           httpGet:
             path: /readyz
-            port: 9443
+            port: {{ .Values.webhook.port }}
             scheme: HTTPS
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
