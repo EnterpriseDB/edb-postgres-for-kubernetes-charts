@@ -2,8 +2,29 @@ apiVersion: v1
 entries:
   cloud-native-postgresql:
   - apiVersion: v2
+    appVersion: 1.9.0
+    created: "2021-09-28T16:46:02.102679721Z"
+    description: Cloud Native Postgresql Helm Chart
+    digest: 449f92faa65b0f3e4509f171a54e1bf92cc46762193b3816ebed169d7093ddf2
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    maintainers:
+    - email: philippe.scorsolini@enterprisedb.com
+      name: phisco
+    name: cloud-native-postgresql
+    sources:
+    - https://github.com/EnterpriseDB/cloud-native-postgresql-helm
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.7.0.tgz
+    version: 0.7.0
+  - apiVersion: v2
     appVersion: 1.8.0
-    created: "2021-09-14T08:45:08.371983129Z"
+    created: "2021-09-28T16:46:02.100202004Z"
     description: Cloud Native Postgresql Helm Chart
     digest: 7f161ff73acc0ea0280b15679abce5f9c6237d5049338a2622d46931f207c02f
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
@@ -24,7 +45,7 @@ entries:
     version: 0.6.0
   - apiVersion: v2
     appVersion: 1.7.1
-    created: "2021-09-14T08:45:08.369791227Z"
+    created: "2021-09-28T16:46:02.098244092Z"
     description: Cloud Native Postgresql Helm Chart
     digest: 09d020bcd573d52bc904a37eedccc18445a0b0ff4b9e0c0d0bd4344766cb5d1e
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
@@ -45,7 +66,7 @@ entries:
     version: 0.5.1
   - apiVersion: v2
     appVersion: 1.7.0
-    created: "2021-09-14T08:45:08.367201525Z"
+    created: "2021-09-28T16:46:02.096343279Z"
     description: Cloud Native Postgresql Helm Chart
     digest: dd455367339f3b7769c8b1929c1bc768ec4f3cc32df0d0b3464056057c337ec4
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
@@ -66,7 +87,7 @@ entries:
     version: 0.5.0
   - apiVersion: v2
     appVersion: 1.6.0
-    created: "2021-09-14T08:45:08.363861922Z"
+    created: "2021-09-28T16:46:02.094286866Z"
     description: Cloud Native Postgresql Helm Chart
     digest: da086244335469420a88b3a6b511c0c130baabb98ccd84e14aa4542d83c1155d
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
@@ -87,7 +108,7 @@ entries:
     version: 0.4.0
   - apiVersion: v2
     appVersion: 1.5.1
-    created: "2021-09-14T08:45:08.36197722Z"
+    created: "2021-09-28T16:46:02.092425354Z"
     description: Cloud Native Postgresql Helm Chart
     digest: 6042b85cc9ecb7a11d564f2103dbc3a6e9cb7e90db20cfabef28142e631a7ab1
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
@@ -106,4 +127,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.3.2.tgz
     version: 0.3.2
-generated: "2021-09-14T08:45:08.359697618Z"
+generated: "2021-09-28T16:46:02.088216826Z"
