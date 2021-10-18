@@ -22,7 +22,7 @@ image:
   repository: quay.io/enterprisedb/cloud-native-postgresql
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "1.9.1"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
