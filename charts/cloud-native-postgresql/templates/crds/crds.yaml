@@ -3,6 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
+    "helm.sh/resource-policy": keep
   name: backups.postgresql.k8s.enterprisedb.io
 spec:
   conversion:
@@ -425,6 +426,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
+    "helm.sh/resource-policy": keep
   name: clusters.postgresql.k8s.enterprisedb.io
 spec:
   conversion:
@@ -4464,6 +4466,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
+    "helm.sh/resource-policy": keep
   name: scheduledbackups.postgresql.k8s.enterprisedb.io
 spec:
   conversion:
