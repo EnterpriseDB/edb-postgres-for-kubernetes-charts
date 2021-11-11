@@ -36,4 +36,4 @@ jobs:
           fi
 
       - name: Run chart-testing (lint)
-        run: ct lint --target-branch=main
+        run: ct lint --target-branch=main --check-version-increment=false
