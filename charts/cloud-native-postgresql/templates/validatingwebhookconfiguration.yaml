@@ -86,63 +86,23 @@ webhooks:
     - scheduledbackups
   sideEffects: None
 - admissionReviewVersions:
-  - v1
+    - v1
   clientConfig:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-backup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-pooler
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: vbackupv1alpha1.kb.io
+  name: vpooler.kb.io
   rules:
-  - apiGroups:
-    - postgresql.k8s.enterprisedb.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - backups
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: {{ .Values.service.name }}
-      namespace: {{ .Release.Namespace }}
-      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-cluster
-  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: vclusterv1alpha1.kb.io
-  rules:
-  - apiGroups:
-    - postgresql.k8s.enterprisedb.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - clusters
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: {{ .Values.service.name }}
-      namespace: {{ .Release.Namespace }}
-      path: /validate-postgresql-k8s-enterprisedb-io-v1alpha1-scheduledbackup
-  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: vscheduledbackupv1alpha1.kb.io
-  rules:
-  - apiGroups:
-    - postgresql.k8s.enterprisedb.io
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - scheduledbackups
+    - apiGroups:
+        - postgresql.k8s.enterprisedb.io
+      apiVersions:
+        - v1
+      operations:
+        - CREATE
+        - UPDATE
+      resources:
+        - poolers
   sideEffects: None
 {{- end }}
