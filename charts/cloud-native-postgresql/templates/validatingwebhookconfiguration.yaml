@@ -32,6 +32,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-postgresql-k8s-enterprisedb-io-v1-backup
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vbackup.kb.io
   rules:
@@ -52,6 +53,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-postgresql-k8s-enterprisedb-io-v1-cluster
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vcluster.kb.io
   rules:
@@ -72,6 +74,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vscheduledbackup.kb.io
   rules:
@@ -92,6 +95,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-postgresql-k8s-enterprisedb-io-v1-pooler
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vpooler.kb.io
   rules:

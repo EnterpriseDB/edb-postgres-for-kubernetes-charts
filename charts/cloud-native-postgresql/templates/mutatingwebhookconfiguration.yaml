@@ -32,6 +32,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /mutate-postgresql-k8s-enterprisedb-io-v1-backup
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: mbackup.kb.io
   rules:
@@ -52,6 +53,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /mutate-postgresql-k8s-enterprisedb-io-v1-cluster
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: mcluster.kb.io
   rules:
@@ -72,6 +74,7 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /mutate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
+      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: mscheduledbackup.kb.io
   rules:
