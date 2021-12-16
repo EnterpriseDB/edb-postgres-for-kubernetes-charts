@@ -48,6 +48,17 @@
         "imagePullSecrets": {
             "type": "array"
         },
+        "monitoringQueriesConfigMap": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "queries": {
+                    "type": "string"
+                }
+            }
+        },
         "nameOverride": {
             "type": "string"
         },

@@ -1168,6 +1168,16 @@ spec:
                             - AES256
                             - aws:kms
                             type: string
+                          maxParallel:
+                            description: Number of WAL files to be either archived
+                              in parallel (when the PostgreSQL instance is archiving
+                              to a backup object store) or restored in parallel (when
+                              a PostgreSQL standby is fetching WAL files from a recovery
+                              object store). If not specified, WAL files will be processed
+                              one at a time. It accepts a positive integer as a value
+                              - with 1 being the minimum accepted value.
+                            minimum: 1
+                            type: integer
                         type: object
                     required:
                     - destinationPath
@@ -1220,6 +1230,13 @@ spec:
                           to be used by applications. Defaults to the value of the
                           `database` key.
                         type: string
+                      postInitApplicationSQL:
+                        description: List of SQL queries to be executed as a superuser
+                          in the application database right after is created - to
+                          be used with extreme care (by default empty)
+                        items:
+                          type: string
+                        type: array
                       postInitSQL:
                         description: List of SQL queries to be executed as a superuser
                           immediately after the cluster has been created - to be used
@@ -1589,6 +1606,17 @@ spec:
                               - AES256
                               - aws:kms
                               type: string
+                            maxParallel:
+                              description: Number of WAL files to be either archived
+                                in parallel (when the PostgreSQL instance is archiving
+                                to a backup object store) or restored in parallel
+                                (when a PostgreSQL standby is fetching WAL files from
+                                a recovery object store). If not specified, WAL files
+                                will be processed one at a time. It accepts a positive
+                                integer as a value - with 1 being the minimum accepted
+                                value.
+                              minimum: 1
+                              type: integer
                           type: object
                       required:
                       - destinationPath
@@ -1741,9 +1769,10 @@ spec:
               logLevel:
                 default: info
                 description: 'The instances'' log level, one of the following values:
-                  error, info (default), debug, trace'
+                  error, warning, info (default), debug, trace'
                 enum:
                 - error
+                - warning
                 - info
                 - debug
                 - trace
@@ -1803,8 +1832,14 @@ spec:
                       type: object
                     type: array
                   disableDefaultQueries:
+                    default: false
                     description: 'Whether the default queries should be injected.
-                      Default: false.'
+                      Set it to `true` if you don''t want to inject default queries
+                      into the cluster. Default: false.'
+                    type: boolean
+                  enablePodMonitor:
+                    default: false
+                    description: Enable or disable the `PodMonitor`
                     type: boolean
                 type: object
               nodeMaintenanceWindow:
@@ -1857,7 +1892,9 @@ spec:
                     type: array
                   promotionTimeout:
                     description: Specifies the maximum number of seconds to wait when
-                      promoting an instance to primary
+                      promoting an instance to primary. Default value is 40000000,
+                      greater than one year in seconds, big enough to simulate an
+                      infinite timeout
                     format: int32
                     type: integer
                   shared_preload_libraries:
@@ -1930,7 +1967,7 @@ spec:
               stopDelay:
                 default: 30
                 description: The time in seconds that is allowed for a PostgreSQL
-                  instance node to gracefully shutdown (default 30)
+                  instance to gracefully shutdown (default 30)
                 format: int32
                 type: integer
               storage:
@@ -2125,6 +2162,14 @@ spec:
                 required:
                 - name
                 type: object
+              switchoverDelay:
+                default: 40000000
+                description: The time in seconds that is allowed for a primary PostgreSQL
+                  instance to gracefully shutdown during a switchover. Default value
+                  is 40000000, greater than one year in seconds, big enough to simulate
+                  an infinite delay
+                format: int32
+                type: integer
             required:
             - instances
             type: object
@@ -2133,6 +2178,10 @@ spec:
               may not be up to date. Populated by the system. Read-only. More info:
               https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status'
             properties:
+              azurePVCUpdateEnabled:
+                description: AzurePVCUpdateEnabled shows if the PVC online upgrade
+                  is enabled for this cluster
+                type: boolean
               certificates:
                 description: The configuration for the CA and related certificates,
                   initialized with defaults.
@@ -2319,6 +2368,11 @@ spec:
                 description: Total number of ready instances in the cluster
                 format: int32
                 type: integer
+              resizingPVC:
+                description: List of all the PVCs that have ResizingPVC condition.
+                items:
+                  type: string
+                type: array
               secretsResourceVersion:
                 description: The list of resource versions of the secrets managed
                   by the operator. Every change here is done in the interest of the
@@ -2482,6 +2536,7 @@ spec:
                       can configure
                     type: object
                   paused:
+                    default: false
                     description: When set to `true`, PgBouncer will disconnect from
                       the PostgreSQL server, first waiting for all queries to complete,
                       and pause all new client connections until this value is set
@@ -2489,6 +2544,7 @@ spec:
                       `PAUSE` and `RESUME` commands.
                     type: boolean
                   poolMode:
+                    default: session
                     description: The pool mode
                     enum:
                     - session
@@ -9312,6 +9368,7 @@ spec:
                     type: object
                 type: object
               type:
+                default: rw
                 description: Which instances we must forward traffic to?
                 enum:
                 - rw
@@ -9326,6 +9383,10 @@ spec:
           status:
             description: PoolerStatus defines the observed state of Pooler
             properties:
+              instances:
+                description: The number of pods trying to be scheduled
+                format: int32
+                type: integer
               secrets:
                 description: The resource version of the config object
                 properties:
