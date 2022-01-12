@@ -151,6 +151,21 @@ spec:
               endWal:
                 description: The ending WAL
                 type: string
+              endpointCA:
+                description: EndpointCA store the CA bundle of the barman endpoint.
+                  Useful when using self-signed certificates to avoid errors with
+                  certificate issuer and barman-cloud-wal-archive.
+                properties:
+                  key:
+                    description: The key to select
+                    type: string
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - key
+                - name
+                type: object
               endpointURL:
                 description: Endpoint to be used to upload data to the cloud, overriding
                   the automatic endpoint discovery
@@ -1295,7 +1310,7 @@ spec:
                           endpointCA:
                             description: EndpointCA store the CA bundle of the barman
                               endpoint. Useful when using self-signed certificates
-                              to avoid errors with certificate issuer and barman-cloud-wal-archive
+                              to avoid errors with certificate issuer and barman-cloud-wal-archive.
                             properties:
                               key:
                                 description: The key to select
@@ -1736,6 +1751,19 @@ spec:
                   - name
                   type: object
                 type: array
+              inheritedMetadata:
+                description: Metadata that will be inherited by all objects related
+                  to the Cluster
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  labels:
+                    additionalProperties:
+                      type: string
+                    type: object
+                type: object
               instances:
                 default: 1
                 description: Number of instances required in the cluster
