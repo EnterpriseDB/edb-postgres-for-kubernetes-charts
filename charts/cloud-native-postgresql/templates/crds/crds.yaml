@@ -173,6 +173,29 @@ spec:
               error:
                 description: The detected error
                 type: string
+              googleCredentials:
+                description: The credentials to use to upload data to Google Cloud
+                  Storage
+                properties:
+                  applicationCredentials:
+                    description: The secret containing the Google Cloud Storage JSON
+                      file with the credentials
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  gkeEnvironment:
+                    description: If set to true, will presume that it's running inside
+                      a GKE environment, default to false.
+                    type: boolean
+                type: object
               instanceID:
                 description: Information to identify the instance where the backup
                   has been taken from
@@ -203,6 +226,10 @@ spec:
                     - key
                     - name
                     type: object
+                  inheritFromIAMRole:
+                    description: Use the role based authentication without providing
+                      explicitly the keys.
+                    type: boolean
                   secretAccessKey:
                     description: The reference to the secret access key
                     properties:
@@ -216,9 +243,6 @@ spec:
                     - key
                     - name
                     type: object
-                required:
-                - accessKeyId
-                - secretAccessKey
                 type: object
               serverName:
                 description: The server name on S3, the cluster name is used if this
@@ -1001,7 +1025,7 @@ spec:
                     description: The configuration for the barman-cloud tool suite
                     properties:
                       azureCredentials:
-                        description: The credentials to use to upload data in Azure
+                        description: The credentials to use to upload data to Azure
                           Blob Storage
                         properties:
                           connectionString:
@@ -1124,6 +1148,29 @@ spec:
                         description: Endpoint to be used to upload data to the cloud,
                           overriding the automatic endpoint discovery
                         type: string
+                      googleCredentials:
+                        description: The credentials to use to upload data to Google
+                          Cloud Storage
+                        properties:
+                          applicationCredentials:
+                            description: The secret containing the Google Cloud Storage
+                              JSON file with the credentials
+                            properties:
+                              key:
+                                description: The key to select
+                                type: string
+                              name:
+                                description: Name of the referent.
+                                type: string
+                            required:
+                            - key
+                            - name
+                            type: object
+                          gkeEnvironment:
+                            description: If set to true, will presume that it's running
+                              inside a GKE environment, default to false.
+                            type: boolean
+                        type: object
                       historyTags:
                         additionalProperties:
                           type: string
@@ -1146,6 +1193,10 @@ spec:
                             - key
                             - name
                             type: object
+                          inheritFromIAMRole:
+                            description: Use the role based authentication without
+                              providing explicitly the keys.
+                            type: boolean
                           secretAccessKey:
                             description: The reference to the secret access key
                             properties:
@@ -1159,9 +1210,6 @@ spec:
                             - key
                             - name
                             type: object
-                        required:
-                        - accessKeyId
-                        - secretAccessKey
                         type: object
                       serverName:
                         description: The server name on S3, the cluster name is used
@@ -1454,7 +1502,7 @@ spec:
                       description: The configuration for the barman-cloud tool suite
                       properties:
                         azureCredentials:
-                          description: The credentials to use to upload data in Azure
+                          description: The credentials to use to upload data to Azure
                             Blob Storage
                           properties:
                             connectionString:
@@ -1577,6 +1625,29 @@ spec:
                           description: Endpoint to be used to upload data to the cloud,
                             overriding the automatic endpoint discovery
                           type: string
+                        googleCredentials:
+                          description: The credentials to use to upload data to Google
+                            Cloud Storage
+                          properties:
+                            applicationCredentials:
+                              description: The secret containing the Google Cloud
+                                Storage JSON file with the credentials
+                              properties:
+                                key:
+                                  description: The key to select
+                                  type: string
+                                name:
+                                  description: Name of the referent.
+                                  type: string
+                              required:
+                              - key
+                              - name
+                              type: object
+                            gkeEnvironment:
+                              description: If set to true, will presume that it's
+                                running inside a GKE environment, default to false.
+                              type: boolean
+                          type: object
                         historyTags:
                           additionalProperties:
                             type: string
@@ -1599,6 +1670,10 @@ spec:
                               - key
                               - name
                               type: object
+                            inheritFromIAMRole:
+                              description: Use the role based authentication without
+                                providing explicitly the keys.
+                              type: boolean
                             secretAccessKey:
                               description: The reference to the secret access key
                               properties:
@@ -1612,9 +1687,6 @@ spec:
                               - key
                               - name
                               type: object
-                          required:
-                          - accessKeyId
-                          - secretAccessKey
                           type: object
                         serverName:
                           description: The server name on S3, the cluster name is
@@ -1759,7 +1831,6 @@ spec:
                   and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`)
                 type: string
               imagePullPolicy:
-                default: IfNotPresent
                 description: 'Image pull policy. One of `Always`, `Never` or `IfNotPresent`.
                   If not defined, it defaults to `IfNotPresent`. Cannot be updated.
                   More info: https://kubernetes.io/docs/concepts/containers/images#updating-images'
