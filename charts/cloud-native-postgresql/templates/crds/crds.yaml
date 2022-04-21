@@ -243,6 +243,19 @@ spec:
                     - key
                     - name
                     type: object
+                  sessionToken:
+                    description: The references to the session key
+                    properties:
+                      key:
+                        description: The key to select
+                        type: string
+                      name:
+                        description: Name of the referent.
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
                 type: object
               serverName:
                 description: The server name on S3, the cluster name is used if this
@@ -1210,6 +1223,19 @@ spec:
                             - key
                             - name
                             type: object
+                          sessionToken:
+                            description: The references to the session key
+                            properties:
+                              key:
+                                description: The key to select
+                                type: string
+                              name:
+                                description: Name of the referent.
+                                type: string
+                            required:
+                            - key
+                            - name
+                            type: object
                         type: object
                       serverName:
                         description: The server name on S3, the cluster name is used
@@ -1416,8 +1442,8 @@ spec:
                               with `pg_create_restore_point`)
                             type: string
                           targetTLI:
-                            description: The target timeline ("latest", "current"
-                              or a positive integer)
+                            description: The target timeline ("latest" or a positive
+                              integer)
                             type: string
                           targetTime:
                             description: The target time, in any unambiguous representation
@@ -1676,6 +1702,19 @@ spec:
                               type: boolean
                             secretAccessKey:
                               description: The reference to the secret access key
+                              properties:
+                                key:
+                                  description: The key to select
+                                  type: string
+                                name:
+                                  description: Name of the referent.
+                                  type: string
+                              required:
+                              - key
+                              - name
+                              type: object
+                            sessionToken:
+                              description: The references to the session key
                               properties:
                                 key:
                                   description: The key to select
@@ -2008,6 +2047,73 @@ spec:
                         description: If true enables edb_audit logging
                         type: boolean
                     type: object
+                  ldap:
+                    description: Options to specify LDAP configuration
+                    properties:
+                      bindAsAuth:
+                        description: Bind as authentication configuration
+                        properties:
+                          prefix:
+                            description: Prefix for the bind authentication option
+                            type: string
+                          suffix:
+                            description: Suffix for the bind authentication option
+                            type: string
+                        type: object
+                      bindSearchAuth:
+                        description: Bind+Search authentication configuration
+                        properties:
+                          baseDN:
+                            description: Root DN to begin the user search
+                            type: string
+                          bindDN:
+                            description: DN of the user to bind to the directory
+                            type: string
+                          bindPassword:
+                            description: Secret with the password for the user to
+                              bind to the directory
+                            properties:
+                              key:
+                                description: The key of the secret to select from.  Must
+                                  be a valid secret key.
+                                type: string
+                              name:
+                                description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                  TODO: Add other useful fields. apiVersion, kind,
+                                  uid?'
+                                type: string
+                              optional:
+                                description: Specify whether the Secret or its key
+                                  must be defined
+                                type: boolean
+                            required:
+                            - key
+                            type: object
+                          searchAttribute:
+                            description: Attribute to match against the username
+                            type: string
+                          searchFilter:
+                            description: Search filter to use when doing the search+bind
+                              authentication
+                            type: string
+                        type: object
+                      port:
+                        description: LDAP server port
+                        type: integer
+                      scheme:
+                        description: LDAP schema to be used, possible options are
+                          `ldap` and `ldaps`
+                        enum:
+                        - ldap
+                        - ldaps
+                        type: string
+                      server:
+                        description: LDAP hostname or IP address
+                        type: string
+                      tls:
+                        description: Set to 1 to enable LDAP over TLS
+                        type: boolean
+                    type: object
                   parameters:
                     additionalProperties:
                       type: string
@@ -2033,6 +2139,16 @@ spec:
                       type: string
                     type: array
                 type: object
+              primaryUpdateMethod:
+                default: switchover
+                description: 'Method to follow to upgrade the primary server during
+                  a rolling update procedure, after all replicas have been successfully
+                  updated: it can be with a switchover (`switchover` - default) or
+                  in-place (`restart`)'
+                enum:
+                - switchover
+                - restart
+                type: string
               primaryUpdateStrategy:
                 default: unsupervised
                 description: 'Strategy to follow to upgrade the primary server during
@@ -2048,8 +2164,10 @@ spec:
                 properties:
                   enabled:
                     description: If replica mode is enabled, this cluster will be
-                      a replica of an existing cluster. A cluster of such type can
-                      be created only using bootstrap via pg_basebackup
+                      a replica of an existing cluster. Replica cluster can be created
+                      from a recovery object store or via streaming through pg_basebackup.
+                      Refer to the Replication page of the documentation for more
+                      information.
                     type: boolean
                   source:
                     description: The name of the external cluster which is the replication
@@ -9915,7 +10033,8 @@ spec:
                   creation or not
                 type: boolean
               schedule:
-                description: The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                description: The schedule follows the same format used in Kubernetes
+                  CronJobs, see https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format
                 type: string
               suspend:
                 description: If this backup is suspended or not
