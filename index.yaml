@@ -2,6 +2,27 @@ apiVersion: v1
 entries:
   cloud-native-postgresql:
   - apiVersion: v2
+    appVersion: 1.15.0
+    created: "2022-04-21T15:40:28.411089003Z"
+    description: Cloud Native Postgresql Helm Chart
+    digest: 8f6c82740ad281a4794c3076928a62fa06ecb50cbb74a9fc06a9e145299c0235
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    maintainers:
+    - email: p.scorsolini@gmail.com
+      name: phisco
+    name: cloud-native-postgresql
+    sources:
+    - https://github.com/EnterpriseDB/cloud-native-postgresql-helm
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.13.0.tgz
+    version: 0.13.0
+  - apiVersion: v2
     appVersion: 1.14.0
     created: "2022-03-25T23:47:28.292907653Z"
     description: Cloud Native Postgresql Helm Chart
@@ -274,4 +295,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.3.2.tgz
     version: 0.3.2
-generated: "2022-03-25T23:47:28.286487648Z"
+generated: "2022-04-21T15:40:28.405103645Z"
