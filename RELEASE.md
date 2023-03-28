@@ -1,4 +1,4 @@
-# Cloud Native PostgreSQL release procedure
+# EDB Postgres for Kubernetes Operator release procedure
 
 ## Required tools:
 

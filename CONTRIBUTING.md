@@ -1,4 +1,4 @@
-# Contributing to Cloud Native PostgreSQL Helm Charts
+# Contributing to EDB Postgres for Kubernetes Operator Helm Charts
 
 Please read the [code of conduct](CODE-OF-CONDUCT.md) first.
 

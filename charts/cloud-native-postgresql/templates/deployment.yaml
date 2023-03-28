@@ -44,13 +44,13 @@ spec:
       containers:
       - args:
         - controller
-        - --enable-leader-election
+        - --leader-elect
         {{- with .Values.config.name }}
         - --config-map-name={{ . }}
         - --secret-name={{ . }}
         {{- end }}
         - --webhook-port={{ .Values.webhook.port }}
-        {{-  range .Values.additionaArgs }}
+        {{- range .Values.additionalArgs }}
         - {{ . }}
         {{- end }}
         command:
@@ -71,6 +71,9 @@ spec:
             path: /readyz
             port: {{ .Values.webhook.port }}
             scheme: HTTPS
+          {{- if .Values.webhook.livenessProbe.initialDelaySeconds }}
+          initialDelaySeconds: {{ .Values.webhook.livenessProbe.initialDelaySeconds }}
+          {{- end }}
         name: manager
         ports:
         - containerPort: 8080
@@ -84,14 +87,21 @@ spec:
             path: /readyz
             port: {{ .Values.webhook.port }}
             scheme: HTTPS
+          {{- if .Values.webhook.readinessProbe.initialDelaySeconds }}
+          initialDelaySeconds: {{ .Values.webhook.readinessProbe.initialDelaySeconds }}
+          {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          {{- toYaml .Values.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /controller
           name: scratch-data
+        - mountPath: /run/secrets/k8s.enterprisedb.io/webhook
+          name: webhook-certificates
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "cloud-native-postgresql.serviceAccountName" . }}
@@ -111,4 +121,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: scratch-data
+      - name: webhook-certificates
+        secret:
+          defaultMode: 420
+          optional: true
+          secretName: postgresql-operator-webhook-cert
 

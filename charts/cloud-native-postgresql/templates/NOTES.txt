@@ -1,5 +1,5 @@
 
-Cloud Native Postgresql operator should be installed in namespace "{{ .Release.Namespace }}".
+EDB Postgres for Kubernetes Operator should be installed in namespace "{{ .Release.Namespace }}".
 You can now create a PostgreSQL cluster with 3 nodes in the current namespace as follows:
 
 cat <<EOF | kubectl apply -f -

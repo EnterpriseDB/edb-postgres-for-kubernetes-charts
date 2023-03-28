@@ -1,7 +1,7 @@
-# Cloud Native PostgreSQL Helm Chart
+# EDB Postgres for Kubernetes Operator Helm Chart
 
 Helm chart to install the
-[Cloud Native PostgreSQL operator](https://docs.enterprisedb.io/cloud-native-postgresql/),
+[EDB Postgres for Kubernetes operator](https://docs.enterprisedb.io/cloud-native-postgresql/),
 designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
 environments.
@@ -32,7 +32,7 @@ helm upgrade --install cnp \
 `edb-postgres-for-kubernetes-charts` is distributed under Apache License 2.0.
 
 **IMPORTANT:** Both the operator and the operand images are distributed
-under different license terms, in particular the Cloud Native PostgreSQL
+under different license terms, in particular the EDB Postgres for Kubernetes
 operator is distributed under the
 [EnterpriseDB Limited Use License](https://www.enterprisedb.com/limited-use-license).
 

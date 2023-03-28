@@ -1,4 +1,4 @@
-# Cloud Native PostgreSQL Helm Charts - Contributor Code of Conduct
+# EDB Postgres for Kubernetes Operator Helm Charts - Contributor Code of Conduct
 
 ## Our Pledge
 
