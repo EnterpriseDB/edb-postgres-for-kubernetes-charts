@@ -45,7 +45,7 @@ spec:
       containers:
       - args:
         - controller
-        - --enable-leader-election
+        - --leader-elect
         {{- with .Values.config.name }}
         - --config-map-name={{ . }}
         - --secret-name={{ . }}
@@ -89,10 +89,17 @@ spec:
           {{- toYaml .Values.resources | nindent 10 }}
         securityContext:
           allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
           readOnlyRootFilesystem: true
+          runAsGroup: 10001
+          runAsUser: 10001
         volumeMounts:
         - mountPath: /controller
           name: scratch-data
+        - mountPath: /run/secrets/k8s.enterprisedb.io/webhook
+          name: webhook-certificates
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "cloud-native-postgresql.serviceAccountName" . }}
@@ -112,4 +119,9 @@ spec:
       volumes:
       - emptyDir: {}
         name: scratch-data
+      - name: webhook-certificates
+        secret:
+          defaultMode: 420
+          optional: true
+          secretName: postgresql-operator-webhook-cert
 

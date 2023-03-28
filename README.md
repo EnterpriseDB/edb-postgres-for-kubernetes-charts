@@ -1,7 +1,7 @@
 # Cloud Native PostgreSQL Helm Chart
 
 Helm chart to install the
-[Cloud Native PostgreSQL operator](https://docs.enterprisedb.io/cloud-native-postgresql/),
+[EDB Postgres for Kubernetes operator](https://docs.enterprisedb.io/cloud-native-postgresql/),
 designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
 environments.
