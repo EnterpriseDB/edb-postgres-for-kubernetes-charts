@@ -22,7 +22,7 @@ instructions accordingly.
 
 To check the chart was updated correctly, run:
 ```bash
-helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
+helm repo add cnp https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
 # or "helm repo update" if already added
 helm search repo cnp
 ```

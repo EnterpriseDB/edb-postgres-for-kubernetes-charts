@@ -9,7 +9,7 @@ environments.
 ## Deployment using the latest release
 
 ```console
-helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
+helm repo add cnp https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
 helm upgrade --install cnp \
   --namespace postgresql-operator-system \
   --create-namespace \
@@ -29,7 +29,7 @@ helm upgrade --install cnp \
 
 ## Copyright
 
-`cloud-native-postgresql-helm` is distributed under Apache License 2.0.
+`edb-postgres-for-kubernetes-charts` is distributed under Apache License 2.0.
 
 **IMPORTANT:** Both the operator and the operand images are distributed
 under different license terms, in particular the Cloud Native PostgreSQL
