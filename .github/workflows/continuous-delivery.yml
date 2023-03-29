@@ -19,6 +19,8 @@ jobs:
 
       - name: Create kind cluster
         uses: helm/kind-action@v1.5.0
+        with:
+          cluster_name: chart-testing
 
       - name: Deploy using helm chart
         run: |
@@ -30,6 +32,11 @@ jobs:
 
       - name: Deploy a cluster
         run: |
+          ## load postgres image
+          image=quay.io/enterprisedb/postgresql:14.2
+          docker pull $image
+          kind load docker-image $image --name chart-testing
+          
           cat <<EOF | kubectl apply -f -
           # Example of PostgreSQL cluster
           apiVersion: postgresql.k8s.enterprisedb.io/v1
@@ -39,7 +46,7 @@ jobs:
           spec:
             instances: 3
             storage:
-             size: 1Gi
+              size: 1Gi
           EOF
 
           ITER=0
@@ -49,6 +56,13 @@ jobs:
               exit 1
             fi
             READY_INSTANCES=$(kubectl get cluster cluster-example -o jsonpath='{.status.readyInstances}')
+            if (( ((ITER % 30)) == 0)); then
+              echo "Ready instances are $READY_INSTANCES"
+              kubectl get nodes
+              kubectl get cluster
+              kubectl get po
+              kubectl get cluster cluster-example -o yaml
+            fi
             if [[ "$READY_INSTANCES" == 3 ]]; then
               echo "Cluster up and running"
               break
