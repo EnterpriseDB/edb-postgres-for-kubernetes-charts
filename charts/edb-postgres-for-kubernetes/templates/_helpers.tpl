@@ -46,7 +46,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "edb-postgres-for-kubernetes.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "edb-postgres-for-kubernetes.name" . }}
+app.kubernetes.io/name: cloud-native-postgresql
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
