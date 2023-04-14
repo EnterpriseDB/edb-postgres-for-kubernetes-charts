@@ -35,5 +35,5 @@ home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters
 maintainers:
   - name: gbartolini
     email: gabriele.bartolini@enterprisedb.com
-  - name: jaime.silvela
+  - name: jsilvela
     email: jaime.silvela@enterprisedb.com
