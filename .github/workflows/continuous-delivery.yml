@@ -22,8 +22,8 @@ jobs:
 
       - name: Deploy using helm chart
         run: |
-          helm upgrade --install cnp --namespace postgresql-operator-system \
-          --create-namespace charts/cloud-native-postgresql --wait
+          helm upgrade --install edb-pg4k --namespace postgresql-operator-system \
+          --create-namespace charts/edb-postgres-for-kubernetes --wait
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3.2

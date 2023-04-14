@@ -1,4 +1,4 @@
-# cloud-native-postgresql
+# edb-postgres-for-kubernetes
 
 ![Version: 0.17.1](https://img.shields.io/badge/Version-0.17.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.19.1](https://img.shields.io/badge/AppVersion-1.19.1-informational?style=flat-square)
 
@@ -10,7 +10,8 @@ EDB Postgres for Kubernetes Helm Chart
 
 | Name | Email | Url |
 | ---- | ------ | --- |
-| phisco | <p.scorsolini@gmail.com> |  |
+| gbartolini | <gabriele.bartolini@enterprisedb.com> |  |
+| jaime.silvela | <jaime.silvela@enterprisedb.com> |  |
 
 ## Source Code
 
@@ -20,7 +21,7 @@ EDB Postgres for Kubernetes Helm Chart
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| additionalArgs | list | `[]` | Additinal arguments to be added to the operator's args list |
+| additionalArgs | list | `[]` | Additional arguments to be added to the operator's args list |
 | affinity | object | `{}` | Affinity for the operator to be installed |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |

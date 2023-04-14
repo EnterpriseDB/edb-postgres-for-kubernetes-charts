@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Default values for cloud-native-postgresql.
+# Default values for edb-postgres-for-kubernetes.
 # This is a YAML-formatted file.
 # Please declare variables to be passed to your templates.
 
@@ -58,7 +58,7 @@ config:
   data: {}
   name: postgresql-operator-controller-manager-config
 
-# -- Additinal arguments to be added to the operator's args list
+# -- Additional arguments to be added to the operator's args list
 additionalArgs: []
 
 serviceAccount:

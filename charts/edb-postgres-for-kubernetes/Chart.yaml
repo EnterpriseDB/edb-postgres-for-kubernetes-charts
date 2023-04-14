@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: cloud-native-postgresql
+name: edb-postgres-for-kubernetes
 description: EDB Postgres for Kubernetes Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
@@ -29,7 +29,11 @@ keywords:
   - postgresql
   - postgres
   - database
+  - edb
+  - enterprisedb
 home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
 maintainers:
-  - name: phisco
-    email: p.scorsolini@gmail.com
+  - name: gbartolini
+    email: gabriele.bartolini@enterprisedb.com
+  - name: jaime.silvela
+    email: jaime.silvela@enterprisedb.com

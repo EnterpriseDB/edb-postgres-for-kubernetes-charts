@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+---
 apiVersion: v1
-kind: Pod
+kind: ConfigMap
 metadata:
-  name: "{{ include "cloud-native-postgresql.fullname" . }}-test-connection"
+  name: {{ .Values.monitoringQueriesConfigMap.name }}
   labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+    k8s.enterprisedb.io/reload: ""
+  {{- with .Values.commonAnnotations }}
   annotations:
-    "helm.sh/hook": test
-spec:
-  containers:
-    - name: wget
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      command: ['curl']
-      args: ['-ki','https://{{ .Values.service.name }}:{{ .Values.service.port }}']
-  restartPolicy: Never
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  queries: {{- toYaml .Values.monitoringQueriesConfigMap.queries | nindent 4 }}

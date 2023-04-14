@@ -16,9 +16,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "cloud-native-postgresql.fullname" . }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
   labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -27,7 +27,7 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "cloud-native-postgresql.selectorLabels" . | nindent 6 }}
+      {{- include "edb-postgres-for-kubernetes.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -35,7 +35,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "cloud-native-postgresql.selectorLabels" . | nindent 8 }}
+        {{- include "edb-postgres-for-kubernetes.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -104,7 +104,7 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      serviceAccountName: {{ include "cloud-native-postgresql.serviceAccountName" . }}
+      serviceAccountName: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
       terminationGracePeriodSeconds: 10
       {{- with .Values.nodeSelector }}
       nodeSelector:
