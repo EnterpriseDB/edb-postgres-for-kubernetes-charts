@@ -295,4 +295,30 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.3.2.tgz
     version: 0.3.2
-generated: "2022-04-21T15:40:28.405103645Z"
+  edb-postgres-for-kubernetes:
+  - apiVersion: v2
+    appVersion: 1.19.1
+    created: "2023-04-17T12:45:41.593498262Z"
+    description: EDB Postgres for Kubernetes Helm Chart
+    digest: a42e7e4dffc357add05444d7db9a1ecb835cc31e4b0ce3206583320568189a3e
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - edb
+    - enterprisedb
+    maintainers:
+    - email: gabriele.bartolini@enterprisedb.com
+      name: gbartolini
+    - email: jaime.silvela@enterprisedb.com
+      name: jsilvela
+    name: edb-postgres-for-kubernetes
+    sources:
+    - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-0.17.1.tgz
+    version: 0.17.1
+generated: "2023-04-17T12:45:41.584411014Z"
