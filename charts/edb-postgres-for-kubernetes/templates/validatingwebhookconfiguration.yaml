@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.webhook.mutating.create }}
+{{- if .Values.webhook.validating.create }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
-kind: MutatingWebhookConfiguration
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: postgresql-operator-mutating-webhook-configuration
-  {{- with .Values.commonAnnotations }}
+  name: postgresql-operator-validating-webhook-configuration
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
 webhooks:
 - admissionReviewVersions:
   - v1
@@ -31,10 +31,10 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-backup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-backup
       port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mbackup.kb.io
+  name: vbackup.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -52,10 +52,10 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-cluster
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-cluster
       port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mcluster.kb.io
+  name: vcluster.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -73,10 +73,10 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
       port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
-  name: mscheduledbackup.kb.io
+  name: vscheduledbackup.kb.io
   rules:
   - apiGroups:
     - postgresql.k8s.enterprisedb.io
@@ -87,5 +87,26 @@ webhooks:
     - UPDATE
     resources:
     - scheduledbackups
+  sideEffects: None
+- admissionReviewVersions:
+    - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-pooler
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vpooler.kb.io
+  rules:
+    - apiGroups:
+        - postgresql.k8s.enterprisedb.io
+      apiVersions:
+        - v1
+      operations:
+        - CREATE
+        - UPDATE
+      resources:
+        - poolers
   sideEffects: None
 {{- end }}

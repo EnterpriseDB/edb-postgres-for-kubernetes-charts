@@ -5,5 +5,5 @@ docs:
 
 
 schema:
-	helm schema-gen charts/cloud-native-postgresql/values.yaml > charts/cloud-native-postgresql/values.schema.json || \
+	helm schema-gen charts/edb-postgres-for-kubernetes/values.yaml > charts/edb-postgres-for-kubernetes/values.schema.json || \
 		(echo "Please, run: helm plugin install https://github.com/karuppiah7890/helm-schema-gen.git" && exit 1)

@@ -19,7 +19,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.config.name }}
   labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -34,7 +34,7 @@ type: Opaque
 metadata:
   name: {{ .Values.config.name }}
   labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

@@ -1,4 +1,4 @@
-# Cloud Native PostgreSQL release procedure
+# EDB Postgres for Kubernetes Operator release procedure
 
 ## Required tools:
 
@@ -22,8 +22,8 @@ instructions accordingly.
 
 To check the chart was updated correctly, run:
 ```bash
-helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
+helm repo add edb-pg4k https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
 # or "helm repo update" if already added
-helm search repo cnp
+helm search repo edb-pg4k
 ```
 and you should see the latest version available.

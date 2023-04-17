@@ -14,15 +14,20 @@
 #
 ---
 apiVersion: v1
-kind: ConfigMap
+kind: Service
 metadata:
-  name: {{ .Values.monitoringQueriesConfigMap.name }}
+  name: {{ .Values.service.name }}
   labels:
-    {{- include "cloud-native-postgresql.labels" . | nindent 4 }}
-    k8s.enterprisedb.io/reload: ""
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-data:
-  queries: {{- toYaml .Values.monitoringQueriesConfigMap.queries | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: webhook-server
+    name: webhook-server
+  selector:
+    {{- include "edb-postgres-for-kubernetes.selectorLabels" . | nindent 4 }}

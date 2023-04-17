@@ -1,19 +1,19 @@
-# Cloud Native PostgreSQL Helm Chart
+# EDB Postgres for Kubernetes Operator Helm Chart
 
 Helm chart to install the
-[Cloud Native PostgreSQL operator](https://docs.enterprisedb.io/cloud-native-postgresql/),
+[EDB Postgres for Kubernetes operator](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
 designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
-environments.
+environments. Derived from CloudNativePG's Helm chart.
 
 ## Deployment using the latest release
 
 ```console
-helm repo add cnp https://enterprisedb.github.io/cloud-native-postgresql-helm/
-helm upgrade --install cnp \
+helm repo add edb-pg4k https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
+helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
-  cnp/cloud-native-postgresql
+  edb-pg4k/edb-postgres-for-kubernetes
 ```
 
 ## Deployment using local chart
@@ -21,18 +21,18 @@ helm upgrade --install cnp \
 To deploy the operator from sources you can run the following command:
 
 ```console
-helm upgrade --install cnp \
+helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
-  charts/cloud-native-postgresql
+  charts/edb-postgres-for-kubernetes
 ```
 
 ## Copyright
 
-`cloud-native-postgresql-helm` is distributed under Apache License 2.0.
+`edb-postgres-for-kubernetes-charts` is distributed under Apache License 2.0.
 
 **IMPORTANT:** Both the operator and the operand images are distributed
-under different license terms, in particular the Cloud Native PostgreSQL
+under different license terms, in particular the EDB Postgres for Kubernetes
 operator is distributed under the
 [EnterpriseDB Limited Use License](https://www.enterprisedb.com/limited-use-license).
 

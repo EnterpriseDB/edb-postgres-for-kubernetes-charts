@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Default values for cloud-native-postgresql.
+# Default values for edb-postgres-for-kubernetes.
 # This is a YAML-formatted file.
 # Please declare variables to be passed to your templates.
 
@@ -28,6 +28,9 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+crds:
+  create: true
+
 webhook:
   port: 9443
   mutating:
@@ -36,6 +39,10 @@ webhook:
   validating:
     create: true
     failurePolicy: Fail
+  livenessProbe:
+    initialDelaySeconds: 3
+  readinessProbe:
+    initialDelaySeconds: 3
 
 # Operator configuration
 config:
@@ -51,7 +58,7 @@ config:
   data: {}
   name: postgresql-operator-controller-manager-config
 
-# -- Additinal arguments to be added to the operator's args list
+# -- Additional arguments to be added to the operator's args list
 additionalArgs: []
 
 serviceAccount:
@@ -70,10 +77,25 @@ podAnnotations: {}
 # -- Annotations to be added to all other resources
 commonAnnotations: {}
 
+# -- Container Security Context
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  capabilities:
+    drop:
+      - "ALL"
+
 # -- Security Context for the whole pod
 podSecurityContext:
-  runAsUser: 1001
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
   # fsGroup: 2000
+
+# -- Priority indicates the importance of a Pod relative to other Pods.
+priorityClassName: ""
 
 service:
   type: ClusterIP
@@ -101,6 +123,13 @@ tolerations: []
 
 # -- Affinity for the operator to be installed
 affinity: {}
+
+# -- Test related configurations
+test:
+  image:
+    repository: busybox
+    pullPolicy: IfNotPresent
+    tag: "latest"
 
 # Default monitoring queries
 monitoringQueriesConfigMap:
@@ -229,6 +258,32 @@ monitoringQueriesConfigMap:
         - streaming_replicas:
             usage: "GAUGE"
             description: "Number of streaming replicas connected to the instance"
+
+    pg_replication_slots:
+      query: |
+        SELECT slot_name,
+          slot_type,
+          database,
+          active,
+          pg_catalog.pg_wal_lsn_diff(pg_catalog.pg_current_wal_lsn(), restart_lsn)
+        FROM pg_catalog.pg_replication_slots
+        WHERE NOT temporary
+      metrics:
+        - slot_name:
+            usage: "LABEL"
+            description: "Name of the replication slot"
+        - slot_type:
+            usage: "LABEL"
+            description: "Type of the replication slot"
+        - database:
+            usage: "LABEL"
+            description: "Name of the database"
+        - active:
+            usage: "GAUGE"
+            description: "Flag indicating whether the slot is active"
+        - pg_wal_lsn_diff:
+            usage: "GAUGE"
+            description: "Replication lag in bytes"
 
     pg_stat_archiver:
       query: |
@@ -386,6 +441,7 @@ monitoringQueriesConfigMap:
             description: "Time spent writing data file blocks by backends in this database, in milliseconds"
 
     pg_stat_replication:
+      primary: true
       query: |
        SELECT usename
          , COALESCE(application_name, '') AS application_name
