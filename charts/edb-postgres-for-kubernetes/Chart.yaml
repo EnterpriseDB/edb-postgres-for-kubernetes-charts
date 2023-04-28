@@ -17,7 +17,7 @@ name: edb-postgres-for-kubernetes
 description: EDB Postgres for Kubernetes Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
-version: "0.18.0"
+version: "0.18.1"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning, they should reflect the version the application is using.
