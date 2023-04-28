@@ -12,6 +12,7 @@ EDB Postgres for Kubernetes Helm Chart
 | ---- | ------ | --- |
 | gbartolini | <gabriele.bartolini@enterprisedb.com> |  |
 | jsilvela | <jaime.silvela@enterprisedb.com> |  |
+| litaocdl | <tao.li@enterprisedb.com> | |
 
 ## Source Code
 
