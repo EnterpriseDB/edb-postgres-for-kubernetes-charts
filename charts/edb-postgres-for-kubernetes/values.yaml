@@ -23,6 +23,14 @@ image:
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  # Credentials configuration
+  imageCredentials:
+    # -- Specifies if an imagePullSecret should be created
+    create: false
+    name: postgresql-operator-pull-secret
+    registry: docker.enterprisedb.com
+    username: ""
+    password: ""
 
 imagePullSecrets: []
 nameOverride: ""

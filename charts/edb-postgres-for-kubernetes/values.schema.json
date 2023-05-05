@@ -70,6 +70,26 @@
         "image": {
             "type": "object",
             "properties": {
+                "imageCredentials": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        },
+                        "registry": {
+                            "type": "string"
+                        },
+                        "username": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "pullPolicy": {
                     "type": "string"
                 },
