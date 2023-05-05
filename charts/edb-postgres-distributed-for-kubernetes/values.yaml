@@ -1,0 +1,169 @@
+# Copyright 2021 EnterpriseDB Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Default values for edb-postgres-distributed-for-kubernetes.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd
+  # -- Additional Registries
+  # repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd
+  # repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  # Credentials configuration
+  imageCredentials:
+    # -- Specifies if an imagePullSecret should be created
+    create: true
+    name: pgd-operator-pull-secret
+    registry: docker.enterprisedb.com
+    username: ""
+    password: ""
+
+imagePullSecrets:
+  - name: pgd-operator-pull-secret
+nameOverride: ""
+fullnameOverride: ""
+
+crds:
+  create: true
+
+webhook:
+  port: 9443
+  mutating:
+    create: true
+    failurePolicy: Fail
+  validating:
+    create: true
+    failurePolicy: Fail
+  livenessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  readinessProbe:
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+# Manager configuration
+managerConfig:
+  name: pgd-operator-manager-config
+  data:
+    health:
+      healthProbeBindAddress: ":9443"
+    metrics:
+      bindAddress: "127.0.0.1:8080"
+    leaderElection:
+      enabled: true
+      resourceName: "e72f3162.k8s.enterprisedb.io"
+
+
+# Operator configuration
+config:
+  # -- Specifies whether the secret should be created
+  create: true
+  # -- Specifies whether it should be stored in a secret, instead of a configmap
+  secret: false
+  # Examples:
+  # PULL_SECRET_NAME: pgd-operator-pull-secret
+
+  data:
+    PULL_SECRET_NAME: pgd-operator-pull-secret
+  name: pgd-operator-controller-manager-config
+
+# -- Additional arguments to be added to the operator's args list
+additionalArgs: []
+
+serviceAccount:
+  # -- Specifies whether the service account should be created
+  create: true
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+rbac:
+  # -- Specifies whether ClusterRole, ClusterRoleBinding, RoleBinding and Role should be created
+  create: true
+
+# -- Annotations to be added to the pod
+podAnnotations: {}
+# -- Annotations to be added to all other resources
+commonAnnotations: {}
+
+# -- Container Security Context
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  capabilities:
+    drop:
+      - "ALL"
+
+# -- Security Context for the whole pod
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  # fsGroup: 2000
+
+# -- Priority indicates the importance of a Pod relative to other Pods.
+priorityClassName: ""
+
+service:
+  type: ClusterIP
+  # -- DO NOT CHANGE THE SERVICE NAME as it is currently used to generate the certificate
+  # and can not be configured
+  name: pgd-operator-webhook-service
+  port: 443
+
+resources: {}
+  # If you want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  #
+  # limits:
+  #   cpu: 500m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 10m
+  #   memory: 64Mi
+
+# -- Nodeselector for the operator to be installed
+nodeSelector: {}
+
+# -- Tolerations for the operator to be installed
+tolerations: []
+
+# -- Affinity for the operator to be installed
+affinity: {}
+
+# cert-manager
+cert-manager:
+  installCRDs: true
+
+# edb-postgres-for-kubernetes
+edb-postgres-for-kubernetes:
+  image:
+    repository: docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes
+    imageCredentials:
+      create: true
+      username: ""
+      password: ""
+  imagePullSecrets:
+    - name: postgresql-operator-pull-secret
+  config:
+    data:
+      PULL_SECRET_NAME: postgresql-operator-pull-secret
