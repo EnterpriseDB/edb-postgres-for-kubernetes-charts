@@ -34,9 +34,9 @@ EDB Postgres for Kubernetes Helm Chart
 | fullnameOverride | string | `""` |  |
 | image.imageCredentials.create | bool | `false` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"postgresql-operator-pull-secret"` |  |
-| image.imageCredentials.password | string | `nil` |  |
+| image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
-| image.imageCredentials.username | string | `nil` |  |
+| image.imageCredentials.username | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"quay.io/enterprisedb/cloud-native-postgresql"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
