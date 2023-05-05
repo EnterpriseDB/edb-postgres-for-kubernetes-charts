@@ -29,8 +29,8 @@ image:
     create: false
     name: postgresql-operator-pull-secret
     registry: docker.enterprisedb.com
-    username:
-    password:
+    username: ""
+    password: ""
 
 imagePullSecrets: []
 nameOverride: ""
