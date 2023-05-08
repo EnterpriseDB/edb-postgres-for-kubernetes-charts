@@ -1,0 +1,14 @@
+The following Kubernetes Operators should be installed in namespace "{{ .Release.Namespace }}":
+- EDB Postgres Distributed for Kubernetes
+- EDB Postgres for Kubernetes
+- cert-manager
+
+First, let's set up a cert-manager Issuer. For example, to set up a self-signed Issuer, run:
+
+kubectl apply -f https://raw.githubusercontent.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/main/hack/samples/issuer-selfsigned.yaml
+
+Finally, to deploy an example 3 Region PGD cluster, run:
+
+kubectl apply -f https://raw.githubusercontent.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/main/hack/samples/pg4k-pgd-example.yaml
+
+kubectl get pgdgroups

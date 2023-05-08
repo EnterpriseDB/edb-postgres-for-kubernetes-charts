@@ -3,3 +3,7 @@
 *.swp
 *.swo
 *~
+
+# Charts Dependency files
+/charts/*/charts/
+/charts/*/Chart.lock
