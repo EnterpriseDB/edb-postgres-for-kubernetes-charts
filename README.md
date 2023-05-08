@@ -21,7 +21,7 @@ helm repo add edb https://enterprisedb.github.io/edb-postgres-for-kubernetes-cha
 
 You can then run `helm search repo edb` to see the all the available charts.
 
-## Deployment using EDB-PG4K
+## Deployment using EDB Postgres for Kubernetes operator
 
 ```console
 helm upgrade --install edb-pg4k \
@@ -30,7 +30,7 @@ helm upgrade --install edb-pg4k \
   edb/edb-postgres-for-kubernetes
 ```
 
-## Deployment using EDB-PG4K
+## Deployment using EDB Postgres Distributed for Kubernetes
 
 Note: make sure to replace $USERNAME and $PASSWORD with your own registry credentials.
 
@@ -41,9 +41,7 @@ helm upgrade --dependency-update \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
-  --set edb-postgres-for-kubernetes.image.imageCredentials.username=${USERNAME} \
-  --set edb-postgres-for-kubernetes.image.imageCredentials.password=${PASSWORD}
+  --set image.imageCredentials.password=${PASSWORD}
 ```
 
 ## Deployment using local chart

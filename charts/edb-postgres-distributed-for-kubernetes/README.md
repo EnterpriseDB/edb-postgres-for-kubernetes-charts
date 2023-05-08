@@ -13,6 +13,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | gbartolini | <gabriele.bartolini@enterprisedb.com> |  |
 | jsilvela | <jaime.silvela@enterprisedb.com> |  |
 | litaocdl | <tao.li@enterprisedb.com> |  |
+| NiccoloFei | <niccolo.fei@enterprisedb.com> |  |
 
 ## Source Code
 
@@ -22,8 +23,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../edb-postgres-for-kubernetes/ | edb-postgres-for-kubernetes | 0.18.1 |
 | https://charts.jetstack.io | cert-manager | 1.11.1 |
+| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/ | edb-postgres-for-kubernetes | 0.18.1 |
 
 ## Values
 
@@ -39,20 +40,17 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
 | crds.create | bool | `true` |  |
-| edb-postgres-for-kubernetes.config.data.PULL_SECRET_NAME | string | `"postgresql-operator-pull-secret"` |  |
-| edb-postgres-for-kubernetes.image.imageCredentials.create | bool | `true` |  |
-| edb-postgres-for-kubernetes.image.imageCredentials.password | string | `""` |  |
-| edb-postgres-for-kubernetes.image.imageCredentials.username | string | `""` |  |
-| edb-postgres-for-kubernetes.image.repository | string | `"docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes"` |  |
-| edb-postgres-for-kubernetes.imagePullSecrets[0].name | string | `"postgresql-operator-pull-secret"` |  |
+| edb-postgres-for-kubernetes.config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
+| edb-postgres-for-kubernetes.image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes"` |  |
+| edb-postgres-for-kubernetes.imagePullSecrets[0].name | string | `"pgd-operator-pull-secret"` |  |
 | fullnameOverride | string | `""` |  |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"pgd-operator-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
 | image.imageCredentials.username | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` | Additional Registries repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd |
-| image.repository | string | `"docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd"` |  |
+| image.pullPolicy | string | `"IfNotPresent"` | Additional Registries repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd |
+| image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets[0].name | string | `"pgd-operator-pull-secret"` |  |
 | managerConfig.data.health.healthProbeBindAddress | string | `":9443"` |  |

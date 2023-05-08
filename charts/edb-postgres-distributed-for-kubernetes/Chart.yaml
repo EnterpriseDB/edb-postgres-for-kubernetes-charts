@@ -30,8 +30,7 @@ dependencies:
   repository: "https://charts.jetstack.io"
 - name: "edb-postgres-for-kubernetes"
   version: "0.18.1"
-  # repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/"
-  repository: "file://../edb-postgres-for-kubernetes/"
+  repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/"
 
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
@@ -51,3 +50,5 @@ maintainers:
     email: jaime.silvela@enterprisedb.com
   - name: litaocdl
     email: tao.li@enterprisedb.com
+  - name: NiccoloFei
+    email: niccolo.fei@enterprisedb.com

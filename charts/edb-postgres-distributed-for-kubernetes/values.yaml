@@ -19,10 +19,10 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd
+  repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd
   # -- Additional Registries
   # repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd
-  # repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd
+  # repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -77,8 +77,6 @@ config:
   create: true
   # -- Specifies whether it should be stored in a secret, instead of a configmap
   secret: false
-  # Examples:
-  # PULL_SECRET_NAME: pgd-operator-pull-secret
 
   data:
     PULL_SECRET_NAME: pgd-operator-pull-secret
@@ -157,13 +155,12 @@ cert-manager:
 # edb-postgres-for-kubernetes
 edb-postgres-for-kubernetes:
   image:
-    repository: docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes
-    imageCredentials:
-      create: true
-      username: ""
-      password: ""
+    repository: docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes
+    # -- Additional Registries
+    # repository: docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes
+    # repository: docker.enterprisedb.com/k8s_community_pgd/edb-postgres-for-kubernetes
   imagePullSecrets:
-    - name: postgresql-operator-pull-secret
+    - name: pgd-operator-pull-secret
   config:
     data:
-      PULL_SECRET_NAME: postgresql-operator-pull-secret
+      PULL_SECRET_NAME: pgd-operator-pull-secret
