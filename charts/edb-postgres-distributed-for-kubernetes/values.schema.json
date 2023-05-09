@@ -93,9 +93,26 @@
                         }
                     }
                 },
+                "enabled": {
+                    "type": "boolean"
+                },
                 "image": {
                     "type": "object",
                     "properties": {
+                        "imageCredentials": {
+                            "type": "object",
+                            "properties": {
+                                "create": {
+                                    "type": "boolean"
+                                },
+                                "password": {
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "repository": {
                             "type": "string"
                         }

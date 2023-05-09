@@ -13,7 +13,7 @@ on Kubernetes, with traffic routed by PGD Proxy.
 
 ## Usage
 
-Add the following repository by running:
+Before deploying the charts, add the following repository by running:
 
 ```console
 helm repo add edb https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
@@ -21,7 +21,7 @@ helm repo add edb https://enterprisedb.github.io/edb-postgres-for-kubernetes-cha
 
 You can then run `helm search repo edb` to see the all the available charts.
 
-## Deployment using EDB Postgres for Kubernetes operator
+## Deployment of the EDB Postgres for Kubernetes operator
 
 ```console
 helm upgrade --install edb-pg4k \
@@ -30,9 +30,36 @@ helm upgrade --install edb-pg4k \
   edb/edb-postgres-for-kubernetes
 ```
 
-## Deployment using EDB Postgres Distributed for Kubernetes
+This will create a deployment in the `postgresql-operator-system` namespace.
+You can check it's ready:
 
-Note: make sure to replace $USERNAME and $PASSWORD with your own registry credentials.
+``` sh
+$ kubectl get deployments -n postgresql-operator-system
+NAME                                   READY   UP-TO-DATE   AVAILABLE   AGE
+edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
+```
+
+Once it is ready, you can verify that you can deploy the sample cluster
+suggested by the helm chart.
+
+## Credentials
+
+The images for the operators and operands are held in different repositories.
+The most convenient way to install the operators and operands would be to have
+a user token with access to all the repositories.
+But if that is not available, individual *entitlement keys* will need to be
+used for each repository.
+
+## Deployment of the EDB Postgres Distributed for Kubernetes operator
+
+**Note:** the `edb-postgres-distributed-for-kubernetes` will by default also
+install the EDB Postgres for Kubernetes operator, which is a dependency. You can
+avoid this if necessary. See the sub-section
+[on deploying individually](#deploying-the-operators-individually).
+
+**Note:** You will need [credentials](#credentials) to retrieve the various
+operator and operand images. Make sure to replace $USERNAME and $PASSWORD with
+ your own credentials in the command below:
 
 ```console
 helm upgrade --dependency-update \
@@ -41,7 +68,71 @@ helm upgrade --dependency-update \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD}
+  --set image.imageCredentials.password=${PASSWORD} \
+  --set edb-postgres-for-kubernetes.image.imageCredentials.username=${USERNAME} \ 
+  --set edb-postgres-for-kubernetes.image.imageCredentials.password="${PASSWORD}
+```
+
+Once the above runs, a new namespace `pgd-operator-system` will be
+created, with several deployments,  including the two operators.
+
+``` sh
+$ kubectl get deployments -n pgd-operator-system
+NAME                                                   READY   UP-TO-DATE   AVAILABLE   AGE
+edb-pg4k-pgd-cert-manager                              1/1     1            1           7m46s
+edb-pg4k-pgd-cert-manager-cainjector                   1/1     1            1           7m46s
+edb-pg4k-pgd-cert-manager-webhook                      1/1     1            1           7m46s
+edb-pg4k-pgd-edb-postgres-distributed-for-kubernetes   1/1     1            1           7m46s
+edb-pg4k-pgd-edb-postgres-for-kubernetes               1/1     1            1           7m46s
+```
+
+When the deployments are ready, you can verify that the steps suggested by the
+helm chart are working:
+
+- set up a cert-manager issuer
+- deploy an example 3-region PGD cluster
+
+### Deploying the operators individually
+
+The chart `edb-postgres-distributed-for-kubernetes` is set by default to
+also install the *EDB Postgres for Kubernetes operator*, which it depends on.
+When following this route, both operators will be installed in the same
+namespace. This is in contrast with other installation paths, where the
+operators reside in a dedicated namespace.
+
+Installing the dependencies in the same namespace is a design limitation of
+Helm, but we can get around it by installing the dependency with a separate
+command invocation.
+
+If you would like to keep the operators in separate namespace, firstdeploy the
+[EDB Postgres for Kubernetes operator helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator)
+
+And once the deployment is ready, you can run the `edb-postgres-distributed-for-kubernetes`
+chart, taking care to set `edb-postgres-for-kubernetes.enabled` to false:
+
+``` sh
+$ helm dependency update charts/edb-postgres-distributed-for-kubernetes
+$ helm upgrade \
+  --install edb-pg4k-pgd \
+  --namespace pgd-operator-system \
+  --create-namespace charts/edb-postgres-distributed-for-kubernetes\
+  --set edb-postgres-for-kubernetes.enabled=false \
+  --wait
+```
+
+**Note:** in the above command, the flags setting the credentials were elided
+to put the focus on the `enabled=false` condition. The flags may still be
+necessary, unless provided in the `values.yaml` file.
+
+You can see the two separate namespaces
+
+``` sh
+$ kubectl get ns
+NAME                         STATUS   AGE
+default                      Active   6m28s
+…
+pgd-operator-system          Active   55s
+postgresql-operator-system   Active   5m33s
 ```
 
 ## Deployment using local chart
