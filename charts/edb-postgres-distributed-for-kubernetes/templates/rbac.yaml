@@ -31,7 +31,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-leader-election-role
+  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-leader-election-role
   labels:
     {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}

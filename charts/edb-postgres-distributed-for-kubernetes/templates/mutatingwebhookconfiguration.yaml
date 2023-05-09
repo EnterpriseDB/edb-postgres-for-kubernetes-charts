@@ -23,7 +23,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
 webhooks:
 - admissionReviewVersions:
   - v1

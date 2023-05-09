@@ -19,7 +19,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: pgd-operator-validating-webhook-configuration
   labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
   {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
