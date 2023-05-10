@@ -26,6 +26,7 @@ appVersion: "0.5.0"
 
 dependencies:
 - name: "cert-manager"
+  condition: cert-manager.enabled
   version: "1.11.1"
   repository: "https://charts.jetstack.io"
 - name: "edb-postgres-for-kubernetes"
