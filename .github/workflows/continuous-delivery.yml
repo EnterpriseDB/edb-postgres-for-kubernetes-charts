@@ -87,7 +87,10 @@ jobs:
           --create-namespace charts/edb-postgres-distributed-for-kubernetes  \
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
-          --wait --timeout 20m
+          --set edb-postgres-for-kubernetes.image.imageCredentials.username=${{ secrets.CS_USER }} \
+          --set edb-postgres-for-kubernetes.image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3.2
