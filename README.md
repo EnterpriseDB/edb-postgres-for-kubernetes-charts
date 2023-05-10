@@ -2,12 +2,12 @@
 
 Helm charts to install the following Operators:
 
-1. [EDB Postgres for Kubernetes operator](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
+1. [EDB Postgres for Kubernetes operator (PG4K)](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
 designed by EnterpriseDB to manage PostgreSQL workloads on any
 supported Kubernetes cluster running in private, public, or hybrid cloud
 environments. Derived from CloudNativePG's Helm chart.
 
-2. [EDB Postgres Distributed for Kubernetes](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
+2. [EDB Postgres Distributed for Kubernetes (PG4K-PGD)](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
 designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
 on Kubernetes, with traffic routed by PGD Proxy.
 
@@ -21,7 +21,7 @@ helm repo add edb https://enterprisedb.github.io/edb-postgres-for-kubernetes-cha
 
 You can then run `helm search repo edb` to see the all the available charts.
 
-## Deployment of the EDB Postgres for Kubernetes operator
+## Deployment of the EDB Postgres for Kubernetes operator (PG4K)
 
 ```console
 helm upgrade --install edb-pg4k \
@@ -50,11 +50,11 @@ a user token with access to all the repositories.
 But if that is not available, individual *entitlement keys* will need to be
 used for each repository.
 
-## Deployment of the EDB Postgres Distributed for Kubernetes operator
+## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
-**Note:** the `edb-postgres-distributed-for-kubernetes` will by default also
-install the EDB Postgres for Kubernetes operator, which is a dependency. You can
-avoid this if necessary. See the sub-section
+**Note:** the `edb-postgres-distributed-for-kubernetes` chart will by default
+also install the PG4K operator, which is a dependency.
+You can avoid this if necessary. See the sub-section
 [on deploying individually](#deploying-the-operators-individually).
 
 **Note:** You will need [credentials](#credentials) to retrieve the various
@@ -95,20 +95,21 @@ helm chart are working:
 ### Deploying the operators individually
 
 The chart `edb-postgres-distributed-for-kubernetes` is set by default to
-also install the *EDB Postgres for Kubernetes operator*, which it depends on.
+also install the PG4K operator, which it depends on.
 When following this route, both operators will be installed in the same
 namespace. This is in contrast with other installation paths, where the
-operators reside in a dedicated namespace.
+operators reside in dedicated namespaces.
 
-Installing the dependencies in the same namespace is a design limitation of
-Helm, but we can get around it by installing the dependency with a separate
-command invocation.
+Installing all dependencies in the same namespace is a design limitation of
+Helm, but we can get around it by installing dependencies with separate
+invocations of `helm`.
 
-If you would like to keep the operators in separate namespace, firstdeploy the
-[EDB Postgres for Kubernetes operator helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator)
+If you would like to install the operators in separate namespaces, first deploy
+the
+[PG4K helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator-pg4k).
 
-And once the deployment is ready, you can run the `edb-postgres-distributed-for-kubernetes`
-chart, taking care to set `edb-postgres-for-kubernetes.enabled` to false:
+Once the deployment is ready, you can run the PG4K-PGD helm chart, taking care
+to set `edb-postgres-for-kubernetes.enabled` to false:
 
 ``` sh
 $ helm dependency update charts/edb-postgres-distributed-for-kubernetes
@@ -122,9 +123,10 @@ $ helm upgrade \
 
 **Note:** in the above command, the flags setting the credentials were elided
 to put the focus on the `enabled=false` condition. The flags may still be
-necessary, unless provided in the `values.yaml` file.
+necessary, unless the credentials are provided in the `values.yaml` file.
 
-You can see the two separate namespaces
+You can see the two separate namespaces, the same that would be created if
+installing manually without Helm charts.
 
 ``` sh
 $ kubectl get ns
