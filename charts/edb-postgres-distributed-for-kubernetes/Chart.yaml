@@ -13,24 +13,37 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: edb-postgres-for-kubernetes
-description: EDB Postgres for Kubernetes Helm Chart
+name: edb-postgres-distributed-for-kubernetes
+description: EDB Postgres Distributed for Kubernetes Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
-version: "0.18.1"
+version: "0.1.0"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.20.0"
+appVersion: "0.5.0"
+
+dependencies:
+- name: "cert-manager"
+  condition: cert-manager.enabled
+  version: "1.11.1"
+  repository: "https://charts.jetstack.io"
+- name: "edb-postgres-for-kubernetes"
+  condition: edb-postgres-for-kubernetes.enabled
+  version: "0.18.1"
+  repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/"
+
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
 keywords:
-  - postgresql
-  - postgres
-  - database
-  - edb
-  - enterprisedb
+- pgd
+- distributed
+- postgresql
+- postgres
+- database
+- edb
+- enterprisedb
 home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
 maintainers:
   - name: gbartolini
@@ -39,3 +52,5 @@ maintainers:
     email: jaime.silvela@enterprisedb.com
   - name: litaocdl
     email: tao.li@enterprisedb.com
+  - name: NiccoloFei
+    email: niccolo.fei@enterprisedb.com

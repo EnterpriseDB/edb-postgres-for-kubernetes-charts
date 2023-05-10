@@ -2,10 +2,36 @@ name: continuous-delivery
 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
-  install_deploy:
+
+  change-triage:
+    name: Check changed files
     runs-on: ubuntu-20.04
+    outputs:
+      pg4k-pgd-changed: ${{ steps.filter.outputs.pg4k-pgd-changed }}
+      ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v2.11.1
+        id: filter
+        with:
+          base: ${{ (github.event_name == 'schedule') && 'main' || '' }}
+          filters: |
+            pg4k-pgd-changed:
+              - 'charts/edb-postgres-distributed-for-kubernetes/**'
+            ep4k-changed:
+              - 'charts/edb-postgres-for-kubernetes/**'
+
+  deploy-ep4k:
+    runs-on: ubuntu-20.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.2
@@ -30,29 +56,49 @@ jobs:
 
       - name: Deploy a cluster
         run: |
-          cat <<EOF | kubectl apply -f -
-          # Example of PostgreSQL cluster
-          apiVersion: postgresql.k8s.enterprisedb.io/v1
-          kind: Cluster
-          metadata:
-            name: cluster-example
-          spec:
-            instances: 3
-            storage:
-             size: 1Gi
-          EOF
+          kubectl apply -f hack/samples/ep4k-cluster.yaml
 
-          ITER=0
-          while true; do
-            if [[ $ITER -ge 300 ]]; then
-              echo "Cluster not ready"
-              exit 1
-            fi
-            READY_INSTANCES=$(kubectl get cluster cluster-example -o jsonpath='{.status.readyInstances}')
-            if [[ "$READY_INSTANCES" == 3 ]]; then
-              echo "Cluster up and running"
-              break
-            fi
-            sleep 1
-            (( ++ITER ))
-          done
+          PHASE="Cluster in healthy state"
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
+
+  deploy-pg4k-pgd:
+    runs-on: ubuntu-20.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.pg4k-pgd-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3.5
+        with:
+          version: v3.11.3
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.5.0
+
+      - name: Deploy using helm chart
+        run: |
+          helm dependency build charts/edb-postgres-distributed-for-kubernetes
+          helm upgrade --install edb-pg4k-pgd --namespace pgd-operator-system \
+          --create-namespace charts/edb-postgres-distributed-for-kubernetes  \
+          --set image.imageCredentials.username=${{ secrets.CS_USER }} \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3.2
+
+      - name: Deploy a cluster
+        run: |
+          kubectl apply -f hack/samples/issuer-selfsigned.yaml
+          kubectl apply -f hack/samples/pg4k-pgd-cluster.yaml
+
+          PHASE="PGDGroup - Healthy"
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c

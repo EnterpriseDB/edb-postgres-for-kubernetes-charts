@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.webhook.mutating.create }}
+{{- if .Values.webhook.validating.create }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
-kind: MutatingWebhookConfiguration
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: postgresql-operator-mutating-webhook-configuration
-  {{- with .Values.commonAnnotations }}
+  name: pgd-operator-validating-webhook-configuration
+  labels:
+    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
 webhooks:
 - admissionReviewVersions:
   - v1
@@ -31,20 +31,20 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-backup
+      path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroup
       port: {{ .Values.service.port }}
-  failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
-  name: mbackup.kb.io
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vpgdgroup.kb.io
   rules:
   - apiGroups:
-    - postgresql.k8s.enterprisedb.io
+    - pgd.k8s.enterprisedb.io
     apiVersions:
-    - v1
+    - v1beta1
     operations:
     - CREATE
     - UPDATE
     resources:
-    - backups
+    - pgdgroups
   sideEffects: None
 - admissionReviewVersions:
   - v1
@@ -52,40 +52,19 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-cluster
+      path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroupcleanup
       port: {{ .Values.service.port }}
-  failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
-  name: mcluster.kb.io
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vpgdgroupcleanup.kb.io
   rules:
   - apiGroups:
-    - postgresql.k8s.enterprisedb.io
+    - pgd.k8s.enterprisedb.io
     apiVersions:
-    - v1
+    - v1beta1
     operations:
     - CREATE
     - UPDATE
     resources:
-    - clusters
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: {{ .Values.service.name }}
-      namespace: {{ .Release.Namespace }}
-      path: /mutate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
-      port: {{ .Values.service.port }}
-  failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
-  name: mscheduledbackup.kb.io
-  rules:
-  - apiGroups:
-    - postgresql.k8s.enterprisedb.io
-    apiVersions:
-    - v1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - scheduledbackups
+    - pgdgroupcleanups
   sideEffects: None
 {{- end }}
