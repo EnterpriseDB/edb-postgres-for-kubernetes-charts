@@ -84,9 +84,10 @@ jobs:
         run: |
           helm dependency build charts/edb-postgres-distributed-for-kubernetes
           helm upgrade --install edb-pg4k-pgd --namespace pgd-operator-system \
-          --create-namespace charts/edb-postgres-distributed-for-kubernetes --wait \
+          --create-namespace charts/edb-postgres-distributed-for-kubernetes  \
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
-          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }}
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3.2
