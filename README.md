@@ -116,7 +116,7 @@ $ helm dependency update charts/edb-postgres-distributed-for-kubernetes
 $ helm upgrade \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
-  --create-namespace charts/edb-postgres-distributed-for-kubernetes\
+  --create-namespace charts/edb-postgres-distributed-for-kubernetes \
   --set edb-postgres-for-kubernetes.enabled=false \
   --wait
 ```
