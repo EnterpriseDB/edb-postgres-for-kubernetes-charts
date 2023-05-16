@@ -106,6 +106,10 @@ spec:
       jsonPath: .status.phase
       name: Phase
       type: string
+    - description: Additional details about the phase
+      jsonPath: .status.phaseDetails
+      name: Phase Details
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
@@ -417,12 +421,12 @@ spec:
                         pattern: ^[1-9][0-9]*[dwm]$
                         type: string
                       target:
-                        default: primary
+                        default: prefer-standby
                         description: The policy to decide which instance should perform
                           backups. Available options are empty string, which will
-                          default to `primary` policy, `primary` to have backups run
-                          always on primary instances, `prefer-standby` to have backups
-                          run preferably on the most updated standby, if available.
+                          default to `prefer-standby` policy, `primary` to have backups
+                          run always on primary instances, `prefer-standby` to have
+                          backups run preferably on the most updated standby, if available.
                         enum:
                         - primary
                         - prefer-standby
@@ -468,10 +472,10 @@ spec:
                       target:
                         description: The policy to decide which instance should perform
                           this backup. If empty, it defaults to `cluster.spec.backup.target`.
-                          Available options are empty string, which will default to
-                          `primary` policy, `primary` to have backups run always on
-                          primary instances, `prefer-standby` to have backups run
-                          preferably on the most updated standby, if available.
+                          Available options are empty string, `primary` and `prefer-standby`.
+                          `primary` to have backups run always on primary instances,
+                          `prefer-standby` to have backups run preferably on the most
+                          updated standby, if available.
                         enum:
                         - primary
                         - prefer-standby
@@ -1575,9 +1579,76 @@ spec:
                               enabled:
                                 description: True if we want to have TDE enabled
                                 type: boolean
+                              passphraseCommand:
+                                description: PassphraseCommand is the command executed
+                                  to get the passphrase that will be passed to the
+                                  OpenSSL command to encrypt and decrypt
+                                properties:
+                                  key:
+                                    description: The key of the secret to select from.  Must
+                                      be a valid secret key.
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info:
+                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                      TODO: Add other useful fields. apiVersion, kind,
+                                      uid?'
+                                    type: string
+                                  optional:
+                                    description: Specify whether the Secret or its
+                                      key must be defined
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                                x-kubernetes-map-type: atomic
                               secretKeyRef:
                                 description: Reference to the secret that contains
                                   the encryption key
+                                properties:
+                                  key:
+                                    description: The key of the secret to select from.  Must
+                                      be a valid secret key.
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info:
+                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                      TODO: Add other useful fields. apiVersion, kind,
+                                      uid?'
+                                    type: string
+                                  optional:
+                                    description: Specify whether the Secret or its
+                                      key must be defined
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                                x-kubernetes-map-type: atomic
+                              unwrapCommand:
+                                description: UnwrapCommand is the decryption command
+                                  provided by the user
+                                properties:
+                                  key:
+                                    description: The key of the secret to select from.  Must
+                                      be a valid secret key.
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info:
+                                      https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                                      TODO: Add other useful fields. apiVersion, kind,
+                                      uid?'
+                                    type: string
+                                  optional:
+                                    description: Specify whether the Secret or its
+                                      key must be defined
+                                    type: boolean
+                                required:
+                                - key
+                                type: object
+                                x-kubernetes-map-type: atomic
+                              wrapCommand:
+                                description: WrapCommand is the encrypt command provided
+                                  by the user
                                 properties:
                                   key:
                                     description: The key of the secret to select from.  Must
@@ -1722,7 +1793,8 @@ spec:
                         description: "Claims lists the names of resources, defined
                           in spec.resourceClaims, that are used by this container.
                           \n This is an alpha field and requires enabling the DynamicResourceAllocation
-                          feature gate. \n This field is immutable."
+                          feature gate. \n This field is immutable. It can only be
+                          set for containers."
                         items:
                           description: ResourceClaim references one entry in PodSpec.ResourceClaims.
                           properties:
@@ -1914,7 +1986,8 @@ spec:
                                   defined in spec.resourceClaims, that are used by
                                   this container. \n This is an alpha field and requires
                                   enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable."
+                                  \n This field is immutable. It can only be set for
+                                  containers."
                                 items:
                                   description: ResourceClaim references one entry
                                     in PodSpec.ResourceClaims.
@@ -2157,7 +2230,8 @@ spec:
                                   defined in spec.resourceClaims, that are used by
                                   this container. \n This is an alpha field and requires
                                   enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable."
+                                  \n This field is immutable. It can only be set for
+                                  containers."
                                 items:
                                   description: ResourceClaim references one entry
                                     in PodSpec.ResourceClaims.
@@ -4286,6 +4360,12 @@ spec:
                 required:
                 - tls
                 type: object
+              failingFinalizerTimeLimitSeconds:
+                default: 300
+                description: The amount of seconds for the finalizer to start correctly,
+                  measured from the deletion timestamp
+                format: int32
+                type: integer
               imageName:
                 description: Name of the container image, supporting both tags (`<image>:<tag>`)
                   and digests for deterministic and repeatable deployments (`<image>:<tag>@sha256:<digestValue>`)
@@ -4350,6 +4430,30 @@ spec:
                         to a PostgreSQL cluster
                       type: object
                     type: array
+                  discoveryJob:
+                    default:
+                      delay: 10
+                      retries: 30
+                      timeout: 300
+                    description: DiscoveryJob the configuration of the PGD Discovery
+                      job
+                    properties:
+                      delay:
+                        default: 10
+                        description: Delay amount of time to sleep between retries,
+                          measured in seconds
+                        type: integer
+                      retries:
+                        default: 30
+                        description: Retries how many times the operation should be
+                          retried
+                        type: integer
+                      timeout:
+                        default: 300
+                        description: Timeout amount of time given to the operation
+                          to succeed, measured in seconds
+                        type: integer
+                    type: object
                   globalRouting:
                     description: GlobalRouting is true when global routing is enabled,
                       and in this case the proxies will be created in the parent group
@@ -4374,9 +4478,17 @@ spec:
                             type: string
                           minItems: 1
                           type: array
+                        type:
+                          default: always
+                          description: The type of SQLMutation
+                          enum:
+                          - always
+                          - beforeSubgroupRaft
+                          type: string
                       required:
                       - exec
                       - isApplied
+                      - type
                       type: object
                     type: array
                   nodeGroupSettings:
@@ -5401,7 +5513,8 @@ spec:
                         description: "Claims lists the names of resources, defined
                           in spec.resourceClaims, that are used by this container.
                           \n This is an alpha field and requires enabling the DynamicResourceAllocation
-                          feature gate. \n This field is immutable."
+                          feature gate. \n This field is immutable. It can only be
+                          set for containers."
                         items:
                           description: ResourceClaim references one entry in PodSpec.ResourceClaims.
                           properties:
@@ -6056,6 +6169,9 @@ spec:
                     node_group_name:
                       description: NodeGroupName is the name of the joined group
                       type: string
+                    node_kind_name:
+                      description: 'The kind of node: witness or data'
+                      type: string
                     node_name:
                       description: Name of the node
                       type: string
@@ -6071,6 +6187,9 @@ spec:
                 type: array
               phase:
                 description: The initialization phase of this cluster
+                type: string
+              phaseDetails:
+                description: The details of the current phase
                 type: string
               restore:
                 description: The status of the restore process
