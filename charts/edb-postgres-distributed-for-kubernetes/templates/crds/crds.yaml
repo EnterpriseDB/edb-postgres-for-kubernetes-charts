@@ -80,8 +80,8 @@ spec:
     webhook:
       clientConfig:
         service:
-          name: pgd-operator-webhook-service
-          namespace: pgd-operator-system
+          name: {{ .Values.service.name }}
+          namespace: {{ .Release.Namespace }}
           path: /convert
       conversionReviewVersions:
       - v1

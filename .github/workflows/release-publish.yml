@@ -19,4 +19,18 @@ jobs:
         with:
           helm_version: 3.11.3
           token: "${{ secrets.REPO_GHA_PAT }}"
-
+  update-gh-pages:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Update miscellaneous files
+        run: |
+          git config user.name edb-updates
+          git config user.email noreply@enterprisedb.com
+          git checkout origin/main README.md LICENSE CODEOWNERS CODE-OF-CONDUCT.md
+          git commit -sm "chore: Automatic Update"
+          git push
