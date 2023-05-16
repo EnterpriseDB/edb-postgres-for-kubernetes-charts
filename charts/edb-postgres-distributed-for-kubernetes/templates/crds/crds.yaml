@@ -6,6 +6,8 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.11.1
     helm.sh/resource-policy: keep
   creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: pgd-operator
   name: pgdgroupcleanups.pgd.k8s.enterprisedb.io
 spec:
   group: pgd.k8s.enterprisedb.io
@@ -69,7 +71,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
     helm.sh/resource-policy: keep
-  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: pgd-operator
   name: pgdgroups.pgd.k8s.enterprisedb.io
 spec:
   conversion:
@@ -77,8 +80,8 @@ spec:
     webhook:
       clientConfig:
         service:
-          name: webhook-service
-          namespace: system
+          name: pgd-operator-webhook-service
+          namespace: pgd-operator-system
           path: /convert
       conversionReviewVersions:
       - v1
