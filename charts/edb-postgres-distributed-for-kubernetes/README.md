@@ -36,6 +36,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
+| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:15.2-5.0.0-1"` |  |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.0.1-131"` |  |
 | config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
