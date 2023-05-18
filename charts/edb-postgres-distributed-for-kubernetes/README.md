@@ -53,7 +53,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
 | image.imageCredentials.username | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` | Additional Registries repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets[0].name | string | `"pgd-operator-pull-secret"` |  |
