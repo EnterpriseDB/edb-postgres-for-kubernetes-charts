@@ -65,7 +65,7 @@ follow these steps:
 1. update the `.version` in `charts/edb-postgres-distributed-for-kubernetes/Chart.yaml` to `"X.Y.Z"`
 1. update everything else as required:
    1. `.appVersion` in `charts/edb-postgres-distributed-for-kubernetes/Chart.yaml`
-   1. `.dependencies` versions in `charts/edb-postgres-distributed-for-kubernetes/Chart yaml`
+   1. `.dependencies` versions in `charts/edb-postgres-distributed-for-kubernetes/Chart.yaml`
    1. CRDs (`charts/edb-postgres-distributed-for-kubernetes/templates/crds/crds.yaml`), whose
       content can be built using [kustomize](https://kustomize.io/) from the
       [PG4K-PGD repo](https://github.com/EnterpriseDB/pg4k-pgd) by
@@ -83,6 +83,9 @@ follow these steps:
    1. update `charts/edb-postgres-distributed-for-kubernetes/values.yaml` if needed
       **NOTE**: updating `values.yaml` just for the PG4K-PGD version may not be
       necessary, as the value should default to the `appVersion` in `Chart.yaml`
+   1. update PGD_IMAGE_NAME and PGD_PROXY_IMAGE_NAME defaults inside
+      `charts/edb-postgres-distributed-for-kubernetes/values.yaml` according to the default
+      versions present in the release.
 
 From here onward, you can follow the steps of the [EPK Release](#how-to-release-the-edb-postgres-for-kubernetes-chart), starting from `point 6`.
 
