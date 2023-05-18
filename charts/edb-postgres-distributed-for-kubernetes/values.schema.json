@@ -31,6 +31,12 @@
                 "data": {
                     "type": "object",
                     "properties": {
+                        "PGD_IMAGE_NAME": {
+                            "type": "string"
+                        },
+                        "PGD_PROXY_IMAGE_NAME": {
+                            "type": "string"
+                        },
                         "PULL_SECRET_NAME": {
                             "type": "string"
                         }

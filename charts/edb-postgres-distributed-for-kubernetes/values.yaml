@@ -19,10 +19,9 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd
-  # -- Additional Registries
+  # Additional Registries
   # repository: docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd
-  # repository: docker.enterprisedb.com/k8s_community_pgd/pg4k-pgd
+  repository: docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -80,6 +79,8 @@ config:
 
   data:
     PULL_SECRET_NAME: pgd-operator-pull-secret
+    PGD_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:15.2-5.0.0-1
+    PGD_PROXY_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.0.1-131
   name: pgd-operator-controller-manager-config
 
 # -- Additional arguments to be added to the operator's args list
@@ -157,10 +158,9 @@ cert-manager:
 edb-postgres-for-kubernetes:
   enabled: true
   image:
-    repository: docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes
-    # -- Additional Registries
+    # Additional Registries
     # repository: docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes
-    # repository: docker.enterprisedb.com/k8s_community_pgd/edb-postgres-for-kubernetes
+    repository: docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes
   imagePullSecrets:
     - name: pgd-operator-pull-secret
   config:
