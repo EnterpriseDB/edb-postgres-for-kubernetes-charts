@@ -9,6 +9,6 @@ kubectl apply -f https://raw.githubusercontent.com/EnterpriseDB/edb-postgres-for
 
 Finally, to deploy an example 3 Region PGD cluster, run:
 
-kubectl apply -f https://raw.githubusercontent.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/main/hack/samples/pg4k-pgd-example.yaml
+kubectl apply -f https://raw.githubusercontent.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/main/hack/samples/pg4k-pgd-cluster.yaml
 
 kubectl get pgdgroups
