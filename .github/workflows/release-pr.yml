@@ -1,11 +1,11 @@
-# Create a PR for a release when a commit is pushed on a release/v* branch
+# Create a PR for a release when a commit is pushed on a release branch
 
 name: release-pr
 
 on:
   push:
     branches:
-    - release/v*
+    - release/*
 
 jobs:
   pull-request:
