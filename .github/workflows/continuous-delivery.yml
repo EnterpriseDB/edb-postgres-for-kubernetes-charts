@@ -8,7 +8,7 @@ jobs:
 
   change-triage:
     name: Check changed files
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       pg4k-pgd-changed: ${{ steps.filter.outputs.pg4k-pgd-changed }}
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
@@ -28,7 +28,7 @@ jobs:
               - 'charts/edb-postgres-for-kubernetes/**'
 
   deploy-ep4k:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - change-triage
     if: needs.change-triage.outputs.ep4k-changed == 'true'
@@ -62,7 +62,7 @@ jobs:
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
   deploy-pg4k-pgd:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs:
       - change-triage
     if: needs.change-triage.outputs.pg4k-pgd-changed == 'true'

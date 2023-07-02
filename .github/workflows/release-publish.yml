@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.3
@@ -19,18 +19,23 @@ jobs:
         with:
           helm_version: 3.11.3
           token: "${{ secrets.REPO_GHA_PAT }}"
+
   update-gh-pages:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3.5.3
         with:
           ref: gh-pages
           fetch-depth: 0
+
       - name: Update miscellaneous files
         run: |
-          git config user.name edb-updates
-          git config user.email noreply@enterprisedb.com
           git checkout origin/main README.md LICENSE CODEOWNERS CODE-OF-CONDUCT.md
-          git commit -sm "chore: Automatic Update"
-          git push
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: EnterpriseDB Automated Updates
+          author_email: noreply@enterprisedb.com
+          message: 'chore: Automatic Update'
