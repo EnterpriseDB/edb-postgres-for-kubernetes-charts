@@ -297,6 +297,46 @@ entries:
     version: 0.3.2
   edb-postgres-distributed-for-kubernetes:
   - apiVersion: v2
+    appVersion: 0.7.1
+    created: "2023-09-12T16:53:22.887232116Z"
+    dependencies:
+    - condition: cert-manager.enabled
+      name: cert-manager
+      repository: https://charts.jetstack.io
+      version: 1.11.1
+    - condition: edb-postgres-for-kubernetes.enabled
+      name: edb-postgres-for-kubernetes
+      repository: https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
+      version: 0.18.1
+    description: EDB Postgres Distributed for Kubernetes Helm Chart
+    digest: 046ec01a0f14f5cce99f03e1e02eca1a4dedef70487b29e7f9f84636c7726eb2
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - pgd
+    - distributed
+    - postgresql
+    - postgres
+    - database
+    - edb
+    - enterprisedb
+    maintainers:
+    - email: gabriele.bartolini@enterprisedb.com
+      name: gbartolini
+    - email: jaime.silvela@enterprisedb.com
+      name: jsilvela
+    - email: tao.li@enterprisedb.com
+      name: litaocdl
+    - email: niccolo.fei@enterprisedb.com
+      name: NiccoloFei
+    name: edb-postgres-distributed-for-kubernetes
+    sources:
+    - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-distributed-for-kubernetes-0.2.2.tgz
+    version: 0.2.2
+  - apiVersion: v2
     appVersion: 0.6.0
     created: "2023-07-31T13:30:24.982849309Z"
     dependencies:
@@ -379,9 +419,9 @@ entries:
   edb-postgres-for-kubernetes:
   - apiVersion: v2
     appVersion: 1.20.2
-    created: "2023-07-31T13:30:24.987969392Z"
+    created: "2023-09-12T16:53:22.892741866Z"
     description: EDB Postgres for Kubernetes Helm Chart
-    digest: 049bc37af24f524260d1dcb0b9ccbf38f231f2f428737accc005ff17ac798372
+    digest: 0ee741d7ce0e45266c8bda6da35a94a2d6f4a548319716207622fa7866b8257f
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -483,4 +523,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-0.17.1.tgz
     version: 0.17.1
-generated: "2023-07-31T13:30:24.970340252Z"
+generated: "2023-09-12T16:53:22.870138561Z"
