@@ -1,6 +1,6 @@
 # edb-postgres-distributed-for-kubernetes
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.6.0](https://img.shields.io/badge/AppVersion-0.6.0-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.7.1](https://img.shields.io/badge/AppVersion-0.7.1-informational?style=flat-square)
 
 EDB Postgres Distributed for Kubernetes Helm Chart
 
@@ -36,8 +36,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
-| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:15.2-5.0.0-1"` |  |
-| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.0.1-131"` |  |
+| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:15.4-5.2.0"` |  |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.2.0-1"` |  |
 | config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
