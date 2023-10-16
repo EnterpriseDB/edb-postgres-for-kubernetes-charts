@@ -27,6 +27,10 @@ You can then run `helm search repo edb` to see the all the available charts.
 helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
+  --set image.repository=docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes \
+  --set image.imageCredentials.username=k8s_enterprise \
+  --set image.imageCredentials.password=<THE-TOKEN> \
+  --set image.imageCredentials.create=true \
   edb/edb-postgres-for-kubernetes
 ```
 
