@@ -42,15 +42,18 @@ edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
 Once it is ready, you can verify that you can deploy the sample cluster
 suggested by the helm chart.
 
-### Deploying EDB Postgres for Kubernetes operator (PG4K) from a private registry
+### Deploying EDB Postgres for Kubernetes (PG4K) operator from EDB's private registry
 
-By default, PG4K will be deployed using [Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql)
-images which can be downloaded without a pullSecret but will require a [license key](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/license_keys/).
+By default, PG4K will be deployed using [images publicly hosted on Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql),
+without a `pullSecret` but requiring a [license key](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/license_keys/).
 
-The operator and operand images necessary for PG4K may also be pulled from `k8s_enterprise`
-or `k8s_standard` repositories of `docker.enterprisedb.com`, available with an EDB subscription plan.
-To do that, you need to configure the chart to pull images from a private registry (this similarly works
-in case you want to host the operator images in your own private registry).
+Additionally, both the operator and the operand images required by PG4K may be
+pulled from the `k8s_enterprise` or `k8s_standard` repositories at
+`docker.enterprisedb.com`, available with an EDB subscription plan.
+
+To do that, you need to configure the chart to pull images from a private
+registry (this works similarly in case you want to host the operator images in
+your own private registry).
 
 For example, to deploy via the `k8s_enterprise` repository:
 
@@ -67,10 +70,11 @@ helm upgrade --install edb-pg4k \
   edb/edb-postgres-for-kubernetes
 ```
 
-**Note:** If instead you want to deploy using the `k8s_standard` repository, you can do that by
-adjusting the following settings in the above example.
-Set `image.repository` to `docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes`
-and `image.imageCredentials.username` to `k8s_standard`.
+> **Note:** If instead you want to deploy using the `k8s_standard` repository,
+> you can do that by adjusting the following settings in the above example:
+>
+> - Set `image.repository` to `docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes`
+> - Set `image.imageCredentials.username` to `k8s_standard`
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
