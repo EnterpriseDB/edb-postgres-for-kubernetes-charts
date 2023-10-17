@@ -19,7 +19,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes # quay.io/enterprisedb/cloud-native-postgresql
+  repository: quay.io/enterprisedb/cloud-native-postgresql
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""

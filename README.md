@@ -27,10 +27,6 @@ You can then run `helm search repo edb` to see the all the available charts.
 helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
-  --set image.repository=docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes \
-  --set image.imageCredentials.username=k8s_enterprise \
-  --set image.imageCredentials.password=<THE-TOKEN> \
-  --set image.imageCredentials.create=true \
   edb/edb-postgres-for-kubernetes
 ```
 
@@ -45,6 +41,31 @@ edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
 
 Once it is ready, you can verify that you can deploy the sample cluster
 suggested by the helm chart.
+
+### Deploying EDB Postgres for Kubernetes operator (PG4K) from a private registry
+
+By default, PG4K will be deployed using [Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql)
+images which can be downloaded without a pullSecret but will require a [license key](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/license_keys/).
+
+The operator and operand images necessary for PG4K may also be pulled from `k8s_enterprise`
+or `k8s_standard` repositories of `docker.enterprisedb.com`, available with an EDB subscription plan.
+To do that, you need to configure the chart to pull images from a private registry (this similarly works
+in case you want to host the operator images in your own private registry).
+
+For example, to deploy via the `k8s_enterprise` repository:
+
+```console
+helm upgrade --install edb-pg4k \
+  --namespace postgresql-operator-system \
+  --create-namespace \
+  --set image.repository=docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes \
+  --set image.imageCredentials.username=k8s_enterprise \
+  --set image.imageCredentials.password=<THE-TOKEN> \
+  --set image.imageCredentials.create=true \
+  --set imagePullSecrets[0].name=postgresql-operator-pull-secret \
+  --set config.data.PULL_SECRET_NAME=postgresql-operator-pull-secret \
+  edb/edb-postgres-for-kubernetes
+```
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
