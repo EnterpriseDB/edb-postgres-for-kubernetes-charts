@@ -67,6 +67,11 @@ helm upgrade --install edb-pg4k \
   edb/edb-postgres-for-kubernetes
 ```
 
+**Note:** If instead you want to deploy using the `k8s_standard` repository, you can do that by
+adjusting the following settings in the above example.
+Set `image.repository` to `docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes`
+and `image.imageCredentials.username` to `k8s_standard`.
+
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
 **Note:** the `edb-postgres-distributed-for-kubernetes` chart will by default
