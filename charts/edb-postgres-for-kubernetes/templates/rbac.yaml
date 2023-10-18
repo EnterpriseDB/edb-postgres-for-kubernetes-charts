@@ -134,13 +134,13 @@ rules:
   - update
   - watch
 - apiGroups:
-    - ""
+  - ""
   resources:
-    - secrets/status
+  - secrets/status
   verbs:
-    - get
-    - patch
-    - update
+  - get
+  - patch
+  - update
 - apiGroups:
   - ""
   resources:
@@ -191,17 +191,17 @@ rules:
   - list
   - update
 - apiGroups:
-    - apps
+  - apps
   resources:
-    - deployments
+  - deployments
   verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - batch
   resources:
@@ -287,32 +287,32 @@ rules:
   resources:
   - clusters/status
   verbs:
-    - get
-    - patch
-    - update
-    - watch
+  - get
+  - patch
+  - update
+  - watch
 - apiGroups:
-    - postgresql.k8s.enterprisedb.io
+  - postgresql.k8s.enterprisedb.io
   resources:
-    - poolers
+  - poolers
   verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
-    - postgresql.k8s.enterprisedb.io
+  - postgresql.k8s.enterprisedb.io
   resources:
-    - poolers/finalizers
+  - poolers/finalizers
   verbs:
-    - update
+  - update
 - apiGroups:
-    - postgresql.k8s.enterprisedb.io
+  - postgresql.k8s.enterprisedb.io
   resources:
-    - poolers/status
+  - poolers/status
   verbs:
   - get
   - patch
@@ -359,6 +359,16 @@ rules:
   - list
   - patch
   - update
+  - watch
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshots
+  verbs:
+  - create
+  - get
+  - list
+  - patch
   - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
