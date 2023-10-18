@@ -298,7 +298,7 @@ entries:
   edb-postgres-distributed-for-kubernetes:
   - apiVersion: v2
     appVersion: 0.7.1
-    created: "2023-09-12T16:53:22.887232116Z"
+    created: "2023-10-18T14:39:25.294781881Z"
     dependencies:
     - condition: cert-manager.enabled
       name: cert-manager
@@ -309,7 +309,7 @@ entries:
       repository: https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/
       version: 0.18.1
     description: EDB Postgres Distributed for Kubernetes Helm Chart
-    digest: 046ec01a0f14f5cce99f03e1e02eca1a4dedef70487b29e7f9f84636c7726eb2
+    digest: 7bccfcd53569fb63f245d60d28104021dc2cbaaca78cebd5cdae532a06afaf3f
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -418,6 +418,33 @@ entries:
     version: 0.2.0
   edb-postgres-for-kubernetes:
   - apiVersion: v2
+    appVersion: 1.21.0
+    created: "2023-10-18T14:39:25.300476906Z"
+    description: EDB Postgres for Kubernetes Helm Chart
+    digest: a8088e378ee2da225224f7fbdaed1d6494ad3e1404f8c874b5e67c96937c0539
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - postgresql
+    - postgres
+    - database
+    - edb
+    - enterprisedb
+    maintainers:
+    - email: gabriele.bartolini@enterprisedb.com
+      name: gbartolini
+    - email: jaime.silvela@enterprisedb.com
+      name: jsilvela
+    - email: tao.li@enterprisedb.com
+      name: litaocdl
+    name: edb-postgres-for-kubernetes
+    sources:
+    - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-0.19.0.tgz
+    version: 0.19.0
+  - apiVersion: v2
     appVersion: 1.20.2
     created: "2023-09-12T16:53:22.892741866Z"
     description: EDB Postgres for Kubernetes Helm Chart
@@ -523,4 +550,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-0.17.1.tgz
     version: 0.17.1
-generated: "2023-09-12T16:53:22.870138561Z"
+generated: "2023-10-18T14:39:25.278683261Z"
