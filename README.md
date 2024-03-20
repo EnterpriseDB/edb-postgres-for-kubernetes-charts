@@ -83,8 +83,8 @@ also install PG4K and cert-manager operators, which are dependencies.
 You can avoid this if necessary. See the sub-section
 [on deploying individually](#deploying-the-operators-individually).
 
-**Note:** this helm chart sets sensible defaults for the location of the operand
-images. If you need to use other repositories, please see the section on
+**Note:** this helm chart do not set default image location of the operand images, 
+you need set those explicitly. For more information please see the section on
 [controlling the image repositories](#controlling-the-image-repositories).
 
 **Note:** You will need credentials to retrieve the various
@@ -97,8 +97,14 @@ helm upgrade --dependency-update \
   --namespace pgd-operator-system \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
+  --set edb-postgres-for-kubernetes.enabled=false \
+  --set cert-manager.enabled=false \
   --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD}
+  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
+  --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
+  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
+  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131 
 ```
 
 Once the above runs, a new namespace `pgd-operator-system` will be
@@ -135,37 +141,9 @@ invocations of `helm`.
 If you would like to install the operators in separate namespaces, please follow
 the below steps.
 
+#### Setup PG4K
+
 First, deploy the [PG4K helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator-pg4k).
-
-### Controlling the image repositories
-
-The various operator and operand images necessary for PGD may be pulled
-from a variety of repositories.
-By default, this helm chart is set up to use the `k8s_enterprise_pgd` repository, available
-with the *Enterprise* subscription plan.
-In case you have a different subscription plan and need to use a different repository
-than what is configured by default, you may do so by adding the appropriate overrides
-with the `--set` option.
-
-Assuming, as in the section above, that you have your necessary credentials,
-note the additional `--set` options for the `image.repository`, `PGD_IMAGE_NAME` and
-`PGD_PROXY_IMAGE_NAME` keys to customize the PGD operator deployment.
-
-For example, to deploy using the `k8s_standard_pgd` repository:
-
-```console
-helm upgrade --dependency-update \
-  --install edb-pg4k-pgd \
-  --namespace pgd-operator-system \
-  --create-namespace \
-  edb/edb-postgres-distributed-for-kubernetes \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
-  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
-  --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
-  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131
-```
 
 #### Setup cert-manager
 
@@ -231,6 +209,38 @@ default                      Active   6m28s
 pgd-operator-system          Active   55s
 postgresql-operator-system   Active   5m33s
 ```
+
+
+### Controlling the image repositories
+
+The various operator and operand images necessary for PGD may be pulled
+from a variety of repositories.
+By default, this helm chart is set up to use the `k8s_enterprise_pgd` repository, available
+with the *Enterprise* subscription plan.
+In case you have a different subscription plan and need to use a different repository
+than what is configured by default, you may do so by adding the appropriate overrides
+with the `--set` option.
+
+Assuming, as in the section above, that you have your necessary credentials,
+note the additional `--set` options for the `image.repository`, `PGD_IMAGE_NAME` and
+`PGD_PROXY_IMAGE_NAME` keys to customize the PGD operator deployment.
+
+For example, to deploy using the `k8s_standard_pgd` repository:
+
+```console
+helm upgrade --dependency-update \
+  --install edb-pg4k-pgd \
+  --namespace pgd-operator-system \
+  --create-namespace \
+  edb/edb-postgres-distributed-for-kubernetes \
+  --set image.imageCredentials.username=${USERNAME} \
+  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
+  --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
+  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
+  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131
+```
+
 
 ## Deployment using local chart
 
