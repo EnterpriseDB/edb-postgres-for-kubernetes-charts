@@ -244,6 +244,10 @@ helm upgrade --install edb-pg4k \
   charts/edb-postgres-for-kubernetes
 ```
 
+If you update the version of dependency chart and install from source, 
+remember to run `helm dependency build` in the chart directory before
+install from the source.  
+
 ## Copyright
 
 `edb-postgres-for-kubernetes-charts` is distributed under Apache License 2.0.
