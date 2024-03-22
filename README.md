@@ -83,14 +83,16 @@ also install the PG4K and cert-manager operators, which are dependencies.
 You can avoid this if necessary. See the sub-section
 [on deploying individually](#deploying-the-operators-individually).
 
-**Note:** this helm chart does not set default image locations for the images.
-You will need set those explicitly. For more information please see the section
+**Note:** this helm chart uses a default registry to retrieve the operator
+images from: `docker.enterprisedb.com/k8s_enterprise_pgd`.
+If you want to use another registry, you will need set it explicitly.
+For more information please see the section
 on [controlling the image repositories](#controlling-the-image-repositories).
 
 **Note:** You will need credentials to retrieve the various
 operator and operand images. Make sure to replace USERNAME and PASSWORD with
-your own credentials in the command below, which uses the `k8s_standard_pgd`
-image registry:
+your own credentials in the command below, which uses the `k8s_enterprise_pgd`
+image registry by default:
 
 ```console
 helm upgrade --dependency-update \
@@ -99,11 +101,7 @@ helm upgrade --dependency-update \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
-  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
-  --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
-  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131 
+  --set image.imageCredentials.password=${PASSWORD}
 ```
 
 Once the above runs, a new namespace `pgd-operator-system` will be
@@ -218,15 +216,17 @@ postgresql-operator-system   Active   5m33s
 
 The various operator and operand images necessary for PGD may be pulled
 from a variety of repositories.
-This helm chart provides no default value, so you will need to fill in the
-image registry and the credentials, according to your subscription plan.
+This helm chart uses `k8s_enterprise_pgd` as the default repository. If you want
+to use another, you will need to fill in the image registry and the
+credentials, according to your subscription plan. This needs to be done in
+several places in the command-line invocation.
 
 The following example uses the `k8s_standard_pgd` registry in
 `docker.enterprisedb.com`.
 Note the multiple `--set` options, for the `image.repository`,
 `PGD_IMAGE_NAME` and `PGD_PROXY_IMAGE_NAME` in addition to the
 `edb-postgres-for-kubernetes.image.repository` where the PGD operator
-is pulled from.
+is pulled from. 4 in total.
 Assuming that you have your necessary credentials, please fill in the USERNAME
 and PASSWORD below.
 
