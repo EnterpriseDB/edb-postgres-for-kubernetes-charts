@@ -31,7 +31,7 @@ dependencies:
   repository: "https://charts.jetstack.io"
 - name: "edb-postgres-for-kubernetes"
   condition: edb-postgres-for-kubernetes.enabled
-  version: "0.20.1"
+  version: "0.20.2"
   repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/"
 
 sources:
