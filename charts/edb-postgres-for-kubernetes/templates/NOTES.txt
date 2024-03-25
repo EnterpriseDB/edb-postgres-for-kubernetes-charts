@@ -8,11 +8,14 @@ apiVersion: postgresql.k8s.enterprisedb.io/v1
 kind: Cluster
 metadata:
   name: cluster-example
+  {{if not .Values.config.clusterWide  -}}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
 spec:
   instances: 3
   storage:
     size: 1Gi
 EOF
 
-kubectl get cluster
+kubectl get -A cluster
 

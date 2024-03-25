@@ -42,6 +42,18 @@ edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
 Once it is ready, you can verify that you can deploy the sample cluster
 suggested by the helm chart.
 
+It is possible to limit the operator's capabilities to solely the namespace in
+which it has been set up. By implementing this restriction, the cluster-level
+permissions required by the operator will be substantially minimized:
+
+```console
+helm upgrade --install edb-pg4k \
+  --namespace postgresql-operator-system \
+  --create-namespace \
+  --set config.clusterWide=false \
+  edb/edb-postgres-for-kubernetes
+```
+
 ### Deploying EDB Postgres for Kubernetes (PG4K) operator from EDB's private registry
 
 By default, PG4K will be deployed using [images publicly hosted on Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql),
