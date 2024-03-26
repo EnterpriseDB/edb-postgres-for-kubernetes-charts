@@ -212,6 +212,23 @@ spec:
                               be stored uncompressed and may be unencrypted in the
                               object store, according to the bucket default policy.
                             properties:
+                              additionalCommandArgs:
+                                description: "AdditionalCommandArgs represents additional
+                                  arguments that can be appended to the 'barman-cloud-backup'
+                                  command-line invocation. These arguments provide
+                                  flexibility to customize the backup process further
+                                  according to specific requirements or configurations.
+                                  \n Example: In a scenario where specialized backup
+                                  options are required, such as setting a specific
+                                  timeout or defining custom behavior, users can use
+                                  this field to specify additional command arguments.
+                                  \n Note: It's essential to ensure that the provided
+                                  arguments are valid and supported by the 'barman-cloud-backup'
+                                  command, to avoid potential errors or unintended
+                                  behavior during execution."
+                                items:
+                                  type: string
+                                type: array
                               compression:
                                 description: Compress a backup file (a tar file per
                                   tablespace) while streaming it to the object store.
@@ -417,7 +434,9 @@ spec:
                         description: RetentionPolicy is the retention policy to be
                           used for backups and WALs (i.e. '60d'). The retention policy
                           is expressed in the form of `XXu` where `XX` is a positive
-                          integer and `u` is in `[dwm]` - days, weeks, months.
+                          integer and `u` is in `[dwm]` - days, weeks, months. It's
+                          currently only applicable when using the BarmanObjectStore
+                          method.
                         pattern: ^[1-9][0-9]*[dwm]$
                         type: string
                       target:
@@ -431,6 +450,88 @@ spec:
                         - primary
                         - prefer-standby
                         type: string
+                      volumeSnapshot:
+                        description: VolumeSnapshot provides the configuration for
+                          the execution of volume snapshot backups.
+                        properties:
+                          annotations:
+                            additionalProperties:
+                              type: string
+                            description: Annotations key-value pairs that will be
+                              added to .metadata.annotations snapshot resources.
+                            type: object
+                          className:
+                            description: ClassName specifies the Snapshot Class to
+                              be used for PG_DATA PersistentVolumeClaim. It is the
+                              default class for the other types if no specific class
+                              is present
+                            type: string
+                          labels:
+                            additionalProperties:
+                              type: string
+                            description: Labels are key-value pairs that will be added
+                              to .metadata.labels snapshot resources.
+                            type: object
+                          online:
+                            default: true
+                            description: Whether the default type of backup with volume
+                              snapshots is online/hot (`true`, default) or offline/cold
+                              (`false`)
+                            type: boolean
+                          onlineConfiguration:
+                            default:
+                              immediateCheckpoint: false
+                              waitForArchive: true
+                            description: Configuration parameters to control the online/hot
+                              backup with volume snapshots
+                            properties:
+                              immediateCheckpoint:
+                                description: Control whether the I/O workload for
+                                  the backup initial checkpoint will be limited, according
+                                  to the `checkpoint_completion_target` setting on
+                                  the PostgreSQL server. If set to true, an immediate
+                                  checkpoint will be used, meaning PostgreSQL will
+                                  complete the checkpoint as soon as possible. `false`
+                                  by default.
+                                type: boolean
+                              waitForArchive:
+                                default: true
+                                description: If false, the function will return immediately
+                                  after the backup is completed, without waiting for
+                                  WAL to be archived. This behavior is only useful
+                                  with backup software that independently monitors
+                                  WAL archiving. Otherwise, WAL required to make the
+                                  backup consistent might be missing and make the
+                                  backup useless. By default, or when this parameter
+                                  is true, pg_backup_stop will wait for WAL to be
+                                  archived when archiving is enabled. On a standby,
+                                  this means that it will wait only when archive_mode
+                                  = always. If write activity on the primary is low,
+                                  it may be useful to run pg_switch_wal on the primary
+                                  in order to trigger an immediate segment switch.
+                                type: boolean
+                            type: object
+                          snapshotOwnerReference:
+                            default: none
+                            description: SnapshotOwnerReference indicates the type
+                              of owner reference the snapshot should have
+                            enum:
+                            - none
+                            - cluster
+                            - backup
+                            type: string
+                          tablespaceClassName:
+                            additionalProperties:
+                              type: string
+                            description: TablespaceClassName specifies the Snapshot
+                              Class to be used for the tablespaces. defaults to the
+                              PGDATA Snapshot Class, if set
+                            type: object
+                          walClassName:
+                            description: WalClassName specifies the Snapshot Class
+                              to be used for the PG_WAL PersistentVolumeClaim.
+                            type: string
+                        type: object
                     type: object
                   cron:
                     description: The scheduled backup for the data
@@ -438,33 +539,69 @@ spec:
                       backupOwnerReference:
                         default: none
                         description: 'Indicates which ownerReference should be put
-                          inside the created backup resources.<br /> - none: no owner
-                          reference for created backup objects (same behavior as before
-                          the field was introduced)<br /> - self: sets the Scheduled
-                          backup object as owner of the backup<br /> - cluster: set
-                          the cluster as owner of the backup<br />'
+                          inside the created backup resources. - none: no owner reference
+                          for created backup objects (same behavior as before the
+                          field was introduced) - self: sets the Scheduled backup
+                          object as owner of the backup - cluster: set the cluster
+                          as owner of the backup'
                         enum:
                         - none
                         - self
                         - cluster
                         type: string
-                      cluster:
-                        description: The cluster to backup
-                        properties:
-                          name:
-                            description: Name of the referent.
-                            type: string
-                        required:
-                        - name
-                        type: object
                       immediate:
                         description: If the first backup has to be immediately start
                           after creation or not
                         type: boolean
+                      method:
+                        default: barmanObjectStore
+                        description: 'The backup method to be used, possible options
+                          are `barmanObjectStore` and `volumeSnapshot`. Defaults to:
+                          `barmanObjectStore`.'
+                        enum:
+                        - barmanObjectStore
+                        - volumeSnapshot
+                        type: string
+                      online:
+                        description: Whether the default type of backup with volume
+                          snapshots is online/hot (`true`, default) or offline/cold
+                          (`false`) Overrides the default setting specified in the
+                          cluster field '.spec.backup.volumeSnapshot.online'
+                        type: boolean
+                      onlineConfiguration:
+                        description: Configuration parameters to control the online/hot
+                          backup with volume snapshots Overrides the default settings
+                          specified in the cluster '.backup.volumeSnapshot.onlineConfiguration'
+                          stanza
+                        properties:
+                          immediateCheckpoint:
+                            description: Control whether the I/O workload for the
+                              backup initial checkpoint will be limited, according
+                              to the `checkpoint_completion_target` setting on the
+                              PostgreSQL server. If set to true, an immediate checkpoint
+                              will be used, meaning PostgreSQL will complete the checkpoint
+                              as soon as possible. `false` by default.
+                            type: boolean
+                          waitForArchive:
+                            default: true
+                            description: If false, the function will return immediately
+                              after the backup is completed, without waiting for WAL
+                              to be archived. This behavior is only useful with backup
+                              software that independently monitors WAL archiving.
+                              Otherwise, WAL required to make the backup consistent
+                              might be missing and make the backup useless. By default,
+                              or when this parameter is true, pg_backup_stop will
+                              wait for WAL to be archived when archiving is enabled.
+                              On a standby, this means that it will wait only when
+                              archive_mode = always. If write activity on the primary
+                              is low, it may be useful to run pg_switch_wal on the
+                              primary in order to trigger an immediate segment switch.
+                            type: boolean
+                        type: object
                       schedule:
                         description: The schedule does not follow the same format
                           used in Kubernetes CronJobs as it includes an additional
-                          seconds specifier, see https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format
+                          second specifier, see https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format
                         type: string
                       suspend:
                         description: If this backup is suspended or not
@@ -519,7 +656,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -570,6 +708,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -683,7 +863,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -733,6 +914,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -844,7 +1063,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -895,6 +1115,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -1008,7 +1270,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -1058,6 +1321,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -1449,6 +1750,118 @@ spec:
                     - debug
                     - trace
                     type: string
+                  managed:
+                    description: The configuration that is used by the portions of
+                      PostgreSQL that are managed by the CNP instance manager
+                    properties:
+                      roles:
+                        description: Database roles managed by the `Cluster`
+                        items:
+                          description: "RoleConfiguration is the representation, in
+                            Kubernetes, of a PostgreSQL role with the additional field
+                            Ensure specifying whether to ensure the presence or absence
+                            of the role in the database \n The defaults of the CREATE
+                            ROLE command are applied Reference: https://www.postgresql.org/docs/current/sql-createrole.html"
+                          properties:
+                            bypassrls:
+                              description: Whether a role bypasses every row-level
+                                security (RLS) policy. Default is `false`.
+                              type: boolean
+                            comment:
+                              description: Description of the role
+                              type: string
+                            connectionLimit:
+                              default: -1
+                              description: If the role can log in, this specifies
+                                how many concurrent connections the role can make.
+                                `-1` (the default) means no limit.
+                              format: int64
+                              type: integer
+                            createdb:
+                              description: When set to `true`, the role being defined
+                                will be allowed to create new databases. Specifying
+                                `false` (default) will deny a role the ability to
+                                create databases.
+                              type: boolean
+                            createrole:
+                              description: Whether the role will be permitted to create,
+                                alter, drop, comment on, change the security label
+                                for, and grant or revoke membership in other roles.
+                                Default is `false`.
+                              type: boolean
+                            disablePassword:
+                              description: DisablePassword indicates that a role's
+                                password should be set to NULL in Postgres
+                              type: boolean
+                            ensure:
+                              default: present
+                              description: Ensure the role is `present` or `absent`
+                                - defaults to "present"
+                              enum:
+                              - present
+                              - absent
+                              type: string
+                            inRoles:
+                              description: List of one or more existing roles to which
+                                this role will be immediately added as a new member.
+                                Default empty.
+                              items:
+                                type: string
+                              type: array
+                            inherit:
+                              default: true
+                              description: Whether a role "inherits" the privileges
+                                of roles it is a member of. Defaults is `true`.
+                              type: boolean
+                            login:
+                              description: Whether the role is allowed to log in.
+                                A role having the `login` attribute can be thought
+                                of as a user. Roles without this attribute are useful
+                                for managing database privileges, but are not users
+                                in the usual sense of the word. Default is `false`.
+                              type: boolean
+                            name:
+                              description: Name of the role
+                              type: string
+                            passwordSecret:
+                              description: Secret containing the password of the role
+                                (if present) If null, the password will be ignored
+                                unless DisablePassword is set
+                              properties:
+                                name:
+                                  description: Name of the referent.
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            replication:
+                              description: Whether a role is a replication role. A
+                                role must have this attribute (or be a superuser)
+                                in order to be able to connect to the server in replication
+                                mode (physical or logical replication) and in order
+                                to be able to create or drop replication slots. A
+                                role having the `replication` attribute is a very
+                                highly privileged role, and should only be used on
+                                roles actually used for replication. Default is `false`.
+                              type: boolean
+                            superuser:
+                              description: Whether the role is a `superuser` who can
+                                override all access restrictions within the database
+                                - superuser status is dangerous and should be used
+                                only when really needed. You must yourself be a superuser
+                                to create a new superuser. Defaults is `false`.
+                              type: boolean
+                            validUntil:
+                              description: Date and time after which the role's password
+                                is no longer valid. When omitted, the password will
+                                never expire (default).
+                              format: date-time
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                    type: object
                   metadata:
                     description: Metadata applied exclusively to the generated Cluster
                       resources. Useful for applying AppArmor profiles.
@@ -1511,6 +1924,160 @@ spec:
                         default: false
                         description: Enable or disable the `PodMonitor`
                         type: boolean
+                      podMonitorMetricRelabelings:
+                        description: The list of metric relabelings for the `PodMonitor`.
+                          Applied to samples before ingestion.
+                        items:
+                          description: "RelabelConfig allows dynamic rewriting of
+                            the label set for targets, alerts, scraped samples and
+                            remote write samples. \n More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config"
+                          properties:
+                            action:
+                              default: replace
+                              description: "Action to perform based on the regex matching.
+                                \n `Uppercase` and `Lowercase` actions require Prometheus
+                                >= v2.36.0. `DropEqual` and `KeepEqual` actions require
+                                Prometheus >= v2.41.0. \n Default: \"Replace\""
+                              enum:
+                              - replace
+                              - Replace
+                              - keep
+                              - Keep
+                              - drop
+                              - Drop
+                              - hashmod
+                              - HashMod
+                              - labelmap
+                              - LabelMap
+                              - labeldrop
+                              - LabelDrop
+                              - labelkeep
+                              - LabelKeep
+                              - lowercase
+                              - Lowercase
+                              - uppercase
+                              - Uppercase
+                              - keepequal
+                              - KeepEqual
+                              - dropequal
+                              - DropEqual
+                              type: string
+                            modulus:
+                              description: "Modulus to take of the hash of the source
+                                label values. \n Only applicable when the action is
+                                `HashMod`."
+                              format: int64
+                              type: integer
+                            regex:
+                              description: Regular expression against which the extracted
+                                value is matched.
+                              type: string
+                            replacement:
+                              description: "Replacement value against which a Replace
+                                action is performed if the regular expression matches.
+                                \n Regex capture groups are available."
+                              type: string
+                            separator:
+                              description: Separator is the string between concatenated
+                                SourceLabels.
+                              type: string
+                            sourceLabels:
+                              description: The source labels select values from existing
+                                labels. Their content is concatenated using the configured
+                                Separator and matched against the configured regular
+                                expression.
+                              items:
+                                description: LabelName is a valid Prometheus label
+                                  name which may only contain ASCII letters, numbers,
+                                  as well as underscores.
+                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                type: string
+                              type: array
+                            targetLabel:
+                              description: "Label to which the resulting string is
+                                written in a replacement. \n It is mandatory for `Replace`,
+                                `HashMod`, `Lowercase`, `Uppercase`, `KeepEqual` and
+                                `DropEqual` actions. \n Regex capture groups are available."
+                              type: string
+                          type: object
+                        type: array
+                      podMonitorRelabelings:
+                        description: The list of relabelings for the `PodMonitor`.
+                          Applied to samples before scraping.
+                        items:
+                          description: "RelabelConfig allows dynamic rewriting of
+                            the label set for targets, alerts, scraped samples and
+                            remote write samples. \n More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config"
+                          properties:
+                            action:
+                              default: replace
+                              description: "Action to perform based on the regex matching.
+                                \n `Uppercase` and `Lowercase` actions require Prometheus
+                                >= v2.36.0. `DropEqual` and `KeepEqual` actions require
+                                Prometheus >= v2.41.0. \n Default: \"Replace\""
+                              enum:
+                              - replace
+                              - Replace
+                              - keep
+                              - Keep
+                              - drop
+                              - Drop
+                              - hashmod
+                              - HashMod
+                              - labelmap
+                              - LabelMap
+                              - labeldrop
+                              - LabelDrop
+                              - labelkeep
+                              - LabelKeep
+                              - lowercase
+                              - Lowercase
+                              - uppercase
+                              - Uppercase
+                              - keepequal
+                              - KeepEqual
+                              - dropequal
+                              - DropEqual
+                              type: string
+                            modulus:
+                              description: "Modulus to take of the hash of the source
+                                label values. \n Only applicable when the action is
+                                `HashMod`."
+                              format: int64
+                              type: integer
+                            regex:
+                              description: Regular expression against which the extracted
+                                value is matched.
+                              type: string
+                            replacement:
+                              description: "Replacement value against which a Replace
+                                action is performed if the regular expression matches.
+                                \n Regex capture groups are available."
+                              type: string
+                            separator:
+                              description: Separator is the string between concatenated
+                                SourceLabels.
+                              type: string
+                            sourceLabels:
+                              description: The source labels select values from existing
+                                labels. Their content is concatenated using the configured
+                                Separator and matched against the configured regular
+                                expression.
+                              items:
+                                description: LabelName is a valid Prometheus label
+                                  name which may only contain ASCII letters, numbers,
+                                  as well as underscores.
+                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                type: string
+                              type: array
+                            targetLabel:
+                              description: "Label to which the resulting string is
+                                written in a replacement. \n It is mandatory for `Replace`,
+                                `HashMod`, `Lowercase`, `Uppercase`, `KeepEqual` and
+                                `DropEqual` actions. \n Regex capture groups are available."
+                              type: string
+                          type: object
+                        type: array
                     type: object
                   otel:
                     description: OpenTelemetry Configuration
@@ -1578,6 +2145,12 @@ spec:
                   postgresql:
                     description: Configuration of the PostgreSQL server
                     properties:
+                      enableAlterSystem:
+                        description: If this parameter is true, the user will be able
+                          to invoke `ALTER SYSTEM` on this EDB Postgres for Kubernetes
+                          Cluster. This should only be used for debugging and troubleshooting.
+                          Defaults to false.
+                        type: boolean
                       epas:
                         description: EDB Postgres Advanced Server specific configurations
                         properties:
@@ -1762,6 +2335,12 @@ spec:
                         items:
                           type: string
                         type: array
+                      pg_ident:
+                        description: PostgreSQL User Name Maps rules (lines to be
+                          appended to the pg_ident.conf file)
+                        items:
+                          type: string
+                        type: array
                       promotionTimeout:
                         description: Specifies the maximum number of seconds to wait
                           when promoting an instance to primary. Default value is
@@ -1855,7 +2434,8 @@ spec:
                           in a file on the node should be used. The profile must be
                           preconfigured on the node to work. Must be a descending
                           path, relative to the kubelet's configured seccomp profile
-                          location. Must only be set if type is "Localhost".
+                          location. Must be set if type is "Localhost". Must NOT be
+                          set for any other type.
                         type: string
                       type:
                         description: "type indicates which kind of seccomp profile
@@ -1895,16 +2475,24 @@ spec:
                     required:
                     - metadata
                     type: object
+                  smartShutdownTimeout:
+                    default: 15
+                    description: 'The time in seconds that controls the window of
+                      time reserved for the smart shutdown of Postgres to complete.
+                      Make sure you reserve enough time for the operator to request
+                      a fast shutdown of Postgres (that is: `stopDelay` - `smartShutdownTimeout`).'
+                    format: int32
+                    type: integer
                   startDelay:
-                    default: 30
+                    default: 3600
                     description: The time in seconds that is allowed for a PostgreSQL
-                      instance to successfully start up (default 30)
+                      instance to successfully start up (default 3600)
                     format: int32
                     type: integer
                   stopDelay:
-                    default: 30
+                    default: 180
                     description: The time in seconds that is allowed for a PostgreSQL
-                      instance node to gracefully shutdown (default 30)
+                      instance node to gracefully shutdown (default 180)
                     format: int32
                     type: integer
                   storage:
@@ -2014,30 +2602,6 @@ spec:
                               must still be higher than capacity recorded in the status
                               field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
                             properties:
-                              claims:
-                                description: "Claims lists the names of resources,
-                                  defined in spec.resourceClaims, that are used by
-                                  this container. \n This is an alpha field and requires
-                                  enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable. It can only be set for
-                                  containers."
-                                items:
-                                  description: ResourceClaim references one entry
-                                    in PodSpec.ResourceClaims.
-                                  properties:
-                                    name:
-                                      description: Name must match the name of one
-                                        entry in pod.spec.resourceClaims of the Pod
-                                        where this field is used. It makes that resource
-                                        available inside a container.
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -2114,6 +2678,26 @@ spec:
                             description: 'storageClassName is the name of the StorageClass
                               required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
                             type: string
+                          volumeAttributesClassName:
+                            description: 'volumeAttributesClassName may be used to
+                              set the VolumeAttributesClass used by this claim. If
+                              specified, the CSI driver will create or update the
+                              volume with the attributes defined in the corresponding
+                              VolumeAttributesClass. This has a different purpose
+                              than storageClassName, it can be changed after the claim
+                              is created. An empty string value means that no VolumeAttributesClass
+                              will be applied to the claim but it''s not allowed to
+                              reset this field to empty string once it is set. If
+                              unspecified and the PersistentVolumeClaim is unbound,
+                              the default VolumeAttributesClass will be set by the
+                              persistentvolume controller if it exists. If the resource
+                              referred to by volumeAttributesClass does not exist,
+                              this PersistentVolumeClaim will be set to a Pending
+                              state, as reflected by the modifyVolumeStatus field,
+                              until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass
+                              (Alpha) Using this field requires the VolumeAttributesClass
+                              feature gate to be enabled.'
+                            type: string
                           volumeMode:
                             description: volumeMode defines what type of volume is
                               required by the claim. Value of Filesystem is implied
@@ -2135,10 +2719,9 @@ spec:
                           be decreased.
                         type: string
                       storageClass:
-                        description: StorageClass to use for database data (`PGDATA`).
-                          Applied after evaluating the PVC template, if available.
-                          If not specified, generated PVCs will be satisfied by the
-                          default storage class
+                        description: StorageClass to use for PVCs. Applied after evaluating
+                          the PVC template, if available. If not specified, the generated
+                          PVCs will use the default storage class
                         type: string
                     type: object
                   superuserSecret:
@@ -2261,30 +2844,6 @@ spec:
                               must still be higher than capacity recorded in the status
                               field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
                             properties:
-                              claims:
-                                description: "Claims lists the names of resources,
-                                  defined in spec.resourceClaims, that are used by
-                                  this container. \n This is an alpha field and requires
-                                  enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable. It can only be set for
-                                  containers."
-                                items:
-                                  description: ResourceClaim references one entry
-                                    in PodSpec.ResourceClaims.
-                                  properties:
-                                    name:
-                                      description: Name must match the name of one
-                                        entry in pod.spec.resourceClaims of the Pod
-                                        where this field is used. It makes that resource
-                                        available inside a container.
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -2361,6 +2920,26 @@ spec:
                             description: 'storageClassName is the name of the StorageClass
                               required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
                             type: string
+                          volumeAttributesClassName:
+                            description: 'volumeAttributesClassName may be used to
+                              set the VolumeAttributesClass used by this claim. If
+                              specified, the CSI driver will create or update the
+                              volume with the attributes defined in the corresponding
+                              VolumeAttributesClass. This has a different purpose
+                              than storageClassName, it can be changed after the claim
+                              is created. An empty string value means that no VolumeAttributesClass
+                              will be applied to the claim but it''s not allowed to
+                              reset this field to empty string once it is set. If
+                              unspecified and the PersistentVolumeClaim is unbound,
+                              the default VolumeAttributesClass will be set by the
+                              persistentvolume controller if it exists. If the resource
+                              referred to by volumeAttributesClass does not exist,
+                              this PersistentVolumeClaim will be set to a Pending
+                              state, as reflected by the modifyVolumeStatus field,
+                              until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass
+                              (Alpha) Using this field requires the VolumeAttributesClass
+                              feature gate to be enabled.'
+                            type: string
                           volumeMode:
                             description: volumeMode defines what type of volume is
                               required by the claim. Value of Filesystem is implied
@@ -2382,10 +2961,9 @@ spec:
                           be decreased.
                         type: string
                       storageClass:
-                        description: StorageClass to use for database data (`PGDATA`).
-                          Applied after evaluating the PVC template, if available.
-                          If not specified, generated PVCs will be satisfied by the
-                          default storage class
+                        description: StorageClass to use for PVCs. Applied after evaluating
+                          the PVC template, if available. If not specified, the generated
+                          PVCs will use the default storage class
                         type: string
                     type: object
                 required:
@@ -2658,11 +3236,10 @@ spec:
                               supports specifying the loadBalancerIP when a load balancer
                               is created. This field will be ignored if the cloud-provider
                               does not support the feature. Deprecated: This field
-                              was under-specified and its meaning varies across implementations,
-                              and it cannot support dual-stack. As of Kubernetes v1.24,
-                              users are encouraged to use implementation-specific
-                              annotations when available. This field may be removed
-                              in a future API version.'
+                              was under-specified and its meaning varies across implementations.
+                              Using it is non-portable and it may not support dual-stack.
+                              Users are encouraged to use implementation-specific
+                              annotations when available.'
                             type: string
                           loadBalancerSourceRanges:
                             description: 'If specified and supported by the platform,
@@ -2681,12 +3258,22 @@ spec:
                                 port.
                               properties:
                                 appProtocol:
-                                  description: The application protocol for this port.
-                                    This field follows standard Kubernetes label syntax.
-                                    Un-prefixed names are reserved for IANA standard
-                                    service names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
-                                    Non-standard protocols should use prefixed names
-                                    such as mycompany.com/my-custom-protocol.
+                                  description: "The application protocol for this
+                                    port. This is used as a hint for implementations
+                                    to offer richer behavior for protocols that they
+                                    understand. This field follows standard Kubernetes
+                                    label syntax. Valid values are either: \n * Un-prefixed
+                                    protocol names - reserved for IANA standard service
+                                    names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
+                                    \n * Kubernetes-defined prefixed names: * 'kubernetes.io/h2c'
+                                    - HTTP/2 prior knowledge over cleartext as described
+                                    in https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
+                                    * 'kubernetes.io/ws'  - WebSocket over cleartext
+                                    as described in https://www.rfc-editor.org/rfc/rfc6455
+                                    * 'kubernetes.io/wss' - WebSocket over TLS as
+                                    described in https://www.rfc-editor.org/rfc/rfc6455
+                                    \n * Other protocols should use implementation-defined
+                                    prefixed names such as mycompany.com/my-custom-protocol."
                                   type: string
                                 name:
                                   description: The name of this port within the service.
@@ -3044,11 +3631,10 @@ spec:
                               supports specifying the loadBalancerIP when a load balancer
                               is created. This field will be ignored if the cloud-provider
                               does not support the feature. Deprecated: This field
-                              was under-specified and its meaning varies across implementations,
-                              and it cannot support dual-stack. As of Kubernetes v1.24,
-                              users are encouraged to use implementation-specific
-                              annotations when available. This field may be removed
-                              in a future API version.'
+                              was under-specified and its meaning varies across implementations.
+                              Using it is non-portable and it may not support dual-stack.
+                              Users are encouraged to use implementation-specific
+                              annotations when available.'
                             type: string
                           loadBalancerSourceRanges:
                             description: 'If specified and supported by the platform,
@@ -3067,12 +3653,22 @@ spec:
                                 port.
                               properties:
                                 appProtocol:
-                                  description: The application protocol for this port.
-                                    This field follows standard Kubernetes label syntax.
-                                    Un-prefixed names are reserved for IANA standard
-                                    service names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
-                                    Non-standard protocols should use prefixed names
-                                    such as mycompany.com/my-custom-protocol.
+                                  description: "The application protocol for this
+                                    port. This is used as a hint for implementations
+                                    to offer richer behavior for protocols that they
+                                    understand. This field follows standard Kubernetes
+                                    label syntax. Valid values are either: \n * Un-prefixed
+                                    protocol names - reserved for IANA standard service
+                                    names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
+                                    \n * Kubernetes-defined prefixed names: * 'kubernetes.io/h2c'
+                                    - HTTP/2 prior knowledge over cleartext as described
+                                    in https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
+                                    * 'kubernetes.io/ws'  - WebSocket over cleartext
+                                    as described in https://www.rfc-editor.org/rfc/rfc6455
+                                    * 'kubernetes.io/wss' - WebSocket over TLS as
+                                    described in https://www.rfc-editor.org/rfc/rfc6455
+                                    \n * Other protocols should use implementation-defined
+                                    prefixed names such as mycompany.com/my-custom-protocol."
                                   type: string
                                 name:
                                   description: The name of this port within the service.
@@ -3431,11 +4027,10 @@ spec:
                               supports specifying the loadBalancerIP when a load balancer
                               is created. This field will be ignored if the cloud-provider
                               does not support the feature. Deprecated: This field
-                              was under-specified and its meaning varies across implementations,
-                              and it cannot support dual-stack. As of Kubernetes v1.24,
-                              users are encouraged to use implementation-specific
-                              annotations when available. This field may be removed
-                              in a future API version.'
+                              was under-specified and its meaning varies across implementations.
+                              Using it is non-portable and it may not support dual-stack.
+                              Users are encouraged to use implementation-specific
+                              annotations when available.'
                             type: string
                           loadBalancerSourceRanges:
                             description: 'If specified and supported by the platform,
@@ -3454,12 +4049,22 @@ spec:
                                 port.
                               properties:
                                 appProtocol:
-                                  description: The application protocol for this port.
-                                    This field follows standard Kubernetes label syntax.
-                                    Un-prefixed names are reserved for IANA standard
-                                    service names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
-                                    Non-standard protocols should use prefixed names
-                                    such as mycompany.com/my-custom-protocol.
+                                  description: "The application protocol for this
+                                    port. This is used as a hint for implementations
+                                    to offer richer behavior for protocols that they
+                                    understand. This field follows standard Kubernetes
+                                    label syntax. Valid values are either: \n * Un-prefixed
+                                    protocol names - reserved for IANA standard service
+                                    names (as per RFC-6335 and https://www.iana.org/assignments/service-names).
+                                    \n * Kubernetes-defined prefixed names: * 'kubernetes.io/h2c'
+                                    - HTTP/2 prior knowledge over cleartext as described
+                                    in https://www.rfc-editor.org/rfc/rfc9113.html#name-starting-http-2-with-prior-
+                                    * 'kubernetes.io/ws'  - WebSocket over cleartext
+                                    as described in https://www.rfc-editor.org/rfc/rfc6455
+                                    * 'kubernetes.io/wss' - WebSocket over TLS as
+                                    described in https://www.rfc-editor.org/rfc/rfc6455
+                                    \n * Other protocols should use implementation-defined
+                                    prefixed names such as mycompany.com/my-custom-protocol."
                                   type: string
                                 name:
                                   description: The name of this port within the service.
@@ -4621,6 +5226,14 @@ spec:
                       serverConnTimeout: 2
                     description: Configuration for the proxy
                     properties:
+                      consensusGracePeriod:
+                        default: 6
+                        description: ConsensusGracePeriod the duration in seconds
+                          for which proxy continues to route even upon loss of a Raft
+                          leader. If set to 0s, proxy stops routing immediately. Defaults
+                          to 6
+                        format: int64
+                        type: integer
                       fallbackGroupTimeout:
                         default: 60
                         description: FallbackGroupTimeout the interval after which
@@ -4933,7 +5546,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -4984,6 +5598,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -5097,7 +5753,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -5147,6 +5804,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -5257,7 +5952,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -5308,6 +6004,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -5421,7 +6159,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -5471,6 +6210,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -5731,6 +6508,22 @@ spec:
                           uncompressed and may be unencrypted in the object store,
                           according to the bucket default policy.
                         properties:
+                          additionalCommandArgs:
+                            description: "AdditionalCommandArgs represents additional
+                              arguments that can be appended to the 'barman-cloud-backup'
+                              command-line invocation. These arguments provide flexibility
+                              to customize the backup process further according to
+                              specific requirements or configurations. \n Example:
+                              In a scenario where specialized backup options are required,
+                              such as setting a specific timeout or defining custom
+                              behavior, users can use this field to specify additional
+                              command arguments. \n Note: It's essential to ensure
+                              that the provided arguments are valid and supported
+                              by the 'barman-cloud-backup' command, to avoid potential
+                              errors or unintended behavior during execution."
+                            items:
+                              type: string
+                            type: array
                           compression:
                             description: Compress a backup file (a tar file per tablespace)
                               while streaming it to the object store. Available options
@@ -5973,12 +6766,64 @@ spec:
                   serverNames:
                     description: The list of server names to be used as a recovery
                       origin. One of these servers will be elected as the seeding
-                      one when evaluating the recovery target
+                      one when evaluating the recovery target, this option is only
+                      used when restore from barmanObjectStore.
                     items:
                       type: string
                     type: array
-                required:
-                - serverNames
+                  volumeSnapshots:
+                    description: The configuration for volumeSnapshot restore
+                    properties:
+                      selector:
+                        description: Label selector used to select the volumeSnapshot
+                          to restore
+                        properties:
+                          matchExpressions:
+                            description: matchExpressions is a list of label selector
+                              requirements. The requirements are ANDed.
+                            items:
+                              description: A label selector requirement is a selector
+                                that contains values, a key, and an operator that
+                                relates the key and values.
+                              properties:
+                                key:
+                                  description: key is the label key that the selector
+                                    applies to.
+                                  type: string
+                                operator:
+                                  description: operator represents a key's relationship
+                                    to a set of values. Valid operators are In, NotIn,
+                                    Exists and DoesNotExist.
+                                  type: string
+                                values:
+                                  description: values is an array of string values.
+                                    If the operator is In or NotIn, the values array
+                                    must be non-empty. If the operator is Exists or
+                                    DoesNotExist, the values array must be empty.
+                                    This array is replaced during a strategic merge
+                                    patch.
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - key
+                              - operator
+                              type: object
+                            type: array
+                          matchLabels:
+                            additionalProperties:
+                              type: string
+                            description: matchLabels is a map of {key,value} pairs.
+                              A single {key,value} in the matchLabels map is equivalent
+                              to an element of matchExpressions, whose key field is
+                              "key", the operator is "In", and the values array contains
+                              only "value". The requirements are ANDed.
+                            type: object
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - selector
+                    type: object
                 type: object
               witness:
                 description: WitnessInstances configuration that will be injected
@@ -6016,7 +6861,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -6067,6 +6913,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -6180,7 +7068,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -6230,6 +7119,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -6341,7 +7268,8 @@ spec:
                                   properties:
                                     labelSelector:
                                       description: A label query over a set of resources,
-                                        in this case pods.
+                                        in this case pods. If it's null, this PodAffinityTerm
+                                        matches with no Pods.
                                       properties:
                                         matchExpressions:
                                           description: matchExpressions is a list
@@ -6392,6 +7320,48 @@ spec:
                                           type: object
                                       type: object
                                       x-kubernetes-map-type: atomic
+                                    matchLabelKeys:
+                                      description: MatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key in (value)` to select the group of
+                                        existing pods which pods will be taken into
+                                        consideration for the incoming pod's pod (anti)
+                                        affinity. Keys that don't exist in the incoming
+                                        pod labels will be ignored. The default value
+                                        is empty. The same key is forbidden to exist
+                                        in both MatchLabelKeys and LabelSelector.
+                                        Also, MatchLabelKeys cannot be set when LabelSelector
+                                        isn't set. This is an alpha field and requires
+                                        enabling MatchLabelKeysInPodAffinity feature
+                                        gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                    mismatchLabelKeys:
+                                      description: MismatchLabelKeys is a set of pod
+                                        label keys to select which pods will be taken
+                                        into consideration. The keys are used to lookup
+                                        values from the incoming pod labels, those
+                                        key-value labels are merged with `LabelSelector`
+                                        as `key notin (value)` to select the group
+                                        of existing pods which pods will be taken
+                                        into consideration for the incoming pod's
+                                        pod (anti) affinity. Keys that don't exist
+                                        in the incoming pod labels will be ignored.
+                                        The default value is empty. The same key is
+                                        forbidden to exist in both MismatchLabelKeys
+                                        and LabelSelector. Also, MismatchLabelKeys
+                                        cannot be set when LabelSelector isn't set.
+                                        This is an alpha field and requires enabling
+                                        MatchLabelKeysInPodAffinity feature gate.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
                                     namespaceSelector:
                                       description: A label query over the set of namespaces
                                         that the term applies to. The term is applied
@@ -6505,7 +7475,8 @@ spec:
                               properties:
                                 labelSelector:
                                   description: A label query over a set of resources,
-                                    in this case pods.
+                                    in this case pods. If it's null, this PodAffinityTerm
+                                    matches with no Pods.
                                   properties:
                                     matchExpressions:
                                       description: matchExpressions is a list of label
@@ -6555,6 +7526,44 @@ spec:
                                       type: object
                                   type: object
                                   x-kubernetes-map-type: atomic
+                                matchLabelKeys:
+                                  description: MatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key in (value)` to select
+                                    the group of existing pods which pods will be
+                                    taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MatchLabelKeys and LabelSelector. Also,
+                                    MatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
+                                mismatchLabelKeys:
+                                  description: MismatchLabelKeys is a set of pod label
+                                    keys to select which pods will be taken into consideration.
+                                    The keys are used to lookup values from the incoming
+                                    pod labels, those key-value labels are merged
+                                    with `LabelSelector` as `key notin (value)` to
+                                    select the group of existing pods which pods will
+                                    be taken into consideration for the incoming pod's
+                                    pod (anti) affinity. Keys that don't exist in
+                                    the incoming pod labels will be ignored. The default
+                                    value is empty. The same key is forbidden to exist
+                                    in both MismatchLabelKeys and LabelSelector. Also,
+                                    MismatchLabelKeys cannot be set when LabelSelector
+                                    isn't set. This is an alpha field and requires
+                                    enabling MatchLabelKeysInPodAffinity feature gate.
+                                  items:
+                                    type: string
+                                  type: array
+                                  x-kubernetes-list-type: atomic
                                 namespaceSelector:
                                   description: A label query over the set of namespaces
                                     that the term applies to. The term is applied
@@ -6940,6 +7949,118 @@ spec:
                     - debug
                     - trace
                     type: string
+                  managed:
+                    description: The configuration that is used by the portions of
+                      PostgreSQL that are managed by the CNP instance manager
+                    properties:
+                      roles:
+                        description: Database roles managed by the `Cluster`
+                        items:
+                          description: "RoleConfiguration is the representation, in
+                            Kubernetes, of a PostgreSQL role with the additional field
+                            Ensure specifying whether to ensure the presence or absence
+                            of the role in the database \n The defaults of the CREATE
+                            ROLE command are applied Reference: https://www.postgresql.org/docs/current/sql-createrole.html"
+                          properties:
+                            bypassrls:
+                              description: Whether a role bypasses every row-level
+                                security (RLS) policy. Default is `false`.
+                              type: boolean
+                            comment:
+                              description: Description of the role
+                              type: string
+                            connectionLimit:
+                              default: -1
+                              description: If the role can log in, this specifies
+                                how many concurrent connections the role can make.
+                                `-1` (the default) means no limit.
+                              format: int64
+                              type: integer
+                            createdb:
+                              description: When set to `true`, the role being defined
+                                will be allowed to create new databases. Specifying
+                                `false` (default) will deny a role the ability to
+                                create databases.
+                              type: boolean
+                            createrole:
+                              description: Whether the role will be permitted to create,
+                                alter, drop, comment on, change the security label
+                                for, and grant or revoke membership in other roles.
+                                Default is `false`.
+                              type: boolean
+                            disablePassword:
+                              description: DisablePassword indicates that a role's
+                                password should be set to NULL in Postgres
+                              type: boolean
+                            ensure:
+                              default: present
+                              description: Ensure the role is `present` or `absent`
+                                - defaults to "present"
+                              enum:
+                              - present
+                              - absent
+                              type: string
+                            inRoles:
+                              description: List of one or more existing roles to which
+                                this role will be immediately added as a new member.
+                                Default empty.
+                              items:
+                                type: string
+                              type: array
+                            inherit:
+                              default: true
+                              description: Whether a role "inherits" the privileges
+                                of roles it is a member of. Defaults is `true`.
+                              type: boolean
+                            login:
+                              description: Whether the role is allowed to log in.
+                                A role having the `login` attribute can be thought
+                                of as a user. Roles without this attribute are useful
+                                for managing database privileges, but are not users
+                                in the usual sense of the word. Default is `false`.
+                              type: boolean
+                            name:
+                              description: Name of the role
+                              type: string
+                            passwordSecret:
+                              description: Secret containing the password of the role
+                                (if present) If null, the password will be ignored
+                                unless DisablePassword is set
+                              properties:
+                                name:
+                                  description: Name of the referent.
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            replication:
+                              description: Whether a role is a replication role. A
+                                role must have this attribute (or be a superuser)
+                                in order to be able to connect to the server in replication
+                                mode (physical or logical replication) and in order
+                                to be able to create or drop replication slots. A
+                                role having the `replication` attribute is a very
+                                highly privileged role, and should only be used on
+                                roles actually used for replication. Default is `false`.
+                              type: boolean
+                            superuser:
+                              description: Whether the role is a `superuser` who can
+                                override all access restrictions within the database
+                                - superuser status is dangerous and should be used
+                                only when really needed. You must yourself be a superuser
+                                to create a new superuser. Defaults is `false`.
+                              type: boolean
+                            validUntil:
+                              description: Date and time after which the role's password
+                                is no longer valid. When omitted, the password will
+                                never expire (default).
+                              format: date-time
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                    type: object
                   metadata:
                     description: Metadata applied exclusively to the generated Cluster
                       resources. Useful for applying AppArmor profiles.
@@ -7002,6 +8123,160 @@ spec:
                         default: false
                         description: Enable or disable the `PodMonitor`
                         type: boolean
+                      podMonitorMetricRelabelings:
+                        description: The list of metric relabelings for the `PodMonitor`.
+                          Applied to samples before ingestion.
+                        items:
+                          description: "RelabelConfig allows dynamic rewriting of
+                            the label set for targets, alerts, scraped samples and
+                            remote write samples. \n More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config"
+                          properties:
+                            action:
+                              default: replace
+                              description: "Action to perform based on the regex matching.
+                                \n `Uppercase` and `Lowercase` actions require Prometheus
+                                >= v2.36.0. `DropEqual` and `KeepEqual` actions require
+                                Prometheus >= v2.41.0. \n Default: \"Replace\""
+                              enum:
+                              - replace
+                              - Replace
+                              - keep
+                              - Keep
+                              - drop
+                              - Drop
+                              - hashmod
+                              - HashMod
+                              - labelmap
+                              - LabelMap
+                              - labeldrop
+                              - LabelDrop
+                              - labelkeep
+                              - LabelKeep
+                              - lowercase
+                              - Lowercase
+                              - uppercase
+                              - Uppercase
+                              - keepequal
+                              - KeepEqual
+                              - dropequal
+                              - DropEqual
+                              type: string
+                            modulus:
+                              description: "Modulus to take of the hash of the source
+                                label values. \n Only applicable when the action is
+                                `HashMod`."
+                              format: int64
+                              type: integer
+                            regex:
+                              description: Regular expression against which the extracted
+                                value is matched.
+                              type: string
+                            replacement:
+                              description: "Replacement value against which a Replace
+                                action is performed if the regular expression matches.
+                                \n Regex capture groups are available."
+                              type: string
+                            separator:
+                              description: Separator is the string between concatenated
+                                SourceLabels.
+                              type: string
+                            sourceLabels:
+                              description: The source labels select values from existing
+                                labels. Their content is concatenated using the configured
+                                Separator and matched against the configured regular
+                                expression.
+                              items:
+                                description: LabelName is a valid Prometheus label
+                                  name which may only contain ASCII letters, numbers,
+                                  as well as underscores.
+                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                type: string
+                              type: array
+                            targetLabel:
+                              description: "Label to which the resulting string is
+                                written in a replacement. \n It is mandatory for `Replace`,
+                                `HashMod`, `Lowercase`, `Uppercase`, `KeepEqual` and
+                                `DropEqual` actions. \n Regex capture groups are available."
+                              type: string
+                          type: object
+                        type: array
+                      podMonitorRelabelings:
+                        description: The list of relabelings for the `PodMonitor`.
+                          Applied to samples before scraping.
+                        items:
+                          description: "RelabelConfig allows dynamic rewriting of
+                            the label set for targets, alerts, scraped samples and
+                            remote write samples. \n More info: https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config"
+                          properties:
+                            action:
+                              default: replace
+                              description: "Action to perform based on the regex matching.
+                                \n `Uppercase` and `Lowercase` actions require Prometheus
+                                >= v2.36.0. `DropEqual` and `KeepEqual` actions require
+                                Prometheus >= v2.41.0. \n Default: \"Replace\""
+                              enum:
+                              - replace
+                              - Replace
+                              - keep
+                              - Keep
+                              - drop
+                              - Drop
+                              - hashmod
+                              - HashMod
+                              - labelmap
+                              - LabelMap
+                              - labeldrop
+                              - LabelDrop
+                              - labelkeep
+                              - LabelKeep
+                              - lowercase
+                              - Lowercase
+                              - uppercase
+                              - Uppercase
+                              - keepequal
+                              - KeepEqual
+                              - dropequal
+                              - DropEqual
+                              type: string
+                            modulus:
+                              description: "Modulus to take of the hash of the source
+                                label values. \n Only applicable when the action is
+                                `HashMod`."
+                              format: int64
+                              type: integer
+                            regex:
+                              description: Regular expression against which the extracted
+                                value is matched.
+                              type: string
+                            replacement:
+                              description: "Replacement value against which a Replace
+                                action is performed if the regular expression matches.
+                                \n Regex capture groups are available."
+                              type: string
+                            separator:
+                              description: Separator is the string between concatenated
+                                SourceLabels.
+                              type: string
+                            sourceLabels:
+                              description: The source labels select values from existing
+                                labels. Their content is concatenated using the configured
+                                Separator and matched against the configured regular
+                                expression.
+                              items:
+                                description: LabelName is a valid Prometheus label
+                                  name which may only contain ASCII letters, numbers,
+                                  as well as underscores.
+                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                type: string
+                              type: array
+                            targetLabel:
+                              description: "Label to which the resulting string is
+                                written in a replacement. \n It is mandatory for `Replace`,
+                                `HashMod`, `Lowercase`, `Uppercase`, `KeepEqual` and
+                                `DropEqual` actions. \n Regex capture groups are available."
+                              type: string
+                          type: object
+                        type: array
                     type: object
                   otel:
                     description: OpenTelemetry Configuration
@@ -7069,6 +8344,12 @@ spec:
                   postgresql:
                     description: Configuration of the PostgreSQL server
                     properties:
+                      enableAlterSystem:
+                        description: If this parameter is true, the user will be able
+                          to invoke `ALTER SYSTEM` on this EDB Postgres for Kubernetes
+                          Cluster. This should only be used for debugging and troubleshooting.
+                          Defaults to false.
+                        type: boolean
                       epas:
                         description: EDB Postgres Advanced Server specific configurations
                         properties:
@@ -7253,6 +8534,12 @@ spec:
                         items:
                           type: string
                         type: array
+                      pg_ident:
+                        description: PostgreSQL User Name Maps rules (lines to be
+                          appended to the pg_ident.conf file)
+                        items:
+                          type: string
+                        type: array
                       promotionTimeout:
                         description: Specifies the maximum number of seconds to wait
                           when promoting an instance to primary. Default value is
@@ -7346,7 +8633,8 @@ spec:
                           in a file on the node should be used. The profile must be
                           preconfigured on the node to work. Must be a descending
                           path, relative to the kubelet's configured seccomp profile
-                          location. Must only be set if type is "Localhost".
+                          location. Must be set if type is "Localhost". Must NOT be
+                          set for any other type.
                         type: string
                       type:
                         description: "type indicates which kind of seccomp profile
@@ -7386,16 +8674,24 @@ spec:
                     required:
                     - metadata
                     type: object
+                  smartShutdownTimeout:
+                    default: 15
+                    description: 'The time in seconds that controls the window of
+                      time reserved for the smart shutdown of Postgres to complete.
+                      Make sure you reserve enough time for the operator to request
+                      a fast shutdown of Postgres (that is: `stopDelay` - `smartShutdownTimeout`).'
+                    format: int32
+                    type: integer
                   startDelay:
-                    default: 30
+                    default: 3600
                     description: The time in seconds that is allowed for a PostgreSQL
-                      instance to successfully start up (default 30)
+                      instance to successfully start up (default 3600)
                     format: int32
                     type: integer
                   stopDelay:
-                    default: 30
+                    default: 180
                     description: The time in seconds that is allowed for a PostgreSQL
-                      instance node to gracefully shutdown (default 30)
+                      instance node to gracefully shutdown (default 180)
                     format: int32
                     type: integer
                   storage:
@@ -7505,30 +8801,6 @@ spec:
                               must still be higher than capacity recorded in the status
                               field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
                             properties:
-                              claims:
-                                description: "Claims lists the names of resources,
-                                  defined in spec.resourceClaims, that are used by
-                                  this container. \n This is an alpha field and requires
-                                  enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable. It can only be set for
-                                  containers."
-                                items:
-                                  description: ResourceClaim references one entry
-                                    in PodSpec.ResourceClaims.
-                                  properties:
-                                    name:
-                                      description: Name must match the name of one
-                                        entry in pod.spec.resourceClaims of the Pod
-                                        where this field is used. It makes that resource
-                                        available inside a container.
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -7605,6 +8877,26 @@ spec:
                             description: 'storageClassName is the name of the StorageClass
                               required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
                             type: string
+                          volumeAttributesClassName:
+                            description: 'volumeAttributesClassName may be used to
+                              set the VolumeAttributesClass used by this claim. If
+                              specified, the CSI driver will create or update the
+                              volume with the attributes defined in the corresponding
+                              VolumeAttributesClass. This has a different purpose
+                              than storageClassName, it can be changed after the claim
+                              is created. An empty string value means that no VolumeAttributesClass
+                              will be applied to the claim but it''s not allowed to
+                              reset this field to empty string once it is set. If
+                              unspecified and the PersistentVolumeClaim is unbound,
+                              the default VolumeAttributesClass will be set by the
+                              persistentvolume controller if it exists. If the resource
+                              referred to by volumeAttributesClass does not exist,
+                              this PersistentVolumeClaim will be set to a Pending
+                              state, as reflected by the modifyVolumeStatus field,
+                              until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass
+                              (Alpha) Using this field requires the VolumeAttributesClass
+                              feature gate to be enabled.'
+                            type: string
                           volumeMode:
                             description: volumeMode defines what type of volume is
                               required by the claim. Value of Filesystem is implied
@@ -7626,10 +8918,9 @@ spec:
                           be decreased.
                         type: string
                       storageClass:
-                        description: StorageClass to use for database data (`PGDATA`).
-                          Applied after evaluating the PVC template, if available.
-                          If not specified, generated PVCs will be satisfied by the
-                          default storage class
+                        description: StorageClass to use for PVCs. Applied after evaluating
+                          the PVC template, if available. If not specified, the generated
+                          PVCs will use the default storage class
                         type: string
                     type: object
                   walStorage:
@@ -7739,30 +9030,6 @@ spec:
                               must still be higher than capacity recorded in the status
                               field of the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources'
                             properties:
-                              claims:
-                                description: "Claims lists the names of resources,
-                                  defined in spec.resourceClaims, that are used by
-                                  this container. \n This is an alpha field and requires
-                                  enabling the DynamicResourceAllocation feature gate.
-                                  \n This field is immutable. It can only be set for
-                                  containers."
-                                items:
-                                  description: ResourceClaim references one entry
-                                    in PodSpec.ResourceClaims.
-                                  properties:
-                                    name:
-                                      description: Name must match the name of one
-                                        entry in pod.spec.resourceClaims of the Pod
-                                        where this field is used. It makes that resource
-                                        available inside a container.
-                                      type: string
-                                  required:
-                                  - name
-                                  type: object
-                                type: array
-                                x-kubernetes-list-map-keys:
-                                - name
-                                x-kubernetes-list-type: map
                               limits:
                                 additionalProperties:
                                   anyOf:
@@ -7839,6 +9106,26 @@ spec:
                             description: 'storageClassName is the name of the StorageClass
                               required by the claim. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#class-1'
                             type: string
+                          volumeAttributesClassName:
+                            description: 'volumeAttributesClassName may be used to
+                              set the VolumeAttributesClass used by this claim. If
+                              specified, the CSI driver will create or update the
+                              volume with the attributes defined in the corresponding
+                              VolumeAttributesClass. This has a different purpose
+                              than storageClassName, it can be changed after the claim
+                              is created. An empty string value means that no VolumeAttributesClass
+                              will be applied to the claim but it''s not allowed to
+                              reset this field to empty string once it is set. If
+                              unspecified and the PersistentVolumeClaim is unbound,
+                              the default VolumeAttributesClass will be set by the
+                              persistentvolume controller if it exists. If the resource
+                              referred to by volumeAttributesClass does not exist,
+                              this PersistentVolumeClaim will be set to a Pending
+                              state, as reflected by the modifyVolumeStatus field,
+                              until such as a resource exists. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#volumeattributesclass
+                              (Alpha) Using this field requires the VolumeAttributesClass
+                              feature gate to be enabled.'
+                            type: string
                           volumeMode:
                             description: volumeMode defines what type of volume is
                               required by the claim. Value of Filesystem is implied
@@ -7860,10 +9147,9 @@ spec:
                           be decreased.
                         type: string
                       storageClass:
-                        description: StorageClass to use for database data (`PGDATA`).
-                          Applied after evaluating the PVC template, if available.
-                          If not specified, generated PVCs will be satisfied by the
-                          default storage class
+                        description: StorageClass to use for PVCs. Applied after evaluating
+                          the PVC template, if available. If not specified, the generated
+                          PVCs will use the default storage class
                         type: string
                     type: object
                 required:
@@ -7897,6 +9183,17 @@ spec:
                       type: string
                     description: The recoverability points, keyed per CNP clusterName,
                       as a date in RFC3339 format
+                    type: object
+                  firstRecoverabilityPointsByMethod:
+                    additionalProperties:
+                      additionalProperties:
+                        format: date-time
+                        type: string
+                      description: RecoverabilityPointsByMethod contains the first
+                        recoverability points for a given backup method
+                      type: object
+                    description: 'The recoverability points by method, keyed per CNP
+                      clusterName nolint: lll'
                     type: object
                   podDisruptionBudgetIsPresent:
                     type: boolean
@@ -7963,6 +9260,12 @@ spec:
                       description: PGDProxyEntry shows information about the proxies
                         available in the PGD configuration
                       properties:
+                        consensusGracePeriod:
+                          description: ConsensusGracePeriod the duration in seconds
+                            for which proxy continues to route even upon loss of a
+                            Raft leader.
+                          format: int64
+                          type: integer
                         fallbackGroupNames:
                           description: FallbackGroupNames are the names of the fallback
                             groups configured for this proxy
@@ -8024,9 +9327,80 @@ spec:
                 properties:
                   clusterName:
                     type: string
+                  scheduledBackupHash:
+                    type: string
                   scheduledBackupName:
                     type: string
                 type: object
+              conditions:
+                description: Conditions for PGDGroup object
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
               connectivity:
                 description: Last known status of Connectivity
                 properties:
@@ -8131,6 +9505,38 @@ spec:
                       type: string
                   type: object
                 type: array
+              pause:
+                description: Last known status of Pause
+                properties:
+                  active:
+                    description: 'Active indicates the PGDGroup is either: - in process
+                      of pausing - already paused - in process of resuming'
+                    type: boolean
+                  instances:
+                    description: Instances is the number of paused PGD instances
+                    format: int32
+                    type: integer
+                  lastCompletedTime:
+                    description: LastCompletedTime is last time the PGDGroup completed
+                      pausing
+                    format: date-time
+                    type: string
+                  lastResumeCompletedTime:
+                    description: LastCompletedTime is last time the PGDGroup completed
+                      resuming
+                    format: date-time
+                    type: string
+                  lastResumeStartedTime:
+                    description: LastResumeStartedTime is the last time the PGDGroup
+                      started resuming
+                    format: date-time
+                    type: string
+                  lastStartedTime:
+                    description: LastStartedTime is the last time the PGDGroup started
+                      pausing
+                    format: date-time
+                    type: string
+                type: object
               phase:
                 description: The initialization phase of this cluster
                 type: string
@@ -8151,6 +9557,20 @@ spec:
               restore:
                 description: The status of the restore process
                 properties:
+                  VolumeSnapshots:
+                    description: selected volumeSnapshots to restore
+                    items:
+                      description: VolumeSnapshotRestoreStatus the volumeSnapshot
+                        to restore
+                      properties:
+                        pvcRole:
+                          description: PVCRole is the pvcRole snapshot to restore
+                          type: string
+                        snapshotName:
+                          description: SnapshotName is the snapshot name to restore
+                          type: string
+                      type: object
+                    type: array
                   serverName:
                     description: The name of the server to be restored
                     type: string
