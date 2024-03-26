@@ -192,8 +192,8 @@ helm upgrade --dependency-update \
   --set edb-postgres-for-kubernetes.enabled=false \
   --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
   --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
-  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131 
+  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.4.0-1 \
+  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0 
 ```
 
 **Note:** in the above command, the flags setting the credentials were elided
@@ -240,8 +240,8 @@ helm upgrade --dependency-update \
   --set image.imageCredentials.password=${PASSWORD} \
   --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
   --set edb-postgres-for-kubernetes.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
-  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.2-5.0.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.0.1-131
+  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.4.0-1 \
+  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0
 ```
 
 ## Deployment using local chart
