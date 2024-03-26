@@ -42,9 +42,11 @@ edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
 Once it is ready, you can verify that you can deploy the sample cluster
 suggested by the helm chart.
 
+### Single namespace installation
+
 It is possible to limit the operator's capabilities to solely the namespace in
-which it has been set up. By implementing this restriction, the cluster-level
-permissions required by the operator will be substantially minimized:
+which it has been installed. With this restriction, the cluster-level
+permissions required by the operator will be substantially reduced:
 
 ```console
 helm upgrade --install edb-pg4k \
