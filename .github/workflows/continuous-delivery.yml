@@ -102,3 +102,42 @@ jobs:
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
+
+  deploy-ep4k-single-namespace:
+    runs-on: ubuntu-22.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.ep4k-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3.5
+        with:
+          version: v3.11.3
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.8.0
+
+      - name: Deploy in single-namespace mode using helm chart
+        run: |
+          helm upgrade --install edb-pg4k --namespace single-install \
+          --set config.clusterWide=false \
+          --create-namespace charts/edb-postgres-for-kubernetes --wait
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3.2
+
+      - name: Deploy a cluster in the watched namespace
+        run: |
+          kubectl -n single-install apply -f hack/samples/ep4k-cluster.yaml
+          PHASE="Cluster in healthy state"
+          kubectl -n single-install wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
+
+      - name: Ignore deploying a cluster in another namespace
+        run: |
+          kubectl create ns test-ignore
+          kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
+          kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
