@@ -124,7 +124,8 @@ jobs:
 
       - name: Deploy using helm chart
         run: |
-          helm upgrade --install edb-pg4k --namespace postgresql-operator-system \
+          helm upgrade --install edb-pg4k --namespace single-install \
+          --set config.clusterWide=false \
           --create-namespace charts/edb-postgres-for-kubernetes --wait
 
       - name: Install kubectl
