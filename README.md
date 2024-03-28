@@ -46,7 +46,11 @@ suggested by the helm chart.
 
 It is possible to limit the operator's capabilities to solely the namespace in
 which it has been installed. With this restriction, the cluster-level
-permissions required by the operator will be substantially reduced:
+permissions required by the operator will be substantially reduced, and
+the security profile of the installation is enhanced.
+
+You can install the operator in single-namespace mode by setting the
+`config.clusterWide` flag to false, as in the following example:
 
 ```console
 helm upgrade --install edb-pg4k \
@@ -55,6 +59,12 @@ helm upgrade --install edb-pg4k \
   --set config.clusterWide=false \
   edb/edb-postgres-for-kubernetes
 ```
+
+**IMPORTANT**: the single-namespace installation mode can't coexist
+with the cluster-wide operator. Otherwise there would be collisions when
+managing the resources in the namespace watched by the single-namespace
+operator.
+It is up to the user to ensure there is no collision between operators.
 
 ### Deploying EDB Postgres for Kubernetes (PG4K) operator from EDB's private registry
 
