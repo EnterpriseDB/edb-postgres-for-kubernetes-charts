@@ -71,3 +71,25 @@ Create the imagePullSecret
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Define which type of roles we should have
+*/}}
+{{- define "edb-postgres-for-kubernetes.role" }}
+{{- if .Values.config.clusterWide }}
+{{- printf "ClusterRole" }}
+{{- else }}
+{{- printf "Role" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define the type of binding for the role
+*/}}
+{{- define "edb-postgres-for-kubernetes.binding" }}
+{{- if .Values.config.clusterWide }}
+{{- printf "ClusterRoleBinding" }}
+{{- else }}
+{{- printf "RoleBinding" }}
+{{- end }}
+{{- end }}
