@@ -47,7 +47,7 @@ suggested by the helm chart.
 It is possible to limit the operator's capabilities to solely the namespace in
 which it has been installed. With this restriction, the cluster-level
 permissions required by the operator will be substantially reduced, and
-the security profile of the installation is enhanced.
+the security profile of the installation will be enhanced.
 
 You can install the operator in single-namespace mode by setting the
 `config.clusterWide` flag to false, as in the following example:

@@ -27,381 +27,12 @@ metadata:
 {{- end }}
 
 {{- if .Values.rbac.create }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: {{ include "edb-postgres-for-kubernetes.role" . }}
-metadata:
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-  labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods/exec
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods/status
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - serviceaccounts
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - deployments
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - batch
-  resources:
-  - jobs
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - coordination.k8s.io
-  resources:
-  - leases
-  verbs:
-  - create
-  - get
-  - update
-- apiGroups:
-  - monitoring.coreos.com
-  resources:
-  - podmonitors
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - backups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - backups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusters
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusters/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusters/status
-  verbs:
-  - get
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - poolers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - poolers/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - poolers/status
-  verbs:
-  - get
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - scheduledbackups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - scheduledbackups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - rolebindings
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
-  - roles
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - snapshot.storage.k8s.io
-  resources:
-  - volumesnapshots
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - watch
 {{/*
-In case we have a clusterWide installation we should create
-in the same role these permissions
+If we're doing a clusterWide installation (default)
+we create a ClusterRole with all the necessary rules for the operator,
+and a ClusterRoleBinding
 */}}
 {{- if .Values.config.clusterWide }}
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - validatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - update
-{{- end }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: {{ include "edb-postgres-for-kubernetes.binding" . }}
-metadata:
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-  labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: {{ include "edb-postgres-for-kubernetes.role" . }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-subjects:
-- kind: ServiceAccount
-  name: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
-  namespace: {{ .Release.Namespace }}
-
-{{/*
-In case that we're not doing a clusterWide installation
-we should create a ClusterRole for the operator that will
-allow a couple of missing permissions
-*/}}
-{{- if eq .Values.config.clusterWide false }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -414,48 +45,8 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - mutatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
-  - validatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - update
+{{- include "edb-postgres-for-kubernetes.commonRules" . }}
+{{- include "edb-postgres-for-kubernetes.clusterwideRules" . }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -470,6 +61,78 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{/*
+If we're doing a single-namespace installation, we're
+restricting attention to the release namespace (.Release.Namespace).
+We put the clusterwide rules in a ClusterRole and add a ClusterRoleBinding.
+We also create a Role and a RoleBinding for the rules that can be
+restricted to a single namespace
+*/}}
+{{- else }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+{{- include "edb-postgres-for-kubernetes.clusterwideRules" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+{{- include "edb-postgres-for-kubernetes.commonRules" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
   name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
 subjects:
 - kind: ServiceAccount
