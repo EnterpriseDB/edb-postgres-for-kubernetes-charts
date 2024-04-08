@@ -27,12 +27,6 @@ metadata:
 {{- end }}
 
 {{- if .Values.rbac.create }}
-{{/*
-If we're doing a clusterWide installation (default)
-we create a ClusterRole with all the necessary rules for the operator,
-and a ClusterRoleBinding
-*/}}
-{{- if .Values.config.clusterWide }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -45,8 +39,14 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 rules:
-{{- include "edb-postgres-for-kubernetes.commonRules" . }}
 {{- include "edb-postgres-for-kubernetes.clusterwideRules" . }}
+{{/*
+If we're doing a clusterWide installation (default)
+we add ALL the necessary rules for the operator to the ClusterRole
+*/}}
+{{- if .Values.config.clusterWide }}
+{{- include "edb-postgres-for-kubernetes.commonRules" . }}
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -67,26 +67,12 @@ subjects:
   name: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{/*
-If we're doing a single-namespace installation, we're
-restricting attention to the release namespace (.Release.Namespace).
-We put the clusterwide rules in a ClusterRole and add a ClusterRoleBinding.
-We also create a Role and a RoleBinding for the rules that can be
-restricted to a single namespace
+If we're doing a single-namespace installation
+we create a Role with the common rules for the operator,
+and a RoleBinding. We already created the ClusterRole above with the
+required cluster-wide rules
 */}}
-{{- else }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-  labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-rules:
-{{- include "edb-postgres-for-kubernetes.clusterwideRules" . }}
+{{- if eq .Values.config.clusterWide false }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -100,25 +86,6 @@ metadata:
   {{- end }}
 rules:
 {{- include "edb-postgres-for-kubernetes.commonRules" . }}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-  labels:
-    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  {{- with .Values.commonAnnotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}
-subjects:
-- kind: ServiceAccount
-  name: {{ include "edb-postgres-for-kubernetes.serviceAccountName" . }}
-  namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
