@@ -52,7 +52,7 @@ jobs:
           --create-namespace charts/edb-postgres-for-kubernetes --wait
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -91,7 +91,7 @@ jobs:
 
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -128,7 +128,7 @@ jobs:
           --set config.clusterWide=false \
           --create-namespace charts/edb-postgres-for-kubernetes --wait
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster in the watched namespace
         run: |
