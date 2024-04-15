@@ -42,6 +42,30 @@ edb-pg4k-edb-postgres-for-kubernetes   1/1     1            1           11s
 Once it is ready, you can verify that you can deploy the sample cluster
 suggested by the helm chart.
 
+### Single namespace installation
+
+It is possible to limit the operator's capabilities to solely the namespace in
+which it has been installed. With this restriction, the cluster-level
+permissions required by the operator will be substantially reduced, and
+the security profile of the installation will be enhanced.
+
+You can install the operator in single-namespace mode by setting the
+`config.clusterWide` flag to false, as in the following example:
+
+```console
+helm upgrade --install edb-pg4k \
+  --namespace postgresql-operator-system \
+  --create-namespace \
+  --set config.clusterWide=false \
+  edb/edb-postgres-for-kubernetes
+```
+
+**IMPORTANT**: the single-namespace installation mode can't coexist
+with the cluster-wide operator. Otherwise there would be collisions when
+managing the resources in the namespace watched by the single-namespace
+operator.
+It is up to the user to ensure there is no collision between operators.
+
 ### Deploying EDB Postgres for Kubernetes (PG4K) operator from EDB's private registry
 
 By default, PG4K will be deployed using [images publicly hosted on Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql),
