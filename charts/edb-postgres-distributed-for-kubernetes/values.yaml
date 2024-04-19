@@ -80,11 +80,11 @@ config:
   data:
     PULL_SECRET_NAME: pgd-operator-pull-secret
     # -- Specifies the location of the pgd image to be used for the operator
-    # docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.4.0-1
-    PGD_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:15.6-5.4.0-1
+    # docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.2-5.4.1-1
+    PGD_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.2-5.4.1-1
     # -- Specifies the location of the pgd-proxy image to be used for the operator
-    #  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0
-    PGD_PROXY_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.4.0
+    #  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0-2
+    PGD_PROXY_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.4.0-2
   name: pgd-operator-controller-manager-config
 
 # -- Additional arguments to be added to the operator's args list
