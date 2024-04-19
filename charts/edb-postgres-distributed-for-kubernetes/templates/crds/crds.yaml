@@ -9586,4 +9586,4 @@ spec:
         specReplicasPath: .spec.instances
         statusReplicasPath: .status.CNP.dataInstances
       status: {}
-{{- end }}      
+{{- end }}
