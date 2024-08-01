@@ -394,18 +394,14 @@ Define the set of rules that must be applied clusterwide
   - mutatingwebhookconfigurations
   verbs:
   - get
-  - list
   - patch
-  - update
 - apiGroups:
   - admissionregistration.k8s.io
   resources:
   - validatingwebhookconfigurations
   verbs:
   - get
-  - list
   - patch
-  - update
 - apiGroups:
   - apiextensions.k8s.io
   resources:
