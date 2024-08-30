@@ -403,14 +403,6 @@ Define the set of rules that must be applied clusterwide
   - get
   - patch
 - apiGroups:
-  - apiextensions.k8s.io
-  resources:
-  - customresourcedefinitions
-  verbs:
-  - get
-  - list
-  - update
-- apiGroups:
   - postgresql.k8s.enterprisedb.io
   resources:
   - clusterimagecatalogs
