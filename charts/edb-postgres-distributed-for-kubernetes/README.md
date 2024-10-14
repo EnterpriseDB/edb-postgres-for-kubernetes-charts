@@ -1,6 +1,6 @@
 # edb-postgres-distributed-for-kubernetes
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
 
 EDB Postgres Distributed for Kubernetes Helm Chart
 
@@ -23,7 +23,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.jetstack.io | cert-manager | 1.14.4 |
+| https://charts.jetstack.io | cert-manager | 1.16.1 |
 | https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/ | edb-postgres-for-kubernetes | 0.20.3 |
 
 ## Values
@@ -36,8 +36,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
-| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.2-5.4.1-1"` | Specifies the location of the pgd image to be used for the operator docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.2-5.4.1-1 |
-| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.4.0-2"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0-2 |
+| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1"` | Specifies the location of the pgd image to be used for the operator docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1 |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0-2 |
 | config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
