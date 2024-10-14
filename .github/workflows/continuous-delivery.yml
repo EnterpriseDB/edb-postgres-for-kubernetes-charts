@@ -14,7 +14,7 @@ jobs:
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.1.7
 
       - name: Check for changes
         uses: dorny/paths-filter@v3.0.2
@@ -34,17 +34,17 @@ jobs:
     if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
         with:
           version: v3.11.3
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.9.0
+        uses: helm/kind-action@v1.10.0
 
       - name: Deploy using helm chart
         run: |
@@ -52,7 +52,7 @@ jobs:
           --create-namespace charts/edb-postgres-for-kubernetes --wait
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -68,17 +68,17 @@ jobs:
     if: needs.change-triage.outputs.pg4k-pgd-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
         with:
           version: v3.11.3
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.9.0
+        uses: helm/kind-action@v1.10.0
 
       - name: Deploy using helm chart
         run: |
@@ -91,7 +91,7 @@ jobs:
 
 
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -110,17 +110,17 @@ jobs:
     if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
         with:
           version: v3.11.3
 
       - name: Create kind cluster
-        uses: helm/kind-action@v1.8.0
+        uses: helm/kind-action@v1.10.0
 
       - name: Deploy in single-namespace mode using helm chart
         run: |
@@ -128,7 +128,7 @@ jobs:
           --set config.clusterWide=false \
           --create-namespace charts/edb-postgres-for-kubernetes --wait
       - name: Install kubectl
-        uses: azure/setup-kubectl@v3.2
+        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster in the watched namespace
         run: |
