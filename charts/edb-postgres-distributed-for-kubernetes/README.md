@@ -37,7 +37,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
 | config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1"` | Specifies the location of the pgd image to be used for the operator docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1 |
-| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0-2 |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0 |
 | config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |

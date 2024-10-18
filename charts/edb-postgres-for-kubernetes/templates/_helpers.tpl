@@ -81,6 +81,8 @@ namespace scope or clusterwide
   - ""
   resources:
   - configmaps
+  - secrets
+  - services
   verbs:
   - create
   - delete
@@ -93,6 +95,7 @@ namespace scope or clusterwide
   - ""
   resources:
   - configmaps/status
+  - secrets/status
   verbs:
   - get
   - patch
@@ -108,27 +111,7 @@ namespace scope or clusterwide
   - ""
   resources:
   - persistentvolumeclaims
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - pods
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - pods/exec
   verbs:
   - create
@@ -146,41 +129,9 @@ namespace scope or clusterwide
 - apiGroups:
   - ""
   resources:
-  - secrets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - secrets/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
   - serviceaccounts
   verbs:
   - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - create
-  - delete
   - get
   - list
   - patch
@@ -244,87 +195,8 @@ namespace scope or clusterwide
   - postgresql.k8s.enterprisedb.io
   resources:
   - backups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - backups/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
   - clusters
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusters/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusters/status
-  verbs:
-  - get
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - imagecatalogs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
   - poolers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - poolers/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - poolers/status
-  verbs:
-  - get
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
   - scheduledbackups
   verbs:
   - create
@@ -337,25 +209,41 @@ namespace scope or clusterwide
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
   resources:
+  - backups/status
   - scheduledbackups/status
   verbs:
   - get
   - patch
   - update
 - apiGroups:
-  - rbac.authorization.k8s.io
+  - postgresql.k8s.enterprisedb.io
   resources:
-  - rolebindings
+  - imagecatalogs
   verbs:
-  - create
   - get
   - list
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - clusters/finalizers
+  - poolers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - clusters/status
+  - poolers/status
+  verbs:
+  - get
   - patch
   - update
   - watch
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
+  - rolebindings
   - roles
   verbs:
   - create
@@ -392,12 +280,6 @@ Define the set of rules that must be applied clusterwide
   - admissionregistration.k8s.io
   resources:
   - mutatingwebhookconfigurations
-  verbs:
-  - get
-  - patch
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
   - validatingwebhookconfigurations
   verbs:
   - get
