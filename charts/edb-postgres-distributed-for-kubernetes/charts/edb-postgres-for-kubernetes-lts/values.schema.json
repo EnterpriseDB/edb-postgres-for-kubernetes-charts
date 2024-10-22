@@ -8,39 +8,20 @@
         "affinity": {
             "type": "object"
         },
-        "cert-manager": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "installCRDs": {
-                    "type": "boolean"
-                }
-            }
-        },
         "commonAnnotations": {
             "type": "object"
         },
         "config": {
             "type": "object",
             "properties": {
+                "clusterWide": {
+                    "type": "boolean"
+                },
                 "create": {
                     "type": "boolean"
                 },
                 "data": {
-                    "type": "object",
-                    "properties": {
-                        "PGD_IMAGE_NAME": {
-                            "type": "string"
-                        },
-                        "PGD_PROXY_IMAGE_NAME": {
-                            "type": "string"
-                        },
-                        "PULL_SECRET_NAME": {
-                            "type": "string"
-                        }
-                    }
+                    "type": "object"
                 },
                 "name": {
                     "type": "string"
@@ -75,6 +56,14 @@
                 },
                 "runAsUser": {
                     "type": "integer"
+                },
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -83,46 +72,6 @@
             "properties": {
                 "create": {
                     "type": "boolean"
-                }
-            }
-        },
-        "edb-postgres-for-kubernetes-lts": {
-            "type": "object",
-            "properties": {
-                "config": {
-                    "type": "object",
-                    "properties": {
-                        "data": {
-                            "type": "object",
-                            "properties": {
-                                "PULL_SECRET_NAME": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                },
-                "enabled": {
-                    "type": "boolean"
-                },
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "repository": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "imagePullSecrets": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            }
-                        }
-                    }
                 }
             }
         },
@@ -164,52 +113,15 @@
             }
         },
         "imagePullSecrets": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    }
-                }
-            }
+            "type": "array"
         },
-        "managerConfig": {
+        "monitoringQueriesConfigMap": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "health": {
-                            "type": "object",
-                            "properties": {
-                                "healthProbeBindAddress": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "leaderElection": {
-                            "type": "object",
-                            "properties": {
-                                "enabled": {
-                                    "type": "boolean"
-                                },
-                                "resourceName": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "metrics": {
-                            "type": "object",
-                            "properties": {
-                                "bindAddress": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                },
                 "name": {
+                    "type": "string"
+                },
+                "queries": {
                     "type": "string"
                 }
             }
@@ -281,6 +193,25 @@
                 }
             }
         },
+        "test": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "object",
+                    "properties": {
+                        "pullPolicy": {
+                            "type": "string"
+                        },
+                        "repository": {
+                            "type": "string"
+                        },
+                        "tag": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "tolerations": {
             "type": "array"
         },
@@ -291,9 +222,6 @@
                     "type": "object",
                     "properties": {
                         "initialDelaySeconds": {
-                            "type": "integer"
-                        },
-                        "periodSeconds": {
                             "type": "integer"
                         }
                     }
@@ -316,9 +244,6 @@
                     "type": "object",
                     "properties": {
                         "initialDelaySeconds": {
-                            "type": "integer"
-                        },
-                        "periodSeconds": {
                             "type": "integer"
                         }
                     }

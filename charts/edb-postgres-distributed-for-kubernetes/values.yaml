@@ -158,8 +158,8 @@ cert-manager:
   enabled: true
   installCRDs: true
 
-# edb-postgres-for-kubernetes
-edb-postgres-for-kubernetes:
+# edb-postgres-for-kubernetes-lts
+edb-postgres-for-kubernetes-lts:
   enabled: true
   image:
     # Additional Registries

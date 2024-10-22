@@ -5,5 +5,5 @@
 *~
 
 # Charts Dependency files
-/charts/*/charts/
+/charts/*/charts/*.tgz
 /charts/*/Chart.lock
