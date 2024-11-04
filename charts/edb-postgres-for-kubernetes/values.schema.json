@@ -113,7 +113,15 @@
             }
         },
         "imagePullSecrets": {
-            "type": "array"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            }
         },
         "monitoringQueriesConfigMap": {
             "type": "object",
