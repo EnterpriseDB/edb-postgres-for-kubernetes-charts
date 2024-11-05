@@ -21,7 +21,12 @@
                     "type": "boolean"
                 },
                 "data": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                        "PULL_SECRET_NAME": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "name": {
                     "type": "string"

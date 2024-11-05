@@ -69,7 +69,8 @@ config:
   # INHERITED_LABELS: environment, workload, app
   # EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
 
-  data: {}
+  data:
+    PULL_SECRET_NAME: edb-pull-secret
   name: postgresql-operator-controller-manager-config
 
 # -- Additional arguments to be added to the operator's args list

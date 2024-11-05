@@ -27,7 +27,7 @@ EDB Postgres for Kubernetes Helm Chart
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.clusterWide | bool | `true` | This option determines if the operator is responsible for observing events across the entire Kubernetes cluster or if its focus should be narrowed down to the specific namespace within which it has been deployed. |
 | config.create | bool | `true` | Specifies whether the secret should be created |
-| config.data | object | `{}` |  |
+| config.data.PULL_SECRET_NAME | string | `"edb-pull-secret"` |  |
 | config.name | string | `"postgresql-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001,"seccompProfile":{"type":"RuntimeDefault"}}` | Container Security Context |
