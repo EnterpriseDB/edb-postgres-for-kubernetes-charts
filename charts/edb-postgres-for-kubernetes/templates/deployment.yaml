@@ -33,7 +33,6 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
       {{- with .Values.podAnnotations }}
-      annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
