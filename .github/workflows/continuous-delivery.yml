@@ -100,7 +100,7 @@ jobs:
 
           PHASE="Cluster in healthy state"
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
-  
+
   deploy-pg4k-pgd:
     runs-on: ubuntu-22.04
     needs:
@@ -139,9 +139,9 @@ jobs:
           kubectl apply -f hack/samples/pg4k-pgd-cluster.yaml
 
           PHASE="PGDGroup - Healthy"
-          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
-          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
-          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
 
   deploy-ep4k-single-namespace:
     runs-on: ubuntu-22.04

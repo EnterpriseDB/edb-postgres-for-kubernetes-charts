@@ -32,7 +32,6 @@ dependencies:
 - name: "edb-postgres-for-kubernetes-lts"
   condition: edb-postgres-for-kubernetes-lts.enabled
   version: "0.22.1"
-  repository: file://charts/edb-postgres-for-kubernetes-lts
 
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
