@@ -24,7 +24,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
-| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/ | edb-postgres-for-kubernetes | 0.20.3 |
+| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/ | edb-postgres-for-kubernetes-lts | 0.22.1 |
 
 ## Values
 

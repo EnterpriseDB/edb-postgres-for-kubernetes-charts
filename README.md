@@ -108,8 +108,8 @@ image registry by default:
 
 **Note:** As of release v1.0.3, the `edb-postgres-distributed-for-kubernetes` chart
 will now depend on PG4K LTS release helm chart, `edb-postgres-for-kubernetes-lts`,
-which is a subchart of `edb-postgres-distributed-for-kubernetes`. The PG4K LTS 
-release helm chart includes only the LTS release of PG4K, the document is updated 
+which is a subchart of `edb-postgres-distributed-for-kubernetes`. The PG4K LTS
+release helm chart includes only the LTS release of PG4K, the document is updated
 accordingly.
 
 ```console
@@ -154,17 +154,7 @@ Helm, but we can get around it by installing dependencies with separate
 invocations of `helm`.
 
 If you would like to install the operators in separate namespaces, please follow
-the below steps.
-
-#### Setup PG4K with LTS release 
-
-EDB Postgres Distributed for Kubernetes requires PG4K operator, with the LTS release 
-of PG4K operator is recommended. As of release v1.0.3, the helm chart 
-`edb-postgres-for-kubernetes-lts` has been created as a subchart of 
-`edb-postgres-distributed-for-kubernetes`. The subchart can be installed seperately.
-To deploy the subchart `edb-postgres-for-kubernetes-lts`, you can follow the 
-[PG4K helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator-pg4k) with
-the chart name modified accordingly.
+the below steps. As of release v1.0.3, the `edb-postgres-distributed-for-kubernetes` chart depends on the `edb-postgres-for-kubernetes-lts` sub-chart instead of the `edb-postgres-for-kubernetes` chart. So it is not recommended to install PG4K operator individually
 
 #### Setup cert-manager
 
@@ -216,7 +206,7 @@ helm upgrade --dependency-update \
   --set edb-postgres-for-kubernetes-lts.enabled=false \
   --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
   --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.4.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0 
+  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0
 ```
 
 **Note:** in the above command, the flags setting the credentials were elided
