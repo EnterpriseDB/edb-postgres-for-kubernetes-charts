@@ -89,7 +89,10 @@ jobs:
       - name: Deploy using helm chart
         run: |
           helm upgrade --install edb-pg4k-lts --namespace postgresql-operator-system \
-          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts --wait
+          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
+          --set image.imageCredentials.username=${{ secrets.CS_USER }} \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
@@ -209,7 +212,11 @@ jobs:
         run: |
           helm upgrade --install edb-pg4k-lts --namespace single-install \
           --set config.clusterWide=false \
-          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts --wait
+          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
+          --set image.imageCredentials.username=${{ secrets.CS_USER }} \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
 

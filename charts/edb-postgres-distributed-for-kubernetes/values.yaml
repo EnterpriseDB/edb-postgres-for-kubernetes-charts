@@ -29,13 +29,13 @@ image:
   imageCredentials:
     # -- Specifies if an imagePullSecret should be created
     create: true
-    name: pgd-operator-pull-secret
+    name: edb-pull-secret
     registry: docker.enterprisedb.com
     username: ""
     password: ""
 
 imagePullSecrets:
-  - name: pgd-operator-pull-secret
+  - name: edb-pull-secret
 nameOverride: ""
 fullnameOverride: ""
 
@@ -78,7 +78,7 @@ config:
   secret: false
 
   data:
-    PULL_SECRET_NAME: pgd-operator-pull-secret
+    PULL_SECRET_NAME: edb-pull-secret
     # -- Specifies the location of the pgd image to be used for the operator
     # docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1
     PGD_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1
@@ -162,11 +162,9 @@ cert-manager:
 edb-postgres-for-kubernetes-lts:
   enabled: true
   image:
-    # Additional Registries
-    # repository: docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes
     repository: docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes
   imagePullSecrets:
-    - name: pgd-operator-pull-secret
+    - name: edb-pull-secret
   config:
     data:
-      PULL_SECRET_NAME: pgd-operator-pull-secret
+      PULL_SECRET_NAME: edb-pull-secret

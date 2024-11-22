@@ -90,10 +90,18 @@ It is up to the user to ensure there is no collision between operators.
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
-**Note:** the `edb-postgres-distributed-for-kubernetes` chart will by default
-also install the PG4K and cert-manager operators, which are dependencies.
-You can avoid this if necessary. See the sub-section
-[on deploying individually](#deploying-the-operators-individually).
+Like PG4K install, both the operator and the operand images required by PG4K-PGD
+may be pulled from the `k8s_enterprise` or `k8s_standard` repositories at
+`docker.enterprisedb.com`, please obtaining an EDB subscription token before setup.
+
+The `edb-postgres-distributed-for-kubernetes` chart will by default install PG4K
+operator defined by sub-chart in the same namespace, the PG4K operator installed
+in the sub-chart is PG4K LTS release operator, which is upgraded along with the
+parent chart version release.
+
+The `edb-postgres-distributed-for-kubernetes` chart also install the cert-manager
+operators as dependency. You can avoid this if necessary. See the sub-section
+[on deploying individually](#deploying-the-PG4K-PGD-operators-individually).
 
 **Note:** this helm chart uses a default registry to retrieve the operator
 images from: `docker.enterprisedb.com/k8s_enterprise_pgd`.
@@ -106,18 +114,11 @@ operator and operand images. Make sure to replace USERNAME and PASSWORD with
 your own credentials in the command below, which uses the `k8s_enterprise_pgd`
 image registry by default:
 
-**Note:** As of release v1.0.3, the `edb-postgres-distributed-for-kubernetes` chart
-will now depend on PG4K LTS release helm chart, `edb-postgres-for-kubernetes-lts`,
-which is a subchart of `edb-postgres-distributed-for-kubernetes`. The PG4K LTS
-release helm chart includes only the LTS release of PG4K, the document is updated
-accordingly.
-
 ```console
 helm upgrade --dependency-update \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
-  --create-namespace \
-  edb/edb-postgres-distributed-for-kubernetes \
+  --create-namespace  edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
   --set image.imageCredentials.password=${PASSWORD}
 ```
@@ -141,7 +142,7 @@ helm chart are working:
 - set up a cert-manager issuer
 - deploy an example 3-region PGD cluster
 
-### Deploying the operators individually
+### Deploying the PG4K-PGD operators and cert-manager individually
 
 The chart `edb-postgres-distributed-for-kubernetes` is set by default to
 also install PG4K and cert-manager operators, which it depends on.
@@ -153,74 +154,76 @@ Installing all dependencies in the same namespace is a design limitation of
 Helm, but we can get around it by installing dependencies with separate
 invocations of `helm`.
 
-If you would like to install the operators in separate namespaces, please follow
-the below steps. As of release v1.0.3, the `edb-postgres-distributed-for-kubernetes` chart depends on the `edb-postgres-for-kubernetes-lts` sub-chart instead of the `edb-postgres-for-kubernetes` chart. So it is not recommended to install PG4K operator individually
+If you would like to install the cert-manager in separate namespaces, please
+follow the below steps.
 
-#### Setup cert-manager
+#### 1. Setup cert-manager
 
-EDB Postgres Distributed for Kubernetes also requires Cert Manager 1.10 or higher.
+EDB Postgres Distributed for Kubernetes requires Cert Manager 1.10 or higher.
 
 **Note:** In case a supported version of the cert-manager operator is already deployed
 in your K8S setup, you can skip this section and go directly to the setup of [PG4K-PGD](#setup-pg4k-pgd).
 
-You can decide to either:
+You can decide to deploy the cert-manager in its own namespaces, or deploy cert-manager
+as a dependency of PG4K-PGD, which will be installed in same namespace with
+PG4K-PGD operator.
 
-1. Also deploy cert-manager in its own namespace
+To deploy cert-manager in its own namespace
 
 ``` sh
 $ helm repo add jetstack https://charts.jetstack.io
 $ helm upgrade --install cert-manager jetstack/cert-manager \
   --create-namespace \
   --namespace cert-manager \
-  --version "v1.11.1" \
+  --version "v1.16.1" \
   --set installCRDs=true \
   --wait
 ```
 
-In case you choose this option, remember to also specify `--set cert-manager.enabled=false`
-during the installation of the PG4K-PGD helm chart in the next section.
+In case you choose this option, remember to also specify
+`--set cert-manager.enabled=false` during the installation of the PG4K-PGD
+helm chart in the next section.
 
-2. Deploy cert-manager as a PG4K-PGD dependency
+#### 2. Setup PG4K
 
-This is the default option. Unless `--set cert-manager.enabled=false` is set
-during the installation of the PG4K-PGD helm chart, cert-manager will be installed
-as part of the PG4K-PGD namespace.
+By default, a PG4K operator with LTS release is installed alongside with PG4K-PGD
+deploy. You can follow [PG4K helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator-pg4k)
+to deploy the PG4K operator in its own namespace. But it is highly recommended to use
+the PG4K operator installed as dependency of PG4K-PGD chart, which contains the well tested PG4K
+operator version.
 
-#### Setup PG4K-PGD
+In case you choose to use existing PG4K operator, remember to also specify
+`--set edb-postgres-for-kubernetes-lts.enabled=false` during the installation of the PG4K-PGD
+helm chart in the next section.
 
-Once the above deployments are ready, you can run the PG4K-PGD helm chart, taking care
-to set `edb-postgres-for-kubernetes.enabled` to false, and in case you also
-installed cert-manager separately, also set `cert-manager.enabled` to false.
+#### 3. Setup PG4K-PGD
 
-**Note**: In the following example, cert-manager will be installed alongside PG4K-PGD
-in the same namespace. If you don't want that, set `cert-manager.enabled`
-to false. See the [cert-manager section](#setup-cert-manager).
+Once the above deployments are ready, you can deploy the PG4K-PGD helm chart. taking care
+to set `edb-postgres-for-kubernetes-lts.enabled` to false if you PG4K already deployed,
+and set `cert-manager.enabled` to false if cert-manager is installed separately.
+
+**Note:** in the following example, the flags setting the credentials were elided
+to put the focus on the `enabled=false` condition. The flags may still be
+necessary, unless the credentials are provided in the `values.yaml` file.
 
 ``` sh
-```console
 helm upgrade --dependency-update \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
-  --set edb-postgres-for-kubernetes-lts.enabled=false \
-  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
-  --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.4.0-1 \
-  --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.4.0
+  --set cert-manager.enabled=false
+  --set edb-postgres-for-kubernetes-lts.enabled=false
 ```
 
-**Note:** in the above command, the flags setting the credentials were elided
-to put the focus on the `enabled=false` condition. The flags may still be
-necessary, unless the credentials are provided in the `values.yaml` file.
-
-You can see the two separate namespaces, the same that would be created if
+You can see the three separate namespaces, the same that would be created if
 installing manually without Helm charts.
 
 ``` sh
 $ kubectl get ns
 NAME                         STATUS   AGE
-default                      Active   6m28s
 …
+cert-manager                 Active   24m
 pgd-operator-system          Active   55s
 postgresql-operator-system   Active   5m33s
 ```
@@ -228,11 +231,11 @@ postgresql-operator-system   Active   5m33s
 ### Controlling the image repositories
 
 The various operator and operand images necessary for PGD may be pulled
-from a variety of repositories.
-This helm chart uses `k8s_enterprise_pgd` as the default repository. If you want
-to use another, you will need to fill in the image registry and the
-credentials, according to your subscription plan. This needs to be done in
-several places in the command-line invocation.
+from a variety of repositories. This helm chart uses `k8s_enterprise_pgd`
+as the default repository. If you want to use another, you will need to
+fill in the image registry and the credentials, according to your
+subscription plan. This needs to be done in several places in the command-line
+invocation.
 
 The following example uses the `k8s_standard_pgd` registry in
 `docker.enterprisedb.com`.
@@ -278,8 +281,8 @@ helm upgrade --install edb-pg4k \
 
 ### Deployment PG4K-PGD using local chart
 
-To deploy PG4K-PGD alone with PG4K LTS subchart together, use the following. To skip PG4K install
-`--set edb-postgres-for-kubernetes-lts.enabled=false`
+Navigate to the charts directory of local chart or source code,
+To deploy PG4K-PGD with all dependencies together
 
 ```console
 helm upgrade --install edb-pg4k-pgd \
@@ -288,7 +291,7 @@ helm upgrade --install edb-pg4k-pgd \
   charts/edb-postgres-distributed-for-kubernetes
 ```
 
-or you can deploy the PG4K LTS subchart separately in a different namespace.
+To deploy the PG4K LTS subchart separately in a different namespace.
 
 ```console
 helm upgrade --install edb-pg4k-lts \
@@ -297,7 +300,17 @@ helm upgrade --install edb-pg4k-lts \
   charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
 ```
 
-Note that the image locations and the credentials are elided. Please refer to
+and then deploy the PG4K-PGD chart.
+
+```
+helm upgrade --install edb-pg4k-pgd \
+  --namespace pgd-operator-system \
+  --create-namespace \
+  charts/edb-postgres-distributed-for-kubernetes \
+  --set edb-postgres-for-kubernetes-lts.enabled=false
+```
+
+**Note:** The image locations and the credentials are elided. Please refer to
 the sections above for directions.
 
 If you update the version of the dependency charts and want to install from

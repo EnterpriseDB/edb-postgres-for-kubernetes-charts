@@ -24,7 +24,6 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
-| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts/ | edb-postgres-for-kubernetes-lts | 0.22.1 |
 
 ## Values
 
@@ -38,25 +37,26 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | config.create | bool | `true` | Specifies whether the secret should be created |
 | config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1"` | Specifies the location of the pgd image to be used for the operator docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1 |
 | config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0 |
-| config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
+| config.data | object | `{}` | The content of the configmap/secret, see https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/operator_conf/#available-options for all the available options. |
+| config.data.PULL_SECRET_NAME | string | `"edb-pull-secret"` |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
-| crds.create | bool | `true` |  |
-| edb-postgres-for-kubernetes.config.data.PULL_SECRET_NAME | string | `"pgd-operator-pull-secret"` |  |
-| edb-postgres-for-kubernetes.enabled | bool | `true` |  |
-| edb-postgres-for-kubernetes.image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes"` |  |
-| edb-postgres-for-kubernetes.imagePullSecrets[0].name | string | `"pgd-operator-pull-secret"` |  |
+| crds.create | bool | `true` |  ||
+| edb-postgres-for-kubernetes-lts.enable | bool | `true` | |
+| edb-postgres-for-kubernetes-lts.image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes"` | |
+| edb-postgres-for-kubernetes-lts.image.imagePullSecrets[0].name | string| `"edb-pull-secret"` | |
+| edb-postgres-for-kubernetes-lts.config.data.PULL_SECRET_NAME| string| `"edb-pull-secret"` | |
+| imagePullSecrets[0].name | string | `"edb-pull-secret"` |  |
 | fullnameOverride | string | `""` |  |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
-| image.imageCredentials.name | string | `"pgd-operator-pull-secret"` |  |
+| image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
 | image.imageCredentials.username | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| imagePullSecrets[0].name | string | `"pgd-operator-pull-secret"` |  |
 | managerConfig.data.health.healthProbeBindAddress | string | `":9443"` |  |
 | managerConfig.data.leaderElection.enabled | bool | `true` |  |
 | managerConfig.data.leaderElection.resourceName | string | `"e72f3162.k8s.enterprisedb.io"` |  |
@@ -86,3 +86,17 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | webhook.validating.create | bool | `true` |  |
 | webhook.validating.failurePolicy | string | `"Fail"` |  |
 
+## Values for PG4K operator settings
+
+We can use prefix `edb-postgres-for-kubernetes-lts.` to specific the configuration for PG4K values if you want to overwrite the default one.
+For a list of PG4K operator configuration values, please see [PG4K Values doc](https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/blob/main/charts/edb-postgres-for-kubernetes/README.md#values)
+
+edb-postgres-for-kubernetes-lts:
+  enabled: true
+  image:
+    repository: docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes
+  imagePullSecrets:
+    - name: edb-pull-secret
+  config:
+    data:
+      PULL_SECRET_NAME: edb-pull-secret
