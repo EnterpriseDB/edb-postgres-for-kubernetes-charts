@@ -19,20 +19,22 @@
 replicaCount: 1
 
 image:
-  repository: quay.io/enterprisedb/cloud-native-postgresql
+  repository: docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   # Credentials configuration
   imageCredentials:
     # -- Specifies if an imagePullSecret should be created
-    create: false
-    name: postgresql-operator-pull-secret
+    create: true
+    name: edb-pull-secret
     registry: docker.enterprisedb.com
     username: ""
     password: ""
 
-imagePullSecrets: []
+imagePullSecrets:
+- name: edb-pull-secret
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -67,7 +69,8 @@ config:
   # INHERITED_LABELS: environment, workload, app
   # EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
 
-  data: {}
+  data:
+    PULL_SECRET_NAME: edb-pull-secret
   name: postgresql-operator-controller-manager-config
 
 # -- Additional arguments to be added to the operator's args list
