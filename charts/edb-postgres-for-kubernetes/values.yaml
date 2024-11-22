@@ -38,9 +38,14 @@ imagePullSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
+hostNetwork: false
+dnsPolicy: ""
+
 crds:
+  # -- Specifies whether the CRDs should be created when installing the chart.
   create: true
 
+# -- The webhook configuration.
 webhook:
   port: 9443
   mutating:
@@ -58,23 +63,35 @@ webhook:
 config:
   # -- Specifies whether the secret should be created
   create: true
-  # -- Specifies whether it should be stored in a secret, instead of a configmap
+  # -- The name of the configmap/secret to use.
+  name: postgresql-operator-controller-manager-config
+  # -- Specifies whether it should be stored in a secret, instead of a configmap.
   secret: false
   # -- This option determines if the operator is responsible for observing
   # events across the entire Kubernetes cluster or if its focus should be
   # narrowed down to the specific namespace within which it has been deployed.
   clusterWide: true
-  # Examples:
-  # INHERITED_ANNOTATIONS: categories
-  # INHERITED_LABELS: environment, workload, app
-  # EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
-
+  # -- The content of the configmap/secret, see
+  # https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/operator_conf/#available-options
+  # for all the available options.
   data:
     PULL_SECRET_NAME: edb-pull-secret
-  name: postgresql-operator-controller-manager-config
+  # INHERITED_ANNOTATIONS: categories
+  # INHERITED_LABELS: environment, workload, app
+  # WATCH_NAMESPACE: namespace-a,namespace-b
+  # EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
+
 
 # -- Additional arguments to be added to the operator's args list
 additionalArgs: []
+
+# -- Array containing extra environment variables which can be templated.
+# For example:
+#  - name: RELEASE_NAME
+#    value: "{{ .Release.Name }}"
+#  - name: MY_VAR
+#    value: "mySpecialKey"
+additionalEnv: []
 
 serviceAccount:
   # -- Specifies whether the service account should be created
@@ -86,11 +103,16 @@ serviceAccount:
 rbac:
   # -- Specifies whether ClusterRole and ClusterRoleBinding should be created
   create: true
+  # -- Aggregate ClusterRoles to Kubernetes default user-facing roles.
+  # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
+  aggregateClusterRoles: false
 
-# -- Annotations to be added to the pod
-podAnnotations: {}
-# -- Annotations to be added to all other resources
+# -- Annotations to be added to all other resources.
 commonAnnotations: {}
+# -- Annotations to be added to the pod.
+podAnnotations: {}
+# -- Labels to be added to the pod.
+podLabels: {}
 
 # -- Container Security Context
 containerSecurityContext:
@@ -141,12 +163,16 @@ tolerations: []
 # -- Affinity for the operator to be installed
 affinity: {}
 
-# -- Test related configurations
-test:
-  image:
-    repository: busybox
-    pullPolicy: IfNotPresent
-    tag: "latest"
+monitoring:
+
+  # -- Specifies whether the monitoring should be enabled. Requires Prometheus Operator CRDs.
+  podMonitorEnabled: false
+  # -- Metrics relabel configurations to apply to samples before ingestion.
+  podMonitorMetricRelabelings: []
+  # -- Relabel configurations to apply to samples before scraping.
+  podMonitorRelabelings: []
+  # -- Additional labels for the podMonitor
+  podMonitorAdditionalLabels: {}
 
 # Default monitoring queries
 monitoringQueriesConfigMap:
