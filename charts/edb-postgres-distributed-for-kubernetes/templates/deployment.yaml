@@ -32,9 +32,10 @@ spec:
       {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
         kubectl.kubernetes.io/default-container: manager
+        checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -49,9 +50,12 @@ spec:
       - args:
         - controller
         - --leader-elect
-        {{- with .Values.config.name }}
-        - --config-map-name={{ . }}
-        - --secret-name={{ . }}
+        {{- if .Values.config.name }}
+        {{- if not .Values.config.secret }}
+        - --config-map-name={{ .Values.config.name }}
+        {{- else }}
+        - --secret-name={{ .Values.config.name }}
+        {{- end }}
         {{- end }}
         - --webhook-port={{ .Values.webhook.port }}
         {{- range .Values.additionalArgs }}

@@ -5,6 +5,9 @@
         "additionalArgs": {
             "type": "array"
         },
+        "additionalEnv": {
+            "type": "array"
+        },
         "affinity": {
             "type": "object"
         },
@@ -80,8 +83,14 @@
                 }
             }
         },
+        "dnsPolicy": {
+            "type": "string"
+        },
         "fullnameOverride": {
             "type": "string"
+        },
+        "hostNetwork": {
+            "type": "boolean"
         },
         "image": {
             "type": "object",
@@ -128,6 +137,23 @@
                 }
             }
         },
+        "monitoring": {
+            "type": "object",
+            "properties": {
+                "podMonitorAdditionalLabels": {
+                    "type": "object"
+                },
+                "podMonitorEnabled": {
+                    "type": "boolean"
+                },
+                "podMonitorMetricRelabelings": {
+                    "type": "array"
+                },
+                "podMonitorRelabelings": {
+                    "type": "array"
+                }
+            }
+        },
         "monitoringQueriesConfigMap": {
             "type": "object",
             "properties": {
@@ -146,6 +172,9 @@
             "type": "object"
         },
         "podAnnotations": {
+            "type": "object"
+        },
+        "podLabels": {
             "type": "object"
         },
         "podSecurityContext": {
@@ -170,6 +199,9 @@
         "rbac": {
             "type": "object",
             "properties": {
+                "aggregateClusterRoles": {
+                    "type": "boolean"
+                },
                 "create": {
                     "type": "boolean"
                 }
@@ -203,25 +235,6 @@
                 },
                 "name": {
                     "type": "string"
-                }
-            }
-        },
-        "test": {
-            "type": "object",
-            "properties": {
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "pullPolicy": {
-                            "type": "string"
-                        },
-                        "repository": {
-                            "type": "string"
-                        },
-                        "tag": {
-                            "type": "string"
-                        }
-                    }
                 }
             }
         },

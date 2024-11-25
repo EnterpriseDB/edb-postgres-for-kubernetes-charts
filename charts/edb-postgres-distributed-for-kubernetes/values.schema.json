@@ -123,6 +123,14 @@
                             }
                         }
                     }
+                },
+                "crd": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        }
+                    }
                 }
             }
         },

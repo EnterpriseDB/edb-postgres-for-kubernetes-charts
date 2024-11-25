@@ -168,3 +168,6 @@ edb-postgres-for-kubernetes-lts:
   config:
     data:
       PULL_SECRET_NAME: edb-pull-secret
+  crds:
+    # -- Specifies whether the CRDs should be created when installing the chart.
+    create: true

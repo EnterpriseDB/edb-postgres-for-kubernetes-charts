@@ -106,4 +106,54 @@ subjects:
   name: {{ include "edb-postgres-for-kubernetes-lts.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 {{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes-lts.fullname" . }}-view
+  labels:
+    {{- include "edb-postgres-for-kubernetes-lts.labels" . | nindent 4 }}
+    {{- if .Values.rbac.aggregateClusterRoles }}
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    {{- end }}
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - backups
+  - clusters
+  - poolers
+  - scheduledbackups
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "edb-postgres-for-kubernetes-lts.fullname" . }}-edit
+  labels:
+    {{- include "edb-postgres-for-kubernetes-lts.labels" . | nindent 4 }}
+    {{- if .Values.rbac.aggregateClusterRoles }}
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    {{- end }}
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - backups
+  - clusters
+  - poolers
+  - scheduledbackups
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+---
 {{- end }}

@@ -34,12 +34,18 @@ image:
 
 imagePullSecrets:
 - name: edb-pull-secret
+
 nameOverride: ""
 fullnameOverride: ""
 
+hostNetwork: false
+dnsPolicy: ""
+
 crds:
+  # -- Specifies whether the CRDs should be created when installing the chart.
   create: true
 
+# -- The webhook configuration.
 webhook:
   port: 9443
   mutating:
@@ -59,7 +65,7 @@ config:
   create: true
   # -- The name of the configmap/secret to use.
   name: postgresql-operator-controller-manager-config
-  # -- Specifies whether it should be stored in a secret, instead of a configmap
+  # -- Specifies whether it should be stored in a secret, instead of a configmap.
   secret: false
   # -- This option determines if the operator is responsible for observing
   # events across the entire Kubernetes cluster or if its focus should be
@@ -75,8 +81,17 @@ config:
   # WATCH_NAMESPACE: namespace-a,namespace-b
   # EDB_LICENSE_KEY: <YOUR_EDB_LICENSE_KEY_HERE>
 
+
 # -- Additional arguments to be added to the operator's args list
 additionalArgs: []
+
+# -- Array containing extra environment variables which can be templated.
+# For example:
+#  - name: RELEASE_NAME
+#    value: "{{ .Release.Name }}"
+#  - name: MY_VAR
+#    value: "mySpecialKey"
+additionalEnv: []
 
 serviceAccount:
   # -- Specifies whether the service account should be created
@@ -88,11 +103,16 @@ serviceAccount:
 rbac:
   # -- Specifies whether ClusterRole and ClusterRoleBinding should be created
   create: true
+  # -- Aggregate ClusterRoles to Kubernetes default user-facing roles.
+  # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
+  aggregateClusterRoles: false
 
-# -- Annotations to be added to the pod
-podAnnotations: {}
-# -- Annotations to be added to all other resources
+# -- Annotations to be added to all other resources.
 commonAnnotations: {}
+# -- Annotations to be added to the pod.
+podAnnotations: {}
+# -- Labels to be added to the pod.
+podLabels: {}
 
 # -- Container Security Context
 containerSecurityContext:
@@ -143,12 +163,16 @@ tolerations: []
 # -- Affinity for the operator to be installed
 affinity: {}
 
-# -- Test related configurations
-test:
-  image:
-    repository: busybox
-    pullPolicy: IfNotPresent
-    tag: "latest"
+monitoring:
+
+  # -- Specifies whether the monitoring should be enabled. Requires Prometheus Operator CRDs.
+  podMonitorEnabled: false
+  # -- Metrics relabel configurations to apply to samples before ingestion.
+  podMonitorMetricRelabelings: []
+  # -- Relabel configurations to apply to samples before scraping.
+  podMonitorRelabelings: []
+  # -- Additional labels for the podMonitor
+  podMonitorAdditionalLabels: {}
 
 # Default monitoring queries
 monitoringQueriesConfigMap:
