@@ -31,6 +31,3 @@ keywords:
   - postgres
   - database
 home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
-maintainers:
-  - name: phisco
-    email: p.scorsolini@gmail.com
