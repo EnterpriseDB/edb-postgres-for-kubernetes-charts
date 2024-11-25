@@ -288,6 +288,8 @@ To deploy PG4K-PGD with all dependencies together
 helm upgrade --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
+  --set image.imageCredentials.username=${USERNAME} \
+  --set image.imageCredentials.password=${PASSWORD} \
   charts/edb-postgres-distributed-for-kubernetes
 ```
 
@@ -297,21 +299,27 @@ To deploy the PG4K LTS subchart separately in a different namespace.
 helm upgrade --install edb-pg4k-lts \
   --namespace postgresql-operator-system \
   --create-namespace \
+  --set image.imageCredentials.create=true \
+  --set image.imageCredentials.username=${USERNAME} \
+  --set image.imageCredentials.password=${PASSWORD} \
   charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
 ```
 
-and then deploy the PG4K-PGD chart.
+and then deploy the PG4K-PGD chart with `edb-postgres-for-kubernetes-lts.enabled=false`
+set.
 
 ```
 helm upgrade --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
+  --set image.imageCredentials.username=${USERNAME} \
+  --set image.imageCredentials.password=${PASSWORD} \
   charts/edb-postgres-distributed-for-kubernetes \
   --set edb-postgres-for-kubernetes-lts.enabled=false
 ```
 
-**Note:** The image locations and the credentials are elided. Please refer to
-the sections above for directions.
+**Note:** The image locations are elided. Please refer to the sections above
+for directions.
 
 If you update the version of the dependency charts and want to install from
 source, remember to run `helm dependency update` and `helm dependency build` in
