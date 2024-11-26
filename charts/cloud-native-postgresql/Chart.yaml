@@ -14,10 +14,11 @@
 #
 apiVersion: v2
 name: cloud-native-postgresql
-description: Cloud Native Postgresql Helm Chart
+description: Cloud Native Postgresql Helm Chart (DEPRECATED)
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
 version: "0.13.1"
+# This helm chart is deprecated and no longer maintained.
 deprecated: true
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
