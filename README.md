@@ -23,12 +23,32 @@ You can then run `helm search repo edb` to see the all the available charts.
 
 ## Deployment of the EDB Postgres for Kubernetes operator (PG4K)
 
+Both the operator and the operand images required by PG4K may be
+pulled from the `k8s_enterprise` or `k8s_standard` repositories at
+`docker.enterprisedb.com`, available with an EDB subscription plan.
+See: [obtaining an EDB subscription token](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/installation_upgrade/#obtaining-an-edb-subscription-token)
+
+By default, the chart will try to pull the operator image from `k8s_enterprise`.
+To do that, you need to configure the chart to pull images from a private
+registry (this works similarly in case you want to host the operator images in
+your own private registry).
+
+For example, to deploy via the `k8s_enterprise` repository:
+
 ```console
 helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
+  --set image.imageCredentials.username=k8s_enterprise \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   edb/edb-postgres-for-kubernetes
 ```
+
+> **Note:** If instead you want to deploy using the `k8s_standard` repository,
+> you can do that by adjusting the following settings in the above example:
+>
+> - Set `image.repository` to `docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes`
+> - Set `image.imageCredentials.username` to `k8s_standard`
 
 This will create a deployment in the `postgresql-operator-system` namespace.
 You can check it's ready:
@@ -57,6 +77,8 @@ helm upgrade --install edb-pg4k \
   --namespace postgresql-operator-system \
   --create-namespace \
   --set config.clusterWide=false \
+  --set image.imageCredentials.username=k8s_enterprise \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   edb/edb-postgres-for-kubernetes
 ```
 
@@ -65,40 +87,6 @@ with the cluster-wide operator. Otherwise there would be collisions when
 managing the resources in the namespace watched by the single-namespace
 operator.
 It is up to the user to ensure there is no collision between operators.
-
-### Deploying EDB Postgres for Kubernetes (PG4K) operator from EDB's private registry
-
-By default, PG4K will be deployed using [images publicly hosted on Quay.io](https://quay.io/repository/enterprisedb/cloud-native-postgresql),
-without a `pullSecret` but requiring a [license key](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/license_keys/).
-
-Additionally, both the operator and the operand images required by PG4K may be
-pulled from the `k8s_enterprise` or `k8s_standard` repositories at
-`docker.enterprisedb.com`, available with an EDB subscription plan.
-
-To do that, you need to configure the chart to pull images from a private
-registry (this works similarly in case you want to host the operator images in
-your own private registry).
-
-For example, to deploy via the `k8s_enterprise` repository:
-
-```console
-helm upgrade --install edb-pg4k \
-  --namespace postgresql-operator-system \
-  --create-namespace \
-  --set image.repository=docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes \
-  --set image.imageCredentials.username=k8s_enterprise \
-  --set image.imageCredentials.password=<THE-TOKEN> \
-  --set image.imageCredentials.create=true \
-  --set imagePullSecrets[0].name=postgresql-operator-pull-secret \
-  --set config.data.PULL_SECRET_NAME=postgresql-operator-pull-secret \
-  edb/edb-postgres-for-kubernetes
-```
-
-> **Note:** If instead you want to deploy using the `k8s_standard` repository,
-> you can do that by adjusting the following settings in the above example:
->
-> - Set `image.repository` to `docker.enterprisedb.com/k8s_standard/edb-postgres-for-kubernetes`
-> - Set `image.imageCredentials.username` to `k8s_standard`
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
