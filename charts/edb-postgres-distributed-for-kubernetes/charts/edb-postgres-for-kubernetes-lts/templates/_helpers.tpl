@@ -73,6 +73,17 @@ Create the imagePullSecret
 {{- end }}
 
 {{/*
+Create the pg4k operator image name
+*/}}
+{{- define "edb-postgres-for-kubernetes-lts.operatorImageName" }}
+{{- if .Values.image.repository }}
+{{- printf "%s/%s:%s"  .Values.image.repository  ( .Values.imageName | default "edb-postgres-for-kubernetes" ) ( .Values.image.tag | default .Chart.AppVersion ) }}
+{{- else }}
+{{- printf "%s/%s:%s"  .Values.global.repository ( .Values.global.imageName | default "edb-postgres-for-kubernetes" ) ( .Values.image.tag | default .Chart.AppVersion ) }}
+{{- end }}
+{{- end }}
+
+{{/*
 Define the common set of rules that can be applied either with
 namespace scope or clusterwide
 */}}

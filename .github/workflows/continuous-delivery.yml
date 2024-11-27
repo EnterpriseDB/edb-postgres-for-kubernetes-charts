@@ -67,7 +67,7 @@ jobs:
           PHASE="Cluster in healthy state"
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
-  deploy-ep4k-lts:
+  deploy-ep4k-subcharts:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
@@ -190,7 +190,7 @@ jobs:
           kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
           kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
 
-  deploy-ep4k-lts-single-namespace:
+  deploy-ep4k-subcharts-single-namespace:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
@@ -209,11 +209,12 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.10.0
 
-      - name: Deploy in single-namespace mode using helm chart
+      - name: Deploy in single-namespace mode using helm chart use different namespace
         run: |
           helm upgrade --install edb-pg4k-lts --namespace single-install \
           --set config.clusterWide=false \
           --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts \
+          --set image.repository=docker.enterprisedb.com/k8s_standard_pgd \
           --set image.imageCredentials.create=true \
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \

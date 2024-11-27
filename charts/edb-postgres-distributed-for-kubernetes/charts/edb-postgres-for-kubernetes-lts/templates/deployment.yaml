@@ -70,7 +70,7 @@ spec:
         - /manager
         env:
         - name: OPERATOR_IMAGE_NAME
-          value: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          value: "{{- include "edb-postgres-for-kubernetes-lts.operatorImageName" . }}"
         - name: OPERATOR_NAMESPACE
           valueFrom:
             fieldRef:
@@ -84,7 +84,7 @@ spec:
         - name: WATCH_NAMESPACE
           value: "{{ .Release.Namespace }}"
         {{- end }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        image: "{{- include "edb-postgres-for-kubernetes-lts.operatorImageName" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         livenessProbe:
           httpGet:

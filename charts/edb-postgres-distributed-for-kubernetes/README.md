@@ -44,18 +44,21 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
 | crds.create | bool | `true` |  ||
 | edb-postgres-for-kubernetes-lts.enable | bool | `true` | |
-| edb-postgres-for-kubernetes-lts.image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-postgres-for-kubernetes"` | |
+| edb-postgres-for-kubernetes-lts.image.repository | string | `""` | Overrides the global image repository for pg4k operator. |
+| edb-postgres-for-kubernetes-lts.image.imageName | string | `"edb-postgres-for-kubernetes"` | pg4k operator image name in repository|
 | edb-postgres-for-kubernetes-lts.image.imagePullSecrets[0].name | string| `"edb-pull-secret"` | |
 | edb-postgres-for-kubernetes-lts.config.data.PULL_SECRET_NAME| string| `"edb-pull-secret"` | |
+|global.repository| string|`docker.enterprisedb.com/k8s_enterprise_pgd`| specifies the repository name where all the operators are pulled from, image name is not included|
 | imagePullSecrets[0].name | string | `"edb-pull-secret"` |  |
 | fullnameOverride | string | `""` |  |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
-| image.imageCredentials.username | string | `""` |  |
+| image.imageCredentials.username | string | `""` | |
+| image.repository | string | `""` |  Overrides the global image repository for pg4k-pgd operator.|
+| image.imageName | string | `"pg4k-pgd"` |  pg4k-pgd operator image name in repository|
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/pg4k-pgd"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | managerConfig.data.health.healthProbeBindAddress | string | `":9443"` |  |
 | managerConfig.data.leaderElection.enabled | bool | `true` |  |

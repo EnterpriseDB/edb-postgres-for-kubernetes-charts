@@ -19,10 +19,14 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes
-  pullPolicy: IfNotPresent
+  # -- Specifies the repository where the operator image to be downloaded from
+  # docker.enterprisedb.com/k8s_standard_pgd
+  repository: docker.enterprisedb.com/k8s_enterprise_pgd
+  # The name of the operator image to be pulled from repository
+  imageName: edb-postgres-for-kubernetes
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
+  pullPolicy: IfNotPresent
   # Credentials configuration
   imageCredentials:
     # -- Specifies if an imagePullSecret should be created
@@ -41,6 +45,7 @@ fullnameOverride: ""
 hostNetwork: false
 dnsPolicy: ""
 
+installCRDs: true
 crds:
   # -- Specifies whether the CRDs should be created when installing the chart.
   create: true

@@ -90,17 +90,17 @@ It is up to the user to ensure there is no collision between operators.
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
-Like PG4K install, both the operator and the operand images required by PG4K-PGD
-may be pulled from the `k8s_enterprise` or `k8s_standard` repositories at
-`docker.enterprisedb.com`, please obtaining an EDB subscription token before setup.
+Like PG4K helm chart install, both the operator and the operand images required
+by `edb-postgres-distributed-for-kubernetes` may be pulled from the
+`k8s_enterprise_pgd` or `k8s_standard_pgd` repositories at `docker.enterprisedb.com`,
+please obtaining an EDB subscription token before setup.
 
-The `edb-postgres-distributed-for-kubernetes` chart will by default install PG4K
-operator defined by sub-chart in the same namespace, the PG4K operator installed
-in the sub-chart is PG4K LTS release operator, which is upgraded along with the
-parent chart version release.
+The PG4K-PGD chart installs both the PG4K-PGD and PG4K operators in the
+same namespace. The PG4K operator installed is a stable version that is
+part of the latest long-term support release of PG4K.
 
-The `edb-postgres-distributed-for-kubernetes` chart also install the cert-manager
-operators as dependency. You can avoid this if necessary. See the sub-section
+The PG4K-PGD chart also install the cert-manager operators as dependency. You
+can avoid this if necessary. See the sub-section
 [on deploying individually](#deploying-the-PG4K-PGD-operators-individually).
 
 **Note:** this helm chart uses a default registry to retrieve the operator
@@ -145,7 +145,7 @@ helm chart are working:
 ### Deploying the PG4K-PGD operators and cert-manager individually
 
 The chart `edb-postgres-distributed-for-kubernetes` is set by default to
-also install PG4K and cert-manager operators, which it depends on.
+also install cert-manager operators, which it depends on.
 When following this route, all operators will be installed in the same
 namespace. This is in contrast with other installation paths, where the
 operators reside in dedicated namespaces.
@@ -154,7 +154,7 @@ Installing all dependencies in the same namespace is a design limitation of
 Helm, but we can get around it by installing dependencies with separate
 invocations of `helm`.
 
-If you would like to install the cert-manager in separate namespaces, please
+If you would like to install the cert-manager in a separate namespaces, please
 follow the below steps.
 
 #### 1. Setup cert-manager
@@ -184,23 +184,10 @@ In case you choose this option, remember to also specify
 `--set cert-manager.enabled=false` during the installation of the PG4K-PGD
 helm chart in the next section.
 
-#### 2. Setup PG4K
-
-By default, a PG4K operator with LTS release is installed alongside with PG4K-PGD
-deploy. You can follow [PG4K helm chart](#deployment-of-the-edb-postgres-for-kubernetes-operator-pg4k)
-to deploy the PG4K operator in its own namespace. But it is highly recommended to use
-the PG4K operator installed as dependency of PG4K-PGD chart, which contains the well tested PG4K
-operator version.
-
-In case you choose to use existing PG4K operator, remember to also specify
-`--set edb-postgres-for-kubernetes-lts.enabled=false` during the installation of the PG4K-PGD
-helm chart in the next section.
-
-#### 3. Setup PG4K-PGD
+#### 2. Setup PG4K-PGD
 
 Once the above deployments are ready, you can deploy the PG4K-PGD helm chart. taking care
-to set `edb-postgres-for-kubernetes-lts.enabled` to false if you PG4K already deployed,
-and set `cert-manager.enabled` to false if cert-manager is installed separately.
+to set `cert-manager.enabled` to false if cert-manager is installed separately.
 
 **Note:** in the following example, the flags setting the credentials were elided
 to put the focus on the `enabled=false` condition. The flags may still be
@@ -213,11 +200,10 @@ helm upgrade --dependency-update \
   --create-namespace \
   edb/edb-postgres-distributed-for-kubernetes \
   --set cert-manager.enabled=false
-  --set edb-postgres-for-kubernetes-lts.enabled=false
 ```
 
-You can see the three separate namespaces, the same that would be created if
-installing manually without Helm charts.
+You can see two seperate namespaces where cert-manager is installed in `cert-manager`
+namespaces.
 
 ``` sh
 $ kubectl get ns
@@ -225,7 +211,6 @@ NAME                         STATUS   AGE
 …
 cert-manager                 Active   24m
 pgd-operator-system          Active   55s
-postgresql-operator-system   Active   5m33s
 ```
 
 ### Controlling the image repositories
@@ -238,14 +223,12 @@ subscription plan. This needs to be done in several places in the command-line
 invocation.
 
 The following example uses the `k8s_standard_pgd` registry in
-`docker.enterprisedb.com`.
-Note the multiple `--set` options, for the `image.repository`,
-`PGD_IMAGE_NAME` and `PGD_PROXY_IMAGE_NAME` in addition to the
-`edb-postgres-for-kubernetes-lts.image.repository` where the PGD operator
-is pulled from. There are 4 in total
-- `image.repository` where the PG4K-PGD operator image is pulled from.
-- `edb-postgres-for-kubernetes-lts.image.repository` where the PG4K operator image is pulled from.
-- `PGD_IMAGE_NAME` and `PGD_PROXY_IMAGE_NAME` where the PGD and PGD Proxy image are pulled from.
+`docker.enterprisedb.com`. Following is the description of set options.
+- `global.image.repository`: The repository where the PG4K-PGD and PG4K operator image downloaded from.
+This is a global setting, which is shared for both PG4K-PGD and PG4K operators.
+- `PGD_IMAGE_NAME`: The location where the PGD image are pulled from.
+- `PGD_PROXY_IMAGE_NAME`: The location where PGD Proxy image are pulled from, usually
+the same with `PGD_IMAGE_NAME`.
 
 Assuming that you have your necessary credentials, please fill in the USERNAME
 and PASSWORD below.
@@ -258,8 +241,7 @@ helm upgrade --dependency-update \
   edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
   --set image.imageCredentials.password=${PASSWORD} \
-  --set image.repository=docker.enterprisedb.com/k8s_standard_pgd/pg4k-pgd \
-  --set edb-postgres-for-kubernetes-lts.image.repository=docker.enterprisedb.com/k8s_standard_pgd/edb-postgres-for-kubernetes \
+  --set global.image.repository=docker.enterprisedb.com/k8s_standard_pgd \
   --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.5.1-1 \
   --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0
 ```
