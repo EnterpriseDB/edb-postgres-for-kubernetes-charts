@@ -31,6 +31,17 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Create the pg4k-pgd operator image name
+*/}}
+{{- define "edb-postgres-distributed-for-kubernetes.operatorImageName" }}
+{{- if .Values.image.repository }}
+{{- printf "%s/%s:%s" .Values.image.repository  ( .Values.image.imageName | default "pg4k-pgd" ) ( .Values.image.imageTag | default .Chart.AppVersion ) }}
+{{- else }}
+{{- printf "%s/%s:%s" .Values.global.repository  ( .Values.image.imageName | default "pg4k-pgd" )  ( .Values.image.imageTag | default .Chart.AppVersion ) }}
+{{- end }}
+{{- end }}
+
+{{/*
 Common labels
 */}}
 {{- define "edb-postgres-distributed-for-kubernetes.labels" -}}

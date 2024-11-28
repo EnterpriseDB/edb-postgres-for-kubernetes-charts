@@ -12,18 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+---
 apiVersion: v1
-kind: Pod
+kind: Service
 metadata:
-  name: "{{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-test-connection"
+  name: {{ .Values.service.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes-lts.labels" . | nindent 4 }}
+  {{- with .Values.commonAnnotations }}
   annotations:
-    "helm.sh/hook": test
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  containers:
-    - name: wget
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      command: ['curl']
-      args: ['-ki','https://{{ .Values.service.name }}:{{ .Values.service.port }}']
-  restartPolicy: Never
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: webhook-server
+    name: webhook-server
+  selector:
+    {{- include "edb-postgres-for-kubernetes-lts.selectorLabels" . | nindent 4 }}
