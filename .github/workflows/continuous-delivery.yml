@@ -41,13 +41,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.11.3
-
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
 
       - name: Deploy using helm chart
         run: |
@@ -56,9 +51,6 @@ jobs:
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -78,13 +70,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.11.3
-
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
 
       - name: Deploy using helm chart
         run: |
@@ -94,9 +81,6 @@ jobs:
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -116,13 +100,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.11.3
-
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
 
       - name: Deploy using helm chart
         run: |
@@ -133,9 +112,6 @@ jobs:
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster
         run: |
@@ -158,13 +134,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.11.3
-
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
 
       - name: Deploy in single-namespace mode using helm chart
         run: |
@@ -174,9 +145,6 @@ jobs:
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster in the watched namespace
         run: |
@@ -201,13 +169,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.11.3
-
-      - name: Create kind cluster
-        uses: helm/kind-action@v1.10.0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
 
       - name: Deploy in single-namespace mode using helm chart use different namespace
         run: |
@@ -219,9 +182,6 @@ jobs:
           --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
-
-      - name: Install kubectl
-        uses: azure/setup-kubectl@v4
 
       - name: Deploy a cluster in the watched namespace
         run: |
