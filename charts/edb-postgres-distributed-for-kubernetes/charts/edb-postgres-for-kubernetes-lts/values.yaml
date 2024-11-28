@@ -19,10 +19,10 @@
 replicaCount: 1
 
 image:
-  # -- Specifies the repository where the operator image to be downloaded from
+  # -- Specifies the repository where the operator image should be downloaded from
   # docker.enterprisedb.com/k8s_standard_pgd
   repository: docker.enterprisedb.com/k8s_enterprise_pgd
-  # The name of the operator image to be pulled from repository
+  # The name of the operator image to be pulled from the repository
   imageName: edb-postgres-for-kubernetes
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""

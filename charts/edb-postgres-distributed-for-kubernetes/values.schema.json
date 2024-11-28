@@ -89,16 +89,11 @@
         "edb-postgres-for-kubernetes-lts": {
             "type": "object",
             "properties": {
-                "config": {
+                "crds": {
                     "type": "object",
                     "properties": {
-                        "data": {
-                            "type": "object",
-                            "properties": {
-                                "PULL_SECRET_NAME": {
-                                    "type": "string"
-                                }
-                            }
+                        "create": {
+                            "type": "boolean"
                         }
                     }
                 },
@@ -112,30 +107,19 @@
                             "type": "string"
                         }
                     }
-                },
-                "imagePullSecrets": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "crd": {
-                    "type": "object",
-                    "properties": {
-                        "create": {
-                            "type": "boolean"
-                        }
-                    }
                 }
             }
         },
         "fullnameOverride": {
             "type": "string"
+        },
+        "global": {
+            "type": "object",
+            "properties": {
+                "repository": {
+                    "type": "string"
+                }
+            }
         },
         "image": {
             "type": "object",
@@ -160,13 +144,16 @@
                         }
                     }
                 },
-                "pullPolicy": {
+                "imageName": {
+                    "type": "string"
+                },
+                "imagePullPolicy": {
+                    "type": "string"
+                },
+                "imageTag": {
                     "type": "string"
                 },
                 "repository": {
-                    "type": "string"
-                },
-                "tag": {
                     "type": "string"
                 }
             }

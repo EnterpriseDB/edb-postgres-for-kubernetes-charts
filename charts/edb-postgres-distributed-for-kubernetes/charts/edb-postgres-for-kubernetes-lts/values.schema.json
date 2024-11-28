@@ -115,6 +115,9 @@
                         }
                     }
                 },
+                "imageName": {
+                    "type": "string"
+                },
                 "pullPolicy": {
                     "type": "string"
                 },
@@ -136,6 +139,9 @@
                     }
                 }
             }
+        },
+        "installCRDs": {
+            "type": "boolean"
         },
         "monitoring": {
             "type": "object",

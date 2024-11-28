@@ -229,14 +229,6 @@ namespace scope or clusterwide
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
   resources:
-  - imagecatalogs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
   - clusters/finalizers
   - poolers/finalizers
   verbs:
@@ -303,12 +295,4 @@ Define the set of rules that must be applied clusterwide
   - get
   - list
   - update
-- apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - clusterimagecatalogs
-  verbs:
-  - get
-  - list
-  - watch
 {{- end }}
