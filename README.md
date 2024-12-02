@@ -219,7 +219,7 @@ invocation.
 
 The following example uses the `k8s_standard_pgd` registry in
 `docker.enterprisedb.com`. Following is the description of set options.
-- `global.image.repository`: The repository where the PG4K-PGD and PG4K operator image are downloaded from.
+- `global.repository`: The repository where the PG4K-PGD and PG4K operator image are downloaded from.
 This is a global setting, which is shared for both PG4K-PGD and PG4K operators.
 - `PGD_IMAGE_NAME`: The location where the PGD image are pulled from.
 - `PGD_PROXY_IMAGE_NAME`: The location where PGD Proxy image are pulled from, usually
@@ -236,7 +236,7 @@ helm upgrade --dependency-update \
   edb/edb-postgres-distributed-for-kubernetes \
   --set image.imageCredentials.username=${USERNAME} \
   --set image.imageCredentials.password=${PASSWORD} \
-  --set global.image.repository=docker.enterprisedb.com/k8s_standard_pgd \
+  --set global.repository=docker.enterprisedb.com/k8s_standard_pgd \
   --set config.data.PGD_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:15.6-5.5.1-1 \
   --set config.data.PGD_PROXY_IMAGE_NAME=docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0
 ```
