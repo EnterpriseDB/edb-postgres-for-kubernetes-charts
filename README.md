@@ -234,7 +234,7 @@ helm upgrade --dependency-update \
   --set image.imageCredentials.username=${USERNAME} \
   --set image.imageCredentials.password=${PASSWORD} \
   --set global.repository=docker.enterprisedb.com/k8s_standard_pgd \
-  edb/edb-postgres-distributed-for-kubernete
+  edb/edb-postgres-distributed-for-kubernetes
 ```
 
 If we want to use different flavor or different version of PGD image, we can set the following two
