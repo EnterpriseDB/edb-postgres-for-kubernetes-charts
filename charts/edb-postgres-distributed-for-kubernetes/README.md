@@ -31,6 +31,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | additionalArgs | list | `[]` | Additional arguments to be added to the operator's args list |
+| additionalEnv | list | `[]` | Array containing extra environment variables which can be templated. For example:  - name: RELEASE_NAME    value: "{{ .Release.Name }}"  - name: MY_VAR    value: "mySpecialKey" |
 | affinity | object | `{}` | Affinity for the operator to be installed |
 | cert-manager.enabled | bool | `true` |  |
 | cert-manager.installCRDs | bool | `true` |  |
