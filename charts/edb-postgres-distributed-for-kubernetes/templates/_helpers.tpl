@@ -41,6 +41,23 @@ Create the pg4k-pgd operator image name
 {{- end }}
 {{- end }}
 
+
+{{/*
+Create the pgd and pgd proxy operand image name in configmap
+*/}}
+{{- define "edb-postgres-distributed-for-kubernetes.configData" }}
+{{- if not .Values.config.data.PGD_IMAGE_NAME }}
+{{-  $_ := set .Values.config.data "PGD_IMAGE_NAME" (printf "%s/%s" .Values.global.repository  .Values.global.pgdImageName) }}
+{{- end }}
+{{- if not .Values.config.data.PGD_PROXY_IMAGE_NAME }}
+{{-  $_ := set .Values.config.data "PGD_PROXY_IMAGE_NAME" (printf "%s/%s" .Values.global.repository  .Values.global.proxyImageName) }}
+{{- end }}
+{{- with .Values.config.data }}
+{{- toYaml . }}
+{{- end }}
+{{- end }}
+
+
 {{/*
 Common labels
 */}}

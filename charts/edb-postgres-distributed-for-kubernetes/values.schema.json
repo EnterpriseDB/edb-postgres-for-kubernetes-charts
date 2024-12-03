@@ -118,6 +118,12 @@
             "properties": {
                 "repository": {
                     "type": "string"
+                },
+                "pgdImageName": {
+                    "type": "string"
+                },
+                "proxyImageName": {
+                    "type": "string"
                 }
             }
         },
