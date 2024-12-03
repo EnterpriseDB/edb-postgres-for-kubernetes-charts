@@ -20,11 +20,19 @@ replicaCount: 1
 
 # -- Global values
 global:
-  # -- Specifies the repository where the operator image to be downloaded from
+  # -- Specifies the repository where the operator and operand image to be downloaded from
   # repository: docker.enterprisedb.com/k8s_standard_pgd
   repository: docker.enterprisedb.com/k8s_enterprise_pgd
+  # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
+  # global repository
+  pgdImageName: postgresql-pgd:16.4-5.5.1-1
+  # -- Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from
+  # global repository
+  proxyImageName: edb-pgd-proxy:5.5.0
 
+# -- operator image configuration
 image:
+  # -- Specifies the repository of the pgd operator image, this will overwrite the global repository
   repository: ""
   # -- Specifies the name of the operator image to be pulled from repository
   imageName: pg4k-pgd
@@ -84,15 +92,14 @@ config:
   create: true
   # -- Specifies whether it should be stored in a secret, instead of a configmap
   secret: false
-
   data:
     PULL_SECRET_NAME: edb-pull-secret
-    # -- Specifies the location of the pgd image to be used for the operator
-    # docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1
-    PGD_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1
-    # -- Specifies the location of the pgd-proxy image to be used for the operator
-    #  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0
-    PGD_PROXY_IMAGE_NAME: docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0
+    # -- Specifies the location of the pgd image (include path) to be used for the operator
+    # this will overwrite the global repository/pgdImageName
+    PGD_IMAGE_NAME: ""
+    # -- Specifies the location of the pgd-proxy image (include path) to be used for the operator
+    #  this will overwrite the global repository/proxyImageName
+    PGD_PROXY_IMAGE_NAME: ""
   name: pgd-operator-controller-manager-config
 
 # -- Additional arguments to be added to the operator's args list
@@ -170,6 +177,7 @@ cert-manager:
 edb-postgres-for-kubernetes-lts:
   enabled: true
   image:
+    # -- Specifies the repository of the pg4k operator image, this will overwrite the global repository
     repository: ""
   crds:
     create: true

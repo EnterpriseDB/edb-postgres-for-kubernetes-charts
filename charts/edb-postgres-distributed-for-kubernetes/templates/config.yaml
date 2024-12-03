@@ -25,7 +25,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
-  {{- toYaml .Values.config.data | nindent 2 }}
+  {{- include "edb-postgres-distributed-for-kubernetes.configData" . | nindent 2 }}
 {{- else }}
 apiVersion: v1
 kind: Secret
@@ -39,6 +39,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 stringData:
-  {{- toYaml .Values.config.data | nindent 2 }}
+  {{- include "edb-postgres-distributed-for-kubernetes.configData" . | nindent 2 }}
 {{- end }}
 {{- end }}
