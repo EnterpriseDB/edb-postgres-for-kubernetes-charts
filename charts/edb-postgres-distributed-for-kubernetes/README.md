@@ -72,6 +72,7 @@ global repository |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | Nodeselector for the operator to be installed |
 | podAnnotations | object | `{}` | Annotations to be added to the pod |
+| podLabels | object | `{}` | Labels to be added to the pod |
 | podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Security Context for the whole pod |
 | priorityClassName | string | `""` | Priority indicates the importance of a Pod relative to other Pods. |
 | rbac.aggregateClusterRoles | bool | `false` | Aggregate ClusterRoles to Kubernetes default user-facing roles. Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles |
