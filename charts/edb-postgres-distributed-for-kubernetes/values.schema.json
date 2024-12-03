@@ -246,6 +246,9 @@
         "rbac": {
             "type": "object",
             "properties": {
+                "aggregateClusterRoles": {
+                    "type": "boolean"
+                },
                 "create": {
                     "type": "boolean"
                 }
