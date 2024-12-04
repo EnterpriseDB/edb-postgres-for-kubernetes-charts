@@ -47,6 +47,9 @@ imagePullSecrets:
 nameOverride: ""
 fullnameOverride: ""
 
+hostNetwork: false
+dnsPolicy: ""
+
 crds:
   create: true
 

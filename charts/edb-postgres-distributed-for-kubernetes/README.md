@@ -44,12 +44,14 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
 | crds.create | bool | `true` |  |
+| dnsPolicy | string | `""` |  |
 | edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.image.repository | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"repository":"docker.enterprisedb.com/k8s_enterprise_pgd"}` | Global values |
 | global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from repository: docker.enterprisedb.com/k8s_standard_pgd |
+| hostNetwork | bool | `false` |  |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
