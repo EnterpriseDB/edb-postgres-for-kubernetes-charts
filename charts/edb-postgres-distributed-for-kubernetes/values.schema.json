@@ -89,6 +89,9 @@
                 }
             }
         },
+        "dnsPolicy": {
+            "type": "string"
+        },
         "edb-postgres-for-kubernetes-lts": {
             "type": "object",
             "properties": {
@@ -129,6 +132,9 @@
                     "type": "string"
                 }
             }
+        },
+        "hostNetwork": {
+            "type": "boolean"
         },
         "image": {
             "type": "object",
