@@ -237,14 +237,16 @@ helm upgrade --dependency-update \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
-If we want to use different flavor or different version of PGD image, we can set the following two
-global options, for each helm chart release, the PGD and PGD proxy are upgrade to latest well-tested
-versions, by default, the PGD image here is using postgresql-pgd.
+If we want to use a different flavor or a different version of PGD image, we can set the following two
+global options, for each helm chart release: 
 
-- `pgdImageName`: The PGD image name to be used by the operator. PGD image with this name will be
- pulled from `global.repository`.
-- `proxyImageName`: The PGD proxy image name to be used by the operator. PGD proxy image with
-this name will be pulled from `global.repository`.
+- `pgdImageName`: the PGD image name to be used by the operator. PGD image (with this name)
+will be pulled from `global.repository`;
+- `proxyImageName`: the PGD proxy image name to be used by the operator. PGD proxy image (with this name)
+will be pulled from `global.repository`.
+
+PGD and PGD proxy are upgraded to the latest well-tested versions.
+By default, the PGD image here is using postgresql-pgd.
 
 This example uses the `edb-postgres-advanced-pgd` PGD images.
 
