@@ -86,6 +86,11 @@ follow these steps:
    1. update PGD_IMAGE_NAME and PGD_PROXY_IMAGE_NAME defaults inside
       `charts/edb-postgres-distributed-for-kubernetes/values.yaml` according to the default
       versions present in the release.
+   1. update the `.appVersion` and `.verions` in subchart
+      `./charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts`,
+      and follow the [EPK Release](#how-to-release-the-edb-postgres-for-kubernetes-chart) to update
+      the subchart to latest PG4K lts release.
+
 
 From here onward, you can follow the steps of the [EPK Release](#how-to-release-the-edb-postgres-for-kubernetes-chart), starting from `point 6`.
 

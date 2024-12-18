@@ -36,8 +36,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
-| config.data.PGD_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/postgresql-pgd:16.4-5.5.1-1"` | Specifies the location of the pgd image to be used for the operator docker.enterprisedb.com/k8s_standard_pgd/postgresql-pgd:16.4-5.5.1-1 |
-| config.data.PGD_PROXY_IMAGE_NAME | string | `"docker.enterprisedb.com/k8s_enterprise_pgd/edb-pgd-proxy:5.5.0"` | Specifies the location of the pgd-proxy image to be used for the operator  docker.enterprisedb.com/k8s_standard_pgd/edb-pgd-proxy:5.5.0 |
+| config.data.PGD_IMAGE_NAME | string | `""` | Specifies the location of the pgd image (include path) to be used for the operator, this will overwrite the global repository/pgdImageName |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `""` | Specifies the location of the pgd image (include path) to be used for the operator, this will overwrite the global repository/pgdImageName|
 | config.data.PULL_SECRET_NAME | string | `"edb-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
@@ -48,7 +48,11 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | edb-postgres-for-kubernetes-lts.image.repository | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"repository":"docker.enterprisedb.com/k8s_enterprise_pgd"}` | Global values |
-| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from repository: docker.enterprisedb.com/k8s_standard_pgd |
+| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from. Another repository is: docker.enterprisedb.com/k8s_standard_pgd |
+| global.pgdImageName | string | `"postgresql-pgd:16.4-5.5.1-1"` | Specifies the name of pgd image to be used for the operator, this image will be downloaded from
+global repository |
+| global.proxyImageName | string | `"edb-pgd-proxy:5.5.0"` | Specifies the name of pgd-proxy image to be used for the operator, this image will be downloaded from
+global repository |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
