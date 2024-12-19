@@ -41,10 +41,19 @@ spec:
       labels:
         control-plane: controller-manager
         {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.hostNetwork }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      {{- end }}
+      {{- if .Values.dnsPolicy }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
       {{- end }}
       containers:
       - args:
@@ -70,6 +79,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        {{- if .Values.additionalEnv }}
+        {{- tpl (.Values.additionalEnv | toYaml) . | nindent 8 }}
+        {{- end }}
         image: "{{- include "edb-postgres-distributed-for-kubernetes.operatorImageName" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         livenessProbe:

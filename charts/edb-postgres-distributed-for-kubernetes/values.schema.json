@@ -5,6 +5,9 @@
         "additionalArgs": {
             "type": "array"
         },
+        "additionalEnv": {
+            "type": "array"
+        },
         "affinity": {
             "type": "object"
         },
@@ -86,6 +89,9 @@
                 }
             }
         },
+        "dnsPolicy": {
+            "type": "string"
+        },
         "edb-postgres-for-kubernetes-lts": {
             "type": "object",
             "properties": {
@@ -126,6 +132,9 @@
                     "type": "string"
                 }
             }
+        },
+        "hostNetwork": {
+            "type": "boolean"
         },
         "image": {
             "type": "object",
@@ -224,6 +233,9 @@
         "podAnnotations": {
             "type": "object"
         },
+        "podLabels": {
+            "type": "object"
+        },
         "podSecurityContext": {
             "type": "object",
             "properties": {
@@ -246,6 +258,9 @@
         "rbac": {
             "type": "object",
             "properties": {
+                "aggregateClusterRoles": {
+                    "type": "boolean"
+                },
                 "create": {
                     "type": "boolean"
                 }

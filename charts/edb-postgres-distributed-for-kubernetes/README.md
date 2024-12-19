@@ -31,6 +31,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | additionalArgs | list | `[]` | Additional arguments to be added to the operator's args list |
+| additionalEnv | list | `[]` | Array containing extra environment variables which can be templated. For example:  - name: RELEASE_NAME    value: "{{ .Release.Name }}"  - name: MY_VAR    value: "mySpecialKey" |
 | affinity | object | `{}` | Affinity for the operator to be installed |
 | cert-manager.enabled | bool | `true` |  |
 | cert-manager.installCRDs | bool | `true` |  |
@@ -43,16 +44,16 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
 | crds.create | bool | `true` |  |
+| dnsPolicy | string | `""` |  |
 | edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.image.repository | string | `""` |  |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"repository":"docker.enterprisedb.com/k8s_enterprise_pgd"}` | Global values |
-| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from. Another repository is: docker.enterprisedb.com/k8s_standard_pgd |
 | global.pgdImageName | string | `"postgresql-pgd:16.4-5.5.1-1"` | Specifies the name of pgd image to be used for the operator, this image will be downloaded from
-global repository |
 | global.proxyImageName | string | `"edb-pgd-proxy:5.5.0"` | Specifies the name of pgd-proxy image to be used for the operator, this image will be downloaded from
-global repository |
+| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from. Another repository is: docker.enterprisedb.com/k8s_standard_pgd |
+| hostNetwork | bool | `false` |  |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
 | image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
@@ -71,8 +72,10 @@ global repository |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | Nodeselector for the operator to be installed |
 | podAnnotations | object | `{}` | Annotations to be added to the pod |
+| podLabels | object | `{}` | Labels to be added to the pod |
 | podSecurityContext | object | `{"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Security Context for the whole pod |
 | priorityClassName | string | `""` | Priority indicates the importance of a Pod relative to other Pods. |
+| rbac.aggregateClusterRoles | bool | `false` | Aggregate ClusterRoles to Kubernetes default user-facing roles. Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles |
 | rbac.create | bool | `true` | Specifies whether ClusterRole, ClusterRoleBinding, RoleBinding and Role should be created |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
@@ -91,4 +94,3 @@ global repository |
 | webhook.readinessProbe.periodSeconds | int | `20` |  |
 | webhook.validating.create | bool | `true` |  |
 | webhook.validating.failurePolicy | string | `"Fail"` |  |
-
