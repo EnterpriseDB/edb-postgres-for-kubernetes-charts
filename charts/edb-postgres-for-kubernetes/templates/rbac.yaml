@@ -110,6 +110,150 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-editor-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - databases
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - databases/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-viewer-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - databases
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - databases/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-editor-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - publications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - publications/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-viewer-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - publications
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - publications/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-editor-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - subscriptions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - subscriptions/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-viewer-role
+rules:
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - subscriptions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - postgresql.k8s.enterprisedb.io
+  resources:
+  - subscriptions/status
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-view
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
