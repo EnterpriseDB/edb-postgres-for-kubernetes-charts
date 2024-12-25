@@ -112,7 +112,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-editor-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-edit
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
@@ -138,7 +138,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-viewer-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-database-view
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
@@ -160,7 +160,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-editor-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-edit
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
@@ -186,7 +186,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-viewer-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-publication-view
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
@@ -208,7 +208,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-editor-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-edit
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
@@ -234,7 +234,7 @@ kind: ClusterRole
 metadata:
   labels:
     {{- include "edb-postgres-for-kubernetes.labels" . | nindent 4 }}
-  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-viewer-role
+  name: {{ include "edb-postgres-for-kubernetes.fullname" . }}-subscription-view
 rules:
 - apiGroups:
   - postgresql.k8s.enterprisedb.io
