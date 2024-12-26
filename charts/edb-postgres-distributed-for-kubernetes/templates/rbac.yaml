@@ -425,7 +425,6 @@ subjects:
 - kind: ServiceAccount
   name: {{ include "edb-postgres-distributed-for-kubernetes.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -443,9 +442,12 @@ rules:
   - postgresql.k8s.enterprisedb.io
   resources:
   - backups
+  - databases
   - clusters
   - poolers
+  - publications
   - scheduledbackups
+  - subscriptions
   verbs:
   - get
   - list
@@ -475,9 +477,12 @@ rules:
   - postgresql.k8s.enterprisedb.io
   resources:
   - backups
+  - databases
   - clusters
   - poolers
+  - publications
   - scheduledbackups
+  - subscriptions
   verbs:
   - create
   - delete

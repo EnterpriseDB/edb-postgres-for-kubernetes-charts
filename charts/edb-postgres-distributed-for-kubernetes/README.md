@@ -1,6 +1,6 @@
 # edb-postgres-distributed-for-kubernetes
 
-![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.1](https://img.shields.io/badge/AppVersion-1.0.1-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 EDB Postgres Distributed for Kubernetes Helm Chart
 
@@ -23,7 +23,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | edb-postgres-for-kubernetes-lts | 0.22.1 |
+|  | edb-postgres-for-kubernetes-lts | 0.25.0 |
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
 
 ## Values
@@ -37,8 +37,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
 | config.create | bool | `true` | Specifies whether the secret should be created |
-| config.data.PGD_IMAGE_NAME | string | `""` | Specifies the location of the pgd image (include path) to be used for the operator, this will overwrite the global repository/pgdImageName |
-| config.data.PGD_PROXY_IMAGE_NAME | string | `""` | Specifies the location of the pgd image (include path) to be used for the operator, this will overwrite the global repository/pgdImageName|
+| config.data.PGD_IMAGE_NAME | string | `""` | Specifies the location of the pgd image (include path) to be used for the operator this will overwrite the global repository/pgdImageName |
+| config.data.PGD_PROXY_IMAGE_NAME | string | `""` | Specifies the location of the pgd-proxy image (include path) to be used for the operator  this will overwrite the global repository/proxyImageName |
 | config.data.PULL_SECRET_NAME | string | `"edb-pull-secret"` |  |
 | config.name | string | `"pgd-operator-controller-manager-config"` |  |
 | config.secret | bool | `false` | Specifies whether it should be stored in a secret, instead of a configmap |
@@ -47,22 +47,18 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | dnsPolicy | string | `""` |  |
 | edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
-| edb-postgres-for-kubernetes-lts.image.repository | string | `""` |  |
+| edb-postgres-for-kubernetes-lts.image.repository | string | `""` | Specifies the repository of the pg4k operator image, this will overwrite the global repository |
 | fullnameOverride | string | `""` |  |
-| global | object | `{"repository":"docker.enterprisedb.com/k8s_enterprise_pgd"}` | Global values |
-| global.pgdImageName | string | `"postgresql-pgd:16.4-5.5.1-1"` | Specifies the name of pgd image to be used for the operator, this image will be downloaded from
-| global.proxyImageName | string | `"edb-pgd-proxy:5.5.0"` | Specifies the name of pgd-proxy image to be used for the operator, this image will be downloaded from
-| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator image to be downloaded from. Another repository is: docker.enterprisedb.com/k8s_standard_pgd |
+| global | object | `{"pgdImageName":"postgresql-pgd:17.2-5.6.1-1","proxyImageName":"edb-pgd-proxy:5.6.0","repository":"docker.enterprisedb.com/k8s_enterprise_pgd"}` | Global values |
+| global.pgdImageName | string | `"postgresql-pgd:17.2-5.6.1-1"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
+| global.proxyImageName | string | `"edb-pgd-proxy:5.6.0"` | Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from global repository |
+| global.repository | string | `"docker.enterprisedb.com/k8s_enterprise_pgd"` | Specifies the repository where the operator and operand image to be downloaded from repository: docker.enterprisedb.com/k8s_standard_pgd |
 | hostNetwork | bool | `false` |  |
+| image | object | `{"imageCredentials":{"create":true,"name":"edb-pull-secret","password":"","registry":"docker.enterprisedb.com","username":""},"imageName":"pg4k-pgd","imagePullPolicy":"IfNotPresent","imageTag":"","repository":""}` | operator image configuration |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |
-| image.imageCredentials.name | string | `"edb-pull-secret"` |  |
-| image.imageCredentials.password | string | `""` |  |
-| image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
-| image.imageCredentials.username | string | `""` |  |
 | image.imageName | string | `"pg4k-pgd"` | Specifies the name of the operator image to be pulled from repository |
-| image.imagePullPolicy | string | `"IfNotPresent"` |  |
 | image.imageTag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
-| image.repository | string | `""` |  |
+| image.repository | string | `""` | Specifies the repository of the pgd operator image, this will overwrite the global repository |
 | imagePullSecrets[0].name | string | `"edb-pull-secret"` |  |
 | managerConfig.data.health.healthProbeBindAddress | string | `":9443"` |  |
 | managerConfig.data.leaderElection.enabled | bool | `true` |  |
@@ -94,3 +90,4 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | webhook.readinessProbe.periodSeconds | int | `20` |  |
 | webhook.validating.create | bool | `true` |  |
 | webhook.validating.failurePolicy | string | `"Fail"` |  |
+

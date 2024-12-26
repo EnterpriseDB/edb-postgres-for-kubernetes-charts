@@ -122,13 +122,13 @@
         "global": {
             "type": "object",
             "properties": {
-                "repository": {
-                    "type": "string"
-                },
                 "pgdImageName": {
                     "type": "string"
                 },
                 "proxyImageName": {
+                    "type": "string"
+                },
+                "repository": {
                     "type": "string"
                 }
             }
