@@ -111,9 +111,8 @@ spec:
                     type: boolean
                 type: object
               pluginConfiguration:
-                description: |-
-                  Configuration parameters passed to the plugin managing this backup
-                  Only available in 1.25 or later
+                description: Configuration parameters passed to the plugin managing
+                  this backup
                 properties:
                   name:
                     description: Name is the name of the plugin managing this backup
@@ -2025,7 +2024,6 @@ spec:
                           Specifies the locale name when the builtin provider is used.
                           This option requires `localeProvider` to be set to `builtin`.
                           Available from PostgreSQL 17.
-                          Only available in 1.25 or later
                         type: string
                       dataChecksums:
                         description: |-
@@ -2045,14 +2043,12 @@ spec:
                           Specifies the ICU locale when the ICU provider is used.
                           This option requires `localeProvider` to be set to `icu`.
                           Available from PostgreSQL 15.
-                          Only available in 1.25 or later
                         type: string
                       icuRules:
                         description: |-
                           Specifies additional collation rules to customize the behavior of the default collation.
                           This option requires `localeProvider` to be set to `icu`.
                           Available from PostgreSQL 16.
-                          Only available in 1.25 or later
                         type: string
                       import:
                         description: |-
@@ -2070,7 +2066,6 @@ spec:
                               Use these options with caution and at your own risk, as the operator
                               does not validate their content. Be aware that certain options may
                               conflict with the operator's intended functionality or design.
-                              Only available in 1.25 or later
                             items:
                               type: string
                             type: array
@@ -2080,7 +2075,6 @@ spec:
                               Use these options with caution and at your own risk, as the operator
                               does not validate their content. Be aware that certain options may
                               conflict with the operator's intended functionality or design.
-                              Only available in 1.25 or later
                             items:
                               type: string
                             type: array
@@ -2125,9 +2119,8 @@ spec:
                         - type
                         type: object
                       locale:
-                        description: |-
-                          Sets the default collation order and character classification in the new database.
-                          Only available in 1.25 or later
+                        description: Sets the default collation order and character
+                          classification in the new database.
                         type: string
                       localeCType:
                         description: The value to be passed as option `--lc-ctype`
@@ -2141,7 +2134,6 @@ spec:
                         description: |-
                           This option sets the locale provider for databases created in the new cluster.
                           Available from PostgreSQL 16.
-                          Only available in 1.25 or later
                         type: string
                       options:
                         description: |-
@@ -2231,7 +2223,6 @@ spec:
                           Within each group, the processing order follows the sequence specified
                           in their respective arrays.
                           (by default empty)
-                          Only available in 1.25 or later
                         properties:
                           configMapRefs:
                             description: ConfigMapRefs holds a list of references
@@ -2289,7 +2280,6 @@ spec:
                           Within each group, the processing order follows the sequence specified
                           in their respective arrays.
                           (by default empty)
-                          Only available in 1.25 or later
                         properties:
                           configMapRefs:
                             description: ConfigMapRefs holds a list of references
@@ -3476,7 +3466,6 @@ spec:
                       description: |-
                         The configuration of the plugin that is taking care
                         of WAL archiving and backups for this external cluster
-                        Only available in 1.25 or later
                       properties:
                         enabled:
                           default: true
@@ -3584,9 +3573,8 @@ spec:
                 format: int32
                 type: integer
               imageCatalogRef:
-                description: |-
-                  Defines the major PostgreSQL version we want to use within an ImageCatalog
-                  Only available in 1.25 or later
+                description: Defines the major PostgreSQL version we want to use within
+                  an ImageCatalog
                 properties:
                   apiGroup:
                     description: |-
@@ -3833,9 +3821,7 @@ spec:
                       type: object
                     type: array
                   services:
-                    description: |-
-                      Services roles managed by the `Cluster`
-                      Only available in 1.25 or later
+                    description: Services roles managed by the `Cluster`
                     properties:
                       additional:
                         description: Additional is a list of additional managed services
@@ -3882,9 +3868,8 @@ spec:
                                         More info: http://kubernetes.io/docs/user-guide/labels
                                       type: object
                                     name:
-                                      description: |-
-                                        The name of the resource. Only supported for certain types
-                                        Only available in 1.25 or later
+                                      description: The name of the resource. Only
+                                        supported for certain types
                                       type: string
                                   type: object
                                 spec:
@@ -4510,7 +4495,6 @@ spec:
                     description: |-
                       Configure TLS communication for the metrics endpoint.
                       Changing tls.enabled option will force a rollout of all instances.
-                      Only available in 1.25 or later
                     properties:
                       enabled:
                         default: false
@@ -4538,7 +4522,6 @@ spec:
                 description: |-
                   The plugins configuration, containing
                   any plugin to be loaded with the corresponding configuration
-                  Only available in 1.25 or later
                 items:
                   description: |-
                     PluginConfiguration specifies a plugin that need to be loaded for this
@@ -4820,9 +4803,8 @@ spec:
                     - enabled
                     type: object
                   synchronous:
-                    description: |-
-                      Configuration of the PostgreSQL synchronous replication feature
-                      Only available in 1.25 or later
+                    description: Configuration of the PostgreSQL synchronous replication
+                      feature
                     properties:
                       dataDurability:
                         default: required
@@ -5425,25 +5407,21 @@ spec:
                       time past the commit time. This provides an opportunity to correct
                       data loss errors. Note that when this parameter is set, a promotion
                       token cannot be used.
-                      Only available in 1.25 or later
                     type: string
                   primary:
                     description: |-
                       Primary defines which Cluster is defined to be the primary in the distributed PostgreSQL cluster, based on the
                       topology specified in externalClusters
-                      Only available in 1.25 or later
                     type: string
                   promotionToken:
                     description: |-
                       A demotion token generated by an external cluster used to
                       check if the promotion requirements are met.
-                      Only available in 1.25 or later
                     type: string
                   self:
                     description: |-
                       Self defines the name of this cluster. It is used to determine if this is a primary
                       or a replica cluster, comparing it with `primary`
-                      Only available in 1.25 or later
                     type: string
                   source:
                     description: The name of the external cluster which is the replication
@@ -5478,9 +5456,8 @@ spec:
                         type: string
                     type: object
                   synchronizeReplicas:
-                    description: |-
-                      Configures the synchronization of the user defined physical replication slots
-                      Only available in 1.25 or later
+                    description: Configures the synchronization of the user defined
+                      physical replication slots
                     properties:
                       enabled:
                         description: When set to true, every replication slot that
@@ -5623,9 +5600,8 @@ spec:
                           More info: http://kubernetes.io/docs/user-guide/labels
                         type: object
                       name:
-                        description: |-
-                          The name of the resource. Only supported for certain types
-                          Only available in 1.25 or later
+                        description: The name of the resource. Only supported for
+                          certain types
                         type: string
                     type: object
                 required:
@@ -7843,9 +7819,7 @@ spec:
                     type: string
                 type: object
               serviceTemplate:
-                description: |-
-                  Template for the Service to be created
-                  Only available in 1.25 or later
+                description: Template for the Service to be created
                 properties:
                   metadata:
                     description: |-
@@ -7871,9 +7845,8 @@ spec:
                           More info: http://kubernetes.io/docs/user-guide/labels
                         type: object
                       name:
-                        description: |-
-                          The name of the resource. Only supported for certain types
-                          Only available in 1.25 or later
+                        description: The name of the resource. Only supported for
+                          certain types
                         type: string
                     type: object
                   spec:
@@ -8249,9 +8222,8 @@ spec:
                           More info: http://kubernetes.io/docs/user-guide/labels
                         type: object
                       name:
-                        description: |-
-                          The name of the resource. Only supported for certain types
-                          Only available in 1.25 or later
+                        description: The name of the resource. Only supported for
+                          certain types
                         type: string
                     type: object
                   spec:
@@ -16668,9 +16640,8 @@ spec:
                     type: boolean
                 type: object
               pluginConfiguration:
-                description: |-
-                  Configuration parameters passed to the plugin managing this backup
-                  Only available in 1.25 or later
+                description: Configuration parameters passed to the plugin managing
+                  this backup
                 properties:
                   name:
                     description: Name is the name of the plugin managing this backup
