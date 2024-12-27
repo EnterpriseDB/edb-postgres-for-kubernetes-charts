@@ -3,10 +3,10 @@ entries:
   cloud-native-postgresql:
   - apiVersion: v2
     appVersion: 1.15.0
-    created: "2024-12-25T07:31:30.976251444Z"
+    created: "2024-12-27T07:11:29.574969315Z"
     deprecated: true
     description: Cloud Native Postgresql Helm Chart (DEPRECATED)
-    digest: 4429e8b18d5915c4a2a1c180c2f527f304ab1ac3d9b59f94d34ccedd1812bc36
+    digest: 069a57bf1ffd649500a6e0201c8e0ac558a3c0e61a4248da738b6c806b24fbde
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -315,6 +315,46 @@ entries:
     - https://EnterpriseDB.github.io/cloud-native-postgresql-helm/cloud-native-postgresql-0.3.2.tgz
     version: 0.3.2
   edb-postgres-distributed-for-kubernetes:
+  - apiVersion: v2
+    appVersion: 1.1.0
+    created: "2024-12-27T07:11:29.588494997Z"
+    dependencies:
+    - condition: cert-manager.enabled
+      name: cert-manager
+      repository: https://charts.jetstack.io
+      version: 1.16.1
+    - condition: edb-postgres-for-kubernetes-lts.enabled
+      name: edb-postgres-for-kubernetes-lts
+      repository: ""
+      version: 0.25.0
+    description: EDB Postgres Distributed for Kubernetes Helm Chart
+    digest: 863ea416032debaafd98bcad1867d4aa1eb2c45db836cbf1008428fd6854f22a
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - pgd
+    - distributed
+    - postgresql
+    - postgres
+    - database
+    - edb
+    - enterprisedb
+    maintainers:
+    - email: gabriele.bartolini@enterprisedb.com
+      name: gbartolini
+    - email: jaime.silvela@enterprisedb.com
+      name: jsilvela
+    - email: tao.li@enterprisedb.com
+      name: litaocdl
+    - email: niccolo.fei@enterprisedb.com
+      name: NiccoloFei
+    name: edb-postgres-distributed-for-kubernetes
+    sources:
+    - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-distributed-for-kubernetes-1.1.0.tgz
+    version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.1
     created: "2024-12-25T07:31:30.98929252Z"
@@ -678,9 +718,9 @@ entries:
   edb-postgres-for-kubernetes:
   - apiVersion: v2
     appVersion: 1.25.0
-    created: "2024-12-25T07:31:30.99472769Z"
+    created: "2024-12-27T07:11:29.593970203Z"
     description: EDB Postgres for Kubernetes Helm Chart
-    digest: e06bbb465a92b3df4cbbbef54c198aaa5db122e5d1c4cb9458001bea0fd55534
+    digest: 951756d40981c689fc756844299315fa3342bcbc6db053f65896b68571d3c3c7
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -1133,4 +1173,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-0.17.1.tgz
     version: 0.17.1
-generated: "2024-12-25T07:31:30.972598071Z"
+generated: "2024-12-27T07:11:29.571245151Z"
