@@ -91,9 +91,9 @@ It is up to the user to ensure there is no collision between operators.
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD)
 
 Similar to the PG4K helm chart installation, both the operator and the operand images
-required by `edb-postgres-distributed-for-kubernetes` may be pulled from the
-`k8s_enterprise_pgd` or `k8s_standard_pgd` repositories at `docker.enterprisedb.com`,
-available with an EDB subscription plan.
+required by PG4K-PGD may be pulled from the `k8s_enterprise_pgd` or `k8s_standard_pgd`
+repositories at `docker.enterprisedb.com`, available with an EDB subscription plan.
+See: [obtaining an EDB subscription token](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/installation_upgrade/#obtaining-an-edb-subscription-token)
 
 The PG4K-PGD chart installs both the PG4K-PGD and PG4K operators in the
 same namespace. The PG4K operator installed is a stable version that is
@@ -119,8 +119,8 @@ helm upgrade --dependency-update \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_enterprise_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
@@ -231,14 +231,14 @@ helm upgrade --dependency-update \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_standard_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   --set global.repository=docker.enterprisedb.com/k8s_standard_pgd \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
 If we want to use a different flavor or a different version of PGD image, we can set the following two
-global options, for each helm chart release: 
+global options, for each helm chart release:
 
 - `pgdImageName`: the PGD image name to be used by the operator. PGD image (with this name)
 will be pulled from `global.repository`;
@@ -248,15 +248,15 @@ will be pulled from `global.repository`.
 PGD and PGD proxy are upgraded to the latest well-tested versions.
 By default, the PGD image here is using postgresql-pgd.
 
-This example uses the `edb-postgres-advanced-pgd` PGD images.
+This example uses the `edb-postgres-advanced-pgd` PGD images as the default operand image.
 
 ```console
 helm upgrade --dependency-update \
   --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_enterprise_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   --set global.pgdImageName=edb-postgres-advanced-pgd:16.4.1-5.5.1-1 \
   --set global.proxyImageName=edb-pgd-proxy:5.5.0 \
   edb/edb-postgres-distributed-for-kubernetes
@@ -286,8 +286,8 @@ To deploy PG4K-PGD with all dependencies together
 helm upgrade --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_enterprise_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   charts/edb-postgres-distributed-for-kubernetes
 ```
 
@@ -298,8 +298,8 @@ helm upgrade --install edb-pg4k-lts \
   --namespace postgresql-operator-system \
   --create-namespace \
   --set image.imageCredentials.create=true \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_enterprise_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
 ```
 
@@ -310,8 +310,8 @@ set.
 helm upgrade --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
-  --set image.imageCredentials.username=${USERNAME} \
-  --set image.imageCredentials.password=${PASSWORD} \
+  --set image.imageCredentials.username=k8s_enterprise_pgd \
+  --set image.imageCredentials.password=<THE-TOKEN> \
   --set edb-postgres-for-kubernetes-lts.enabled=false \
   charts/edb-postgres-distributed-for-kubernetes
 ```
