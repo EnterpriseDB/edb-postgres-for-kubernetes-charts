@@ -2,14 +2,14 @@
 
 Helm charts to install the following Operators:
 
-1. [EDB Postgres for Kubernetes operator (PG4K)](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
-designed by EnterpriseDB to manage PostgreSQL workloads on any
-supported Kubernetes cluster running in private, public, or hybrid cloud
-environments. Derived from CloudNativePG's Helm chart.
+- [EDB Postgres for Kubernetes operator (PG4K)](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
+   designed by EnterpriseDB to manage PostgreSQL workloads on any
+   supported Kubernetes cluster running in private, public, or hybrid cloud
+   environments. Derived from CloudNativePG's Helm chart.
 
-2. [EDB Postgres Distributed for Kubernetes (PG4K-PGD)](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
-designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
-on Kubernetes, with traffic routed by PGD Proxy.
+- [EDB Postgres Distributed for Kubernetes (PG4K-PGD)](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
+   designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
+   on Kubernetes, with traffic routed by PGD Proxy.
 
 ## Usage
 
@@ -183,8 +183,9 @@ helm chart in the next section.
 
 #### 2. Setup PG4K-PGD
 
-Once the above deployments are ready, you can deploy the PG4K-PGD helm chart taking care
-to set `cert-manager.enabled` to false if cert-manager is installed separately.
+Once the above deployments are ready, you can deploy the PG4K-PGD
+helm chart taking care to set `cert-manager.enabled`
+to false if cert-manager is installed separately.
 
 **Note:** In the following example, the flags setting the credentials were elided
 to put the focus on the `enabled=false` condition. The flags may still be
@@ -220,8 +221,11 @@ invocation.
 
 The following example uses the `k8s_standard_pgd` registry in
 `docker.enterprisedb.com`. Following is the description of set options.
-- `global.repository`: The repository where the operator and operand image are downloaded from.
-This is a global setting, which is shared for both PG4K-PGD and PG4K operators and pgd operands.
+
+- `global.repository`: The repository where the operator and
+   operand image are downloaded from.
+This is a global setting, which is shared for both PG4K-PGD
+and PG4K operators and pgd operands.
 
 Assuming that you have your necessary credentials, please fill in the USERNAME
 and PASSWORD below.
@@ -237,18 +241,20 @@ helm upgrade --dependency-update \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
-If we want to use a different flavor or a different version of PGD image, we can set the following two
-global options, for each helm chart release:
+If we want to use a different flavor or a different version of PGD image,
+we can set the following two global options, for each helm chart release:
 
-- `pgdImageName`: the PGD image name to be used by the operator. PGD image (with this name)
-will be pulled from `global.repository`;
-- `proxyImageName`: the PGD proxy image name to be used by the operator. PGD proxy image (with this name)
-will be pulled from `global.repository`.
+- `pgdImageName`: the PGD image name to be used by the operator.
+   PGD image (with this name) will be pulled from `global.repository`;
+
+- `proxyImageName`: the PGD proxy image name to be used by the operator.
+   PGD proxy image (with this name) will be pulled from `global.repository`.
 
 PGD and PGD proxy are upgraded to the latest well-tested versions.
 By default, the PGD image here is using postgresql-pgd.
 
-This example uses the `edb-postgres-advanced-pgd` PGD images as the default operand image.
+This example uses the `edb-postgres-advanced-pgd` PGD images
+as the default operand image.
 
 ```console
 helm upgrade --dependency-update \
@@ -261,7 +267,6 @@ helm upgrade --dependency-update \
   --set global.proxyImageName=edb-pgd-proxy:5.5.0 \
   edb/edb-postgres-distributed-for-kubernetes
 ```
-
 
 ## Deployment using local chart
 
@@ -329,7 +334,8 @@ the chart directory before installing from the source.
 
 **IMPORTANT:** Both the operators and the operand images are distributed
 under different license terms, in particular the `EDB Postgres for Kubernetes operator`
-and the `EDB Postgres Distributed for Kubernetes operator` are distributed under the
+and the `EDB Postgres Distributed for Kubernetes operator`
+are distributed under the
 [EnterpriseDB Limited Use License](https://www.enterprisedb.com/limited-use-license).
 
 Copyright (C) 2021 EnterpriseDB Corporation.
