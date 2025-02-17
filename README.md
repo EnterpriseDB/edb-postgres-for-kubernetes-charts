@@ -200,7 +200,7 @@ helm upgrade --dependency-update \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
-You should now have a seperate namespace for each operator:
+You should now have a separate namespace for each operator:
 
 ```sh
 $ kubectl get ns
