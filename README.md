@@ -110,9 +110,9 @@ For more information please see the section
 on [controlling the image repositories](#controlling-the-image-repositories).
 
 **Note:** You will need credentials to retrieve the various
-operator and operand images. Make sure to replace USERNAME and PASSWORD with
-your own credentials in the command below, which uses the `k8s_enterprise_pgd`
-image registry by default:
+operator and operand images. Make sure to replace THE-TOKEN with
+your own EDB subscription token in the command below, which uses the
+`k8s_enterprise_pgd` image registry by default:
 
 ```console
 helm upgrade --dependency-update \
@@ -227,8 +227,8 @@ The following example uses the `k8s_standard_pgd` registry in
 This is a global setting, which is shared for both PG4K-PGD
 and PG4K operators and pgd operands.
 
-Assuming that you have your necessary credentials, please fill in the USERNAME
-and PASSWORD below.
+Assuming that you have your necessary EDB subscription token, please replace
+THE-TOKEN below.
 
 ```console
 helm upgrade --dependency-update \
