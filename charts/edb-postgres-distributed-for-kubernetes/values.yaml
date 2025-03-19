@@ -75,6 +75,9 @@ webhook:
   readinessProbe:
     initialDelaySeconds: 15
     periodSeconds: 20
+  startupProbe:
+    failureThreshold: 6
+    periodSeconds: 5
 
 # Manager configuration
 managerConfig:
