@@ -263,8 +263,8 @@ helm upgrade --dependency-update \
   --create-namespace \
   --set image.imageCredentials.username=k8s_enterprise_pgd \
   --set image.imageCredentials.password=<THE-TOKEN> \
-  --set global.pgdImageName=edb-postgres-advanced-pgd:16.4.1-5.5.1-1 \
-  --set global.proxyImageName=edb-pgd-proxy:5.5.0 \
+  --set global.pgdImageName=edb-postgres-advanced-pgd:16.8.0-5.7.0-1 \
+  --set global.proxyImageName=edb-pgd-proxy:5.7.0-1 \
   edb/edb-postgres-distributed-for-kubernetes
 ```
 
