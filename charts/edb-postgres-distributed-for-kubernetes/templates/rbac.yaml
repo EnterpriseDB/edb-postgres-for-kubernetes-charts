@@ -310,24 +310,16 @@ rules:
   resources:
   - clusterimagecatalogs
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - pgd.k8s.enterprisedb.io
   resources:
   - imagecatalogs
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - policy
