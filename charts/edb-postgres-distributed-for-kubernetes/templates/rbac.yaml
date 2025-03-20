@@ -306,6 +306,22 @@ rules:
   - update
   - watch
 - apiGroups:
+  - pgd.k8s.enterprisedb.io
+  resources:
+  - clusterimagecatalogs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - pgd.k8s.enterprisedb.io
+  resources:
+  - imagecatalogs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - policy
   resources:
   - poddisruptionbudgets
@@ -457,6 +473,8 @@ rules:
   resources:
   - pgdgroups
   - pgdgroupcleanups
+  - clusterimagecatalogs
+  - imagecatalogs
   verbs:
   - get
   - list
@@ -494,6 +512,8 @@ rules:
   resources:
   - pgdgroups
   - pgdgroupcleanups
+  - clusterimagecatalogs
+  - imagecatalogs
   verbs:
   - create
   - delete
