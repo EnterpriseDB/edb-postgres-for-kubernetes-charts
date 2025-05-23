@@ -94,6 +94,27 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
+      path: /validate-postgresql-k8s-enterprisedb-io-v1-database
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vdatabase.k8s.enterprisedb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - databases
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
       path: /validate-postgresql-k8s-enterprisedb-io-v1-pooler
       port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
