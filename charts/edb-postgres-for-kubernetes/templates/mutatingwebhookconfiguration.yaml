@@ -73,6 +73,27 @@ webhooks:
     service:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
+      path: /mutate-postgresql-k8s-enterprisedb-io-v1-database
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
+  name: mdatabase.k8s.enterprisedb.io
+  rules:
+  - apiGroups:
+    - postgresql.k8s.enterprisedb.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - databases
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
       path: /mutate-postgresql-k8s-enterprisedb-io-v1-scheduledbackup
       port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
