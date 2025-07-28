@@ -1,6 +1,6 @@
 # edb-postgres-distributed-for-kubernetes
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.2](https://img.shields.io/badge/AppVersion-1.1.2-informational?style=flat-square)
 
 EDB Postgres Distributed for Kubernetes Helm Chart
 
@@ -23,7 +23,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | edb-postgres-for-kubernetes-lts | 0.25.1 |
+|  | edb-postgres-for-kubernetes-lts | 0.26.0 |
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
 
 ## Values
