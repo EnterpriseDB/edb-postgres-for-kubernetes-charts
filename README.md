@@ -263,10 +263,14 @@ helm upgrade --dependency-update \
   --create-namespace \
   --set image.imageCredentials.username=k8s_enterprise_pgd \
   --set image.imageCredentials.password=<THE-TOKEN> \
-  --set global.pgdImageName=edb-postgres-advanced-pgd:16.8.0-5.7.0-1 \
-  --set global.proxyImageName=edb-pgd-proxy:5.7.0-1 \
+  --set global.pgdImageName=edb-postgres-advanced-pgd:17.5-pgd581-ubi9 \
+  --set global.proxyImageName=edb-pgd-proxy:5.8.1-ubi9 \
   edb/edb-postgres-distributed-for-kubernetes
 ```
+
+**Note:** You can find more latest released image catalogs for operand from
+[PGD Operand images](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/supported_versions/#pgd-operand-images)
+
 
 ## Deployment using local chart
 
