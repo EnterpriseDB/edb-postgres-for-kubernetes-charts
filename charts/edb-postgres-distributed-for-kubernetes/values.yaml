@@ -25,10 +25,10 @@ global:
   repository: docker.enterprisedb.com/k8s_enterprise_pgd
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
-  pgdImageName: postgresql-pgd:17.4-5.7.0-1
+  pgdImageName: postgresql-pgd:17.5-pgd581-ubi9
   # -- Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from
   # global repository
-  proxyImageName: edb-pgd-proxy:5.7.0-1
+  proxyImageName: edb-pgd-proxy:5.8.1-ubi9
 
 # -- operator image configuration
 image:

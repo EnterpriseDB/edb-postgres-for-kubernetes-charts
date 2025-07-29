@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -90,7 +90,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -176,7 +176,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -251,7 +251,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.17.2
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -423,10 +423,10 @@ spec:
                                 description: |-
                                   Compress a backup file (a tar file per tablespace) while streaming it
                                   to the object store. Available options are empty string (no
-                                  compression, default), `gzip`, `bzip2` or `snappy`.
+                                  compression, default), `gzip`, `bzip2`, and `snappy`.
                                 enum:
-                                - gzip
                                 - bzip2
+                                - gzip
                                 - snappy
                                 type: string
                               encryption:
@@ -615,11 +615,15 @@ spec:
                               compression:
                                 description: |-
                                   Compress a WAL file before sending it to the object store. Available
-                                  options are empty string (no compression, default), `gzip`, `bzip2` or `snappy`.
+                                  options are empty string (no compression, default), `gzip`, `bzip2`,
+                                  `lz4`, `snappy`, `xz`, and `zstd`.
                                 enum:
-                                - gzip
                                 - bzip2
+                                - gzip
+                                - lz4
                                 - snappy
+                                - xz
+                                - zstd
                                 type: string
                               encryption:
                                 description: |-
@@ -762,8 +766,8 @@ spec:
                     type: object
                   cron:
                     description: |-
-                      The scheduled backup for the data. This field is deprecated and
-                      will be removed in future versions.
+                      The scheduled backup for the data.
+                      Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       backupOwnerReference:
                         default: none
@@ -784,11 +788,12 @@ spec:
                       method:
                         default: barmanObjectStore
                         description: |-
-                          The backup method to be used, possible options are `barmanObjectStore`
-                          and `volumeSnapshot`. Defaults to: `barmanObjectStore`.
+                          The backup method to be used, possible options are `barmanObjectStore`,
+                          `volumeSnapshot` and `plugin`. Defaults to: `barmanObjectStore`.
                         enum:
                         - barmanObjectStore
                         - volumeSnapshot
+                        - plugin
                         type: string
                       online:
                         description: |-
@@ -822,6 +827,24 @@ spec:
                               If write activity on the primary is low, it may be useful to run pg_switch_wal on the primary in order to trigger
                               an immediate segment switch.
                             type: boolean
+                        type: object
+                      pluginConfiguration:
+                        description: Configuration parameters passed to the plugin
+                          managing this backup
+                        properties:
+                          name:
+                            description: Name is the name of the plugin managing this
+                              backup
+                            type: string
+                          parameters:
+                            additionalProperties:
+                              type: string
+                            description: |-
+                              Parameters are the configuration parameters passed to the backup
+                              plugin for this backup
+                            type: object
+                        required:
+                        - name
                         type: object
                       schedule:
                         description: |-
@@ -874,11 +897,12 @@ spec:
                         method:
                           default: barmanObjectStore
                           description: |-
-                            The backup method to be used, possible options are `barmanObjectStore`
-                            and `volumeSnapshot`. Defaults to: `barmanObjectStore`.
+                            The backup method to be used, possible options are `barmanObjectStore`,
+                            `volumeSnapshot` and `plugin`. Defaults to: `barmanObjectStore`.
                           enum:
                           - barmanObjectStore
                           - volumeSnapshot
+                          - plugin
                           type: string
                         online:
                           description: |-
@@ -913,6 +937,24 @@ spec:
                                 an immediate segment switch.
                               type: boolean
                           type: object
+                        pluginConfiguration:
+                          description: Configuration parameters passed to the plugin
+                            managing this backup
+                          properties:
+                            name:
+                              description: Name is the name of the plugin managing
+                                this backup
+                              type: string
+                            parameters:
+                              additionalProperties:
+                                type: string
+                              description: |-
+                                Parameters are the configuration parameters passed to the backup
+                                plugin for this backup
+                              type: object
+                          required:
+                          - name
+                          type: object
                         schedule:
                           description: |-
                             The schedule does not follow the same format used in Kubernetes CronJobs
@@ -941,7 +983,7 @@ spec:
                 type: object
               cnp:
                 description: |-
-                  Instances configuration that will be injected into the CNP
+                  DataInstances configuration that will be injected into the CNP
                   clusters that compose the PGD Group
                 properties:
                   affinity:
@@ -1030,7 +1072,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -1045,7 +1086,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -1212,7 +1252,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -1227,7 +1266,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -1392,7 +1430,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -1407,7 +1444,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -1574,7 +1610,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -1589,7 +1624,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -1956,6 +1990,73 @@ spec:
                       of the secret and set the password of the `postgres` user to `NULL`.
                       Enabled by default.
                     type: boolean
+                  initDBOptions:
+                    description: |-
+                      InitDBOptions specifies the options to be passed to the `initdb` command
+                      when the node is created from scratch
+                    properties:
+                      builtinLocale:
+                        description: |-
+                          Specifies the locale name when the builtin provider is used.
+                          This option requires `localeProvider` to be set to `builtin`.
+                          Available from PostgreSQL 17.
+                        type: string
+                      dataChecksums:
+                        description: |-
+                          Whether the `-k` option should be passed to initdb,
+                          enabling checksums on data pages (default: `false`)
+                        type: boolean
+                      encoding:
+                        description: The value to be passed as option `--encoding`
+                          for initdb (default:`UTF8`)
+                        type: string
+                      icuLocale:
+                        description: |-
+                          Specifies the ICU locale when the ICU provider is used.
+                          This option requires `localeProvider` to be set to `icu`.
+                          Available from PostgreSQL 15.
+                        type: string
+                      icuRules:
+                        description: |-
+                          Specifies additional collation rules to customize the behavior of the default collation.
+                          This option requires `localeProvider` to be set to `icu`.
+                          Available from PostgreSQL 16.
+                        type: string
+                      locale:
+                        description: Sets the default collation order and character
+                          classification in the new database.
+                        type: string
+                      localeCType:
+                        description: The value to be passed as option `--lc-ctype`
+                          for initdb (default:`C`)
+                        type: string
+                      localeCollate:
+                        description: The value to be passed as option `--lc-collate`
+                          for initdb (default:`C`)
+                        type: string
+                      localeProvider:
+                        description: |-
+                          This option sets the locale provider for databases created in the new cluster.
+                          Available from PostgreSQL 16.
+                        type: string
+                      walSegmentSize:
+                        description: |-
+                          The value in megabytes (1 to 1024) to be passed to the `--wal-segsize`
+                          option for initdb (default: empty, resulting in PostgreSQL default: 16MB)
+                        maximum: 1024
+                        minimum: 1
+                        type: integer
+                    type: object
+                    x-kubernetes-validations:
+                    - message: builtinLocale is only available when localeProvider
+                        is set to `builtin`
+                      rule: '!has(self.builtinLocale) || self.localeProvider == ''builtin'''
+                    - message: icuLocale is only available when localeProvider is
+                        set to `icu`
+                      rule: '!has(self.icuLocale) || self.localeProvider == ''icu'''
+                    - message: icuRules is only available when localeProvider is set
+                        to `icu`
+                      rule: '!has(self.icuRules) || self.localeProvider == ''icu'''
                   joinMethod:
                     default: logical
                     description: "JoinMethod specifies the method data nodes will
@@ -2465,13 +2566,12 @@ spec:
                                           type: object
                                         trafficDistribution:
                                           description: |-
-                                            TrafficDistribution offers a way to express preferences for how traffic is
-                                            distributed to Service endpoints. Implementations can use this field as a
-                                            hint, but are not required to guarantee strict adherence. If the field is
-                                            not set, the implementation will apply its default routing strategy. If set
-                                            to "PreferClose", implementations should prioritize endpoints that are
-                                            topologically close (e.g., same zone).
-                                            This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                                            TrafficDistribution offers a way to express preferences for how traffic
+                                            is distributed to Service endpoints. Implementations can use this field
+                                            as a hint, but are not required to guarantee strict adherence. If the
+                                            field is not set, the implementation will apply its default routing
+                                            strategy. If set to "PreferClose", implementations should prioritize
+                                            endpoints that are in the same zone.
                                           type: string
                                         type:
                                           description: |-
@@ -2778,20 +2878,25 @@ spec:
                         type: object
                     type: object
                   otel:
-                    description: OpenTelemetry Configuration
+                    description: |-
+                      OpenTelemetry Configuration
+                      Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       metricsURL:
-                        description: The OpenTelemetry HTTP endpoint URL to accept
-                          metrics data
+                        description: |-
+                          The OpenTelemetry HTTP endpoint URL to accept metrics data
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                       tls:
-                        description: TLSConfiguration provides the TLS certificate
-                          configuration when MetricsURL and TraceURL are using HTTPS
+                        description: |-
+                          TLSConfiguration provides the TLS certificate configuration when MetricsURL and TraceURL are using HTTPS
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         properties:
                           caBundleSecretRef:
                             description: |-
                               CABundleSecretRef is a reference to a secret field containing the CA bundle
                               to verify the openTelemetry server certificate
+                              Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               key:
                                 description: The key to select
@@ -2808,6 +2913,7 @@ spec:
                               ClientCertSecret is the name of the secret containing the client certificate used to connect
                               to openTelemetry. It must contain both the standard "tls.crt" and "tls.key" files,
                               encoded in PEM format.
+                              Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               name:
                                 description: Name of the referent.
@@ -2817,11 +2923,14 @@ spec:
                             type: object
                         type: object
                       traceEnable:
-                        description: Whether to push trace data to OpenTelemetry traceUrl
+                        description: |-
+                          Whether to push trace data to OpenTelemetry traceUrl
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: boolean
                       traceURL:
-                        description: The OpenTelemetry HTTP endpoint URL to accept
-                          trace data
+                        description: |-
+                          The OpenTelemetry HTTP endpoint URL to accept trace data
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                     required:
                     - traceEnable
@@ -3277,7 +3386,6 @@ spec:
                           feature
                         properties:
                           dataDurability:
-                            default: required
                             description: |-
                               If set to "required", data durability is strictly enforced. Write operations
                               with synchronous commit settings (`on`, `remote_write`, or `remote_apply`) will
@@ -4439,7 +4547,6 @@ spec:
                             - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
 
                             If this value is nil, the behavior is equivalent to the Honor policy.
-                            This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                           type: string
                         nodeTaintsPolicy:
                           description: |-
@@ -4450,7 +4557,6 @@ spec:
                             - Ignore: node taints are ignored. All nodes are included.
 
                             If this value is nil, the behavior is equivalent to the Ignore policy.
-                            This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                           type: string
                         topologyKey:
                           description: |-
@@ -5100,13 +5206,12 @@ spec:
                             type: object
                           trafficDistribution:
                             description: |-
-                              TrafficDistribution offers a way to express preferences for how traffic is
-                              distributed to Service endpoints. Implementations can use this field as a
-                              hint, but are not required to guarantee strict adherence. If the field is
-                              not set, the implementation will apply its default routing strategy. If set
-                              to "PreferClose", implementations should prioritize endpoints that are
-                              topologically close (e.g., same zone).
-                              This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                              TrafficDistribution offers a way to express preferences for how traffic
+                              is distributed to Service endpoints. Implementations can use this field
+                              as a hint, but are not required to guarantee strict adherence. If the
+                              field is not set, the implementation will apply its default routing
+                              strategy. If set to "PreferClose", implementations should prioritize
+                              endpoints that are in the same zone.
                             type: string
                           type:
                             description: |-
@@ -5482,13 +5587,12 @@ spec:
                             type: object
                           trafficDistribution:
                             description: |-
-                              TrafficDistribution offers a way to express preferences for how traffic is
-                              distributed to Service endpoints. Implementations can use this field as a
-                              hint, but are not required to guarantee strict adherence. If the field is
-                              not set, the implementation will apply its default routing strategy. If set
-                              to "PreferClose", implementations should prioritize endpoints that are
-                              topologically close (e.g., same zone).
-                              This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                              TrafficDistribution offers a way to express preferences for how traffic
+                              is distributed to Service endpoints. Implementations can use this field
+                              as a hint, but are not required to guarantee strict adherence. If the
+                              field is not set, the implementation will apply its default routing
+                              strategy. If set to "PreferClose", implementations should prioritize
+                              endpoints that are in the same zone.
                             type: string
                           type:
                             description: |-
@@ -5865,13 +5969,12 @@ spec:
                             type: object
                           trafficDistribution:
                             description: |-
-                              TrafficDistribution offers a way to express preferences for how traffic is
-                              distributed to Service endpoints. Implementations can use this field as a
-                              hint, but are not required to guarantee strict adherence. If the field is
-                              not set, the implementation will apply its default routing strategy. If set
-                              to "PreferClose", implementations should prioritize endpoints that are
-                              topologically close (e.g., same zone).
-                              This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                              TrafficDistribution offers a way to express preferences for how traffic
+                              is distributed to Service endpoints. Implementations can use this field
+                              as a hint, but are not required to guarantee strict adherence. If the
+                              field is not set, the implementation will apply its default routing
+                              strategy. If set to "PreferClose", implementations should prioritize
+                              endpoints that are in the same zone.
                             type: string
                           type:
                             description: |-
@@ -6248,13 +6351,12 @@ spec:
                             type: object
                           trafficDistribution:
                             description: |-
-                              TrafficDistribution offers a way to express preferences for how traffic is
-                              distributed to Service endpoints. Implementations can use this field as a
-                              hint, but are not required to guarantee strict adherence. If the field is
-                              not set, the implementation will apply its default routing strategy. If set
-                              to "PreferClose", implementations should prioritize endpoints that are
-                              topologically close (e.g., same zone).
-                              This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                              TrafficDistribution offers a way to express preferences for how traffic
+                              is distributed to Service endpoints. Implementations can use this field
+                              as a hint, but are not required to guarantee strict adherence. If the
+                              field is not set, the implementation will apply its default routing
+                              strategy. If set to "PreferClose", implementations should prioritize
+                              endpoints that are in the same zone.
                             type: string
                           type:
                             description: |-
@@ -7702,7 +7804,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -7717,7 +7818,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -7884,7 +7984,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -7899,7 +7998,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -8064,7 +8162,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -8079,7 +8176,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -8246,7 +8342,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -8261,7 +8356,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -8556,10 +8650,10 @@ spec:
                             description: |-
                               Compress a backup file (a tar file per tablespace) while streaming it
                               to the object store. Available options are empty string (no
-                              compression, default), `gzip`, `bzip2` or `snappy`.
+                              compression, default), `gzip`, `bzip2`, and `snappy`.
                             enum:
-                            - gzip
                             - bzip2
+                            - gzip
                             - snappy
                             type: string
                           encryption:
@@ -8747,11 +8841,15 @@ spec:
                           compression:
                             description: |-
                               Compress a WAL file before sending it to the object store. Available
-                              options are empty string (no compression, default), `gzip`, `bzip2` or `snappy`.
+                              options are empty string (no compression, default), `gzip`, `bzip2`,
+                              `lz4`, `snappy`, `xz`, and `zstd`.
                             enum:
-                            - gzip
                             - bzip2
+                            - gzip
+                            - lz4
                             - snappy
+                            - xz
+                            - zstd
                             type: string
                           encryption:
                             description: |-
@@ -8905,7 +9003,7 @@ spec:
                 description: |-
                   WitnessInstances configuration that will be injected into
                   the WitnessInstances CNP clusters
-                  If not defined, it will default to the Instances configuration
+                  If not defined, it will default to the DataInstances configuration
                 properties:
                   affinity:
                     description: Affinity/Anti-affinity rules for Pods
@@ -8993,7 +9091,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -9008,7 +9105,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -9175,7 +9271,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -9190,7 +9285,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -9355,7 +9449,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                         Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -9370,7 +9463,6 @@ spec:
                                         pod labels will be ignored. The default value is empty.
                                         The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                         Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                        This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                       items:
                                         type: string
                                       type: array
@@ -9537,7 +9629,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both matchLabelKeys and labelSelector.
                                     Also, matchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -9552,7 +9643,6 @@ spec:
                                     pod labels will be ignored. The default value is empty.
                                     The same key is forbidden to exist in both mismatchLabelKeys and labelSelector.
                                     Also, mismatchLabelKeys cannot be set when labelSelector isn't set.
-                                    This is a beta field and requires enabling MatchLabelKeysInPodAffinity feature gate (enabled by default).
                                   items:
                                     type: string
                                   type: array
@@ -9910,6 +10000,73 @@ spec:
                       successfully start up (default 300)
                     format: int32
                     type: integer
+                  initDBOptions:
+                    description: |-
+                      InitDBOptions specifies the options to be passed to the `initdb` command
+                      when the node is created from scratch
+                    properties:
+                      builtinLocale:
+                        description: |-
+                          Specifies the locale name when the builtin provider is used.
+                          This option requires `localeProvider` to be set to `builtin`.
+                          Available from PostgreSQL 17.
+                        type: string
+                      dataChecksums:
+                        description: |-
+                          Whether the `-k` option should be passed to initdb,
+                          enabling checksums on data pages (default: `false`)
+                        type: boolean
+                      encoding:
+                        description: The value to be passed as option `--encoding`
+                          for initdb (default:`UTF8`)
+                        type: string
+                      icuLocale:
+                        description: |-
+                          Specifies the ICU locale when the ICU provider is used.
+                          This option requires `localeProvider` to be set to `icu`.
+                          Available from PostgreSQL 15.
+                        type: string
+                      icuRules:
+                        description: |-
+                          Specifies additional collation rules to customize the behavior of the default collation.
+                          This option requires `localeProvider` to be set to `icu`.
+                          Available from PostgreSQL 16.
+                        type: string
+                      locale:
+                        description: Sets the default collation order and character
+                          classification in the new database.
+                        type: string
+                      localeCType:
+                        description: The value to be passed as option `--lc-ctype`
+                          for initdb (default:`C`)
+                        type: string
+                      localeCollate:
+                        description: The value to be passed as option `--lc-collate`
+                          for initdb (default:`C`)
+                        type: string
+                      localeProvider:
+                        description: |-
+                          This option sets the locale provider for databases created in the new cluster.
+                          Available from PostgreSQL 16.
+                        type: string
+                      walSegmentSize:
+                        description: |-
+                          The value in megabytes (1 to 1024) to be passed to the `--wal-segsize`
+                          option for initdb (default: empty, resulting in PostgreSQL default: 16MB)
+                        maximum: 1024
+                        minimum: 1
+                        type: integer
+                    type: object
+                    x-kubernetes-validations:
+                    - message: builtinLocale is only available when localeProvider
+                        is set to `builtin`
+                      rule: '!has(self.builtinLocale) || self.localeProvider == ''builtin'''
+                    - message: icuLocale is only available when localeProvider is
+                        set to `icu`
+                      rule: '!has(self.icuLocale) || self.localeProvider == ''icu'''
+                    - message: icuRules is only available when localeProvider is set
+                        to `icu`
+                      rule: '!has(self.icuRules) || self.localeProvider == ''icu'''
                   logLevel:
                     default: info
                     description: 'The instances'' log level, one of the following
@@ -10406,13 +10563,12 @@ spec:
                                           type: object
                                         trafficDistribution:
                                           description: |-
-                                            TrafficDistribution offers a way to express preferences for how traffic is
-                                            distributed to Service endpoints. Implementations can use this field as a
-                                            hint, but are not required to guarantee strict adherence. If the field is
-                                            not set, the implementation will apply its default routing strategy. If set
-                                            to "PreferClose", implementations should prioritize endpoints that are
-                                            topologically close (e.g., same zone).
-                                            This is a beta field and requires enabling ServiceTrafficDistribution feature.
+                                            TrafficDistribution offers a way to express preferences for how traffic
+                                            is distributed to Service endpoints. Implementations can use this field
+                                            as a hint, but are not required to guarantee strict adherence. If the
+                                            field is not set, the implementation will apply its default routing
+                                            strategy. If set to "PreferClose", implementations should prioritize
+                                            endpoints that are in the same zone.
                                           type: string
                                         type:
                                           description: |-
@@ -10719,20 +10875,25 @@ spec:
                         type: object
                     type: object
                   otel:
-                    description: OpenTelemetry Configuration
+                    description: |-
+                      OpenTelemetry Configuration
+                      Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       metricsURL:
-                        description: The OpenTelemetry HTTP endpoint URL to accept
-                          metrics data
+                        description: |-
+                          The OpenTelemetry HTTP endpoint URL to accept metrics data
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                       tls:
-                        description: TLSConfiguration provides the TLS certificate
-                          configuration when MetricsURL and TraceURL are using HTTPS
+                        description: |-
+                          TLSConfiguration provides the TLS certificate configuration when MetricsURL and TraceURL are using HTTPS
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         properties:
                           caBundleSecretRef:
                             description: |-
                               CABundleSecretRef is a reference to a secret field containing the CA bundle
                               to verify the openTelemetry server certificate
+                              Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               key:
                                 description: The key to select
@@ -10749,6 +10910,7 @@ spec:
                               ClientCertSecret is the name of the secret containing the client certificate used to connect
                               to openTelemetry. It must contain both the standard "tls.crt" and "tls.key" files,
                               encoded in PEM format.
+                              Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               name:
                                 description: Name of the referent.
@@ -10758,11 +10920,14 @@ spec:
                             type: object
                         type: object
                       traceEnable:
-                        description: Whether to push trace data to OpenTelemetry traceUrl
+                        description: |-
+                          Whether to push trace data to OpenTelemetry traceUrl
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: boolean
                       traceURL:
-                        description: The OpenTelemetry HTTP endpoint URL to accept
-                          trace data
+                        description: |-
+                          The OpenTelemetry HTTP endpoint URL to accept trace data
+                          Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                     required:
                     - traceEnable
@@ -11218,7 +11383,6 @@ spec:
                           feature
                         properties:
                           dataDurability:
-                            default: required
                             description: |-
                               If set to "required", data durability is strictly enforced. Write operations
                               with synchronous commit settings (`on`, `remote_write`, or `remote_apply`) will
@@ -12367,7 +12531,6 @@ spec:
                             - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
 
                             If this value is nil, the behavior is equivalent to the Honor policy.
-                            This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                           type: string
                         nodeTaintsPolicy:
                           description: |-
@@ -12378,7 +12541,6 @@ spec:
                             - Ignore: node taints are ignored. All nodes are included.
 
                             If this value is nil, the behavior is equivalent to the Ignore policy.
-                            This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
                           type: string
                         topologyKey:
                           description: |-
@@ -12851,13 +13013,15 @@ spec:
                     type: string
                   scheduledBackupHash:
                     description: |-
-                      ScheduledBackupHash is the hash of the scheduled backup configuration. This field is deprecated,
-                      will be migrated to ScheduledBackupStatus
+                      ScheduledBackupHash is the hash of the scheduled backup configuration.
+                      Deprecated: This field is deprecated and will be removed in future versions.
+                      Please use ScheduledBackupStatus instead
                     type: string
                   scheduledBackupName:
                     description: |-
-                      ScheduledBackupName is the name of the scheduled backup. This field is deprecated,
-                      will be migrated to ScheduledBackupStatus
+                      ScheduledBackupName is the name of the scheduled backup.
+                      Deprecated: This field is deprecated and will be removed in future versions.
+                      Please use ScheduledBackupStatus instead
                     type: string
                   scheduledBackups:
                     description: ScheduledBackupStatus contains the status of all
@@ -13104,6 +13268,33 @@ spec:
                 - wait
                 - fail
                 type: string
+              plugins:
+                description: Plugin Last known status of the plugins
+                properties:
+                  barmanCloud:
+                    description: BarmanCloud stored the barman cloud plugin status
+                    properties:
+                      objectStore:
+                        description: ObjectStore contains the name and hashcode of
+                          the managed objectStore
+                        items:
+                          description: ObjectStoreStatus contains the name and hash
+                            of the objectStore
+                          properties:
+                            hash:
+                              description: Hash stored the objectStore hashcode
+                              type: string
+                            name:
+                              description: Name is the name of the objectStore
+                              type: string
+                          type: object
+                        type: array
+                      pluginEnabled:
+                        description: PluginEnabled is true when the barman cloud plugin
+                          is enabled
+                        type: boolean
+                    type: object
+                type: object
               restore:
                 description: The status of the restore process
                 properties:
@@ -13141,4 +13332,5 @@ spec:
         specReplicasPath: .spec.instances
         statusReplicasPath: .status.CNP.dataInstances
       status: {}
+
 {{- end }}
