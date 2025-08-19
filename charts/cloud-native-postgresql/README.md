@@ -48,4 +48,3 @@ Cloud Native Postgresql Helm Chart (DEPRECATED)
 | webhook.port | int | `9443` |  |
 | webhook.validating.create | bool | `true` |  |
 | webhook.validating.failurePolicy | string | `"Fail"` |  |
-
