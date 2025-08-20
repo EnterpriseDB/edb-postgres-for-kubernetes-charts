@@ -4,7 +4,7 @@ docs:
 ifeq (, $(shell which helm-docs))
 	$(error "Please, install https://github.com/norwoodj/helm-docs first")
 endif
-	helm-docs
+	helm-docs --skip-version-footer
 
 SCHEMA-GEN := $(shell helm plugin ls | grep schema-gen 2>/dev/null)
 
