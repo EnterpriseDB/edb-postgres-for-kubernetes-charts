@@ -234,20 +234,20 @@ follow these steps:
         NOTE: updating `values.yaml` just for the PGD4K version may not be necessary,
         as the value should default to the `appVersion` in `Chart.yaml`
 
-        1. Update `PGD_IMAGE_NAME` and `PGD_PROXY_IMAGE_NAME` defaults inside
-            [values.yaml](./charts/edb-postgres-distributed-for-kubernetes/values.yaml)
-            according to the default versions present in the release.
+    6. Update `PGD_IMAGE_NAME` and `PGD_PROXY_IMAGE_NAME` defaults inside
+        [values.yaml](./charts/edb-postgres-distributed-for-kubernetes/values.yaml)
+        according to the default versions present in the release.
 
-        2. Update dependent `cert-manager` version in
-           [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml) if needed
+    7. Update dependent `cert-manager` version in
+       [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml) if needed
 
-        3. Update the `.appVersion` and `.verions` in subchart
-           [edb-postgres-for-kubernetes-lts](./charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts)
-           and follow the [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart)
-           to update the subchart to latest PG4K lts release if needed
+    8. Update the `.appVersion` and `.verions` in subchart
+       [edb-postgres-for-kubernetes-lts](./charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts)
+       and follow the [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart)
+       to update the subchart to latest PG4K lts release if needed
 
-        4. Update dependent `edb-postgres-for-kubernetes-lts` version in
-           [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
+    9. Update dependent `edb-postgres-for-kubernetes-lts` version in
+       [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
 
 From here onward, you can follow the steps of the
 [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart), starting from `point 6`.
