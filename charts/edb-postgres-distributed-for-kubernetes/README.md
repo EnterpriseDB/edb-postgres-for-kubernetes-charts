@@ -14,6 +14,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | jsilvela | <jaime.silvela@enterprisedb.com> |  |
 | litaocdl | <tao.li@enterprisedb.com> |  |
 | NiccoloFei | <niccolo.fei@enterprisedb.com> |  |
+| YanniHu1996 | <yantian.hu@enterprisedb.com> |  |
 
 ## Source Code
 
