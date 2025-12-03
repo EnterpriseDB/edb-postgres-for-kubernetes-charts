@@ -32,7 +32,7 @@ image:
     create: false
     name: edb-pull-secret
     registry: docker.enterprisedb.com
-    username: ""
+    username: "k8s"
     password: ""
 
 imagePullSecrets:
