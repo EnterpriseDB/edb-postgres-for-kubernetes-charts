@@ -340,6 +340,6 @@ the chart directory before installing from the source.
 under different license terms, in particular the `EDB Postgres for Kubernetes operator`
 and the `EDB Postgres Distributed for Kubernetes operator`
 are distributed under the
-[EnterpriseDB Limited Use License](https://www.enterprisedb.com/limited-use-license).
+[EnterpriseDB End User License Agreement](https://www.enterprisedb.com/legal/EDB-Eula).
 
 Copyright (C) 2021 EnterpriseDB Corporation.
