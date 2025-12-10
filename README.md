@@ -183,6 +183,32 @@ cert-manager                 Active   24m
 pgd-operator-system          Active   55s
 ```
 
+## Migrating existing deployments to the unified `k8s` repository
+
+If you have existing Helm deployments using the previous separate repositories
+(`k8s_enterprise`, `k8s_standard`, `k8s_enterprise_pgd`, `k8s_standard_pgd`),
+you need to migrate them to the new unified `docker.enterprisedb.com/k8s` repository.
+
+For **EDB Postgres for Kubernetes (PG4K)** releases:
+```console
+helm upgrade --reuse-values \
+  --set image.repository=docker.enterprisedb.com/k8s/edb-postgres-for-kubernetes \
+  --set image.imageCredentials.username=k8s \
+  edb-pg4k \
+  edb/edb-postgres-for-kubernetes
+```
+
+For **EDB Postgres Distributed for Kubernetes (PG4K-PGD)** releases:
+```console
+helm upgrade --reuse-values \
+  --set global.repository=docker.enterprisedb.com/k8s \
+  --set image.imageCredentials.username=k8s \
+  edb-pg4k-pgd \
+  edb/edb-postgres-distributed-for-kubernetes
+```
+
+For more details, see the [official migration guide](https://www.enterprisedb.com/docs/postgres_for_kubernetes/latest/migrating_edb_registries/).
+
 ### Customized the PGD image
 
 By default, the Helm chart-installed operator adds default PGD and PGD proxy image
