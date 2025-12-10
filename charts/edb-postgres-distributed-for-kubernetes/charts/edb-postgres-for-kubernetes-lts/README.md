@@ -41,7 +41,7 @@ EDB Postgres for Kubernetes LTS release Helm Chart
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
 | image.imageCredentials.username | string | `"k8s"` |  |
-| image.imageName | string | `"edb-postgres-for-kubernetes"` |  |
+| image.imageName | string | `"edb-postgres-for-cloudnativepg"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the operator image should be downloaded from |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |

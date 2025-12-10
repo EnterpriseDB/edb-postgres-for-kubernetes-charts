@@ -19,7 +19,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s/edb-postgres-for-kubernetes
+  repository: docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""

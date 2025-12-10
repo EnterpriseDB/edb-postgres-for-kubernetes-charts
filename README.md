@@ -192,7 +192,7 @@ you need to migrate them to the new unified `docker.enterprisedb.com/k8s` reposi
 For **EDB Postgres for Kubernetes (PG4K)** releases:
 ```console
 helm upgrade --reuse-values \
-  --set image.repository=docker.enterprisedb.com/k8s/edb-postgres-for-kubernetes \
+  --set image.repository=docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg \
   --set image.imageCredentials.username=k8s \
   edb-pg4k \
   edb/edb-postgres-for-kubernetes

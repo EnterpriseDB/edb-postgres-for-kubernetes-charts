@@ -22,7 +22,7 @@ image:
   # -- Specifies the repository where the operator image should be downloaded from
   repository: docker.enterprisedb.com/k8s
   # The name of the operator image to be pulled from the repository
-  imageName: edb-postgres-for-kubernetes
+  imageName: edb-postgres-for-cloudnativepg
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
   pullPolicy: IfNotPresent
