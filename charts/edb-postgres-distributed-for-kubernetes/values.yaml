@@ -21,8 +21,7 @@ replicaCount: 1
 # -- Global values
 global:
   # -- Specifies the repository where the operator and operand image to be downloaded from
-  # repository: docker.enterprisedb.com/k8s_standard_pgd
-  repository: docker.enterprisedb.com/k8s_enterprise_pgd
+  repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
   pgdImageName: postgresql-pgd:17.6-pgd590-ubi9
@@ -46,7 +45,7 @@ image:
     create: true
     name: edb-pull-secret
     registry: docker.enterprisedb.com
-    username: ""
+    username: "k8s"
     password: ""
 
 imagePullSecrets:

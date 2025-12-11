@@ -19,7 +19,7 @@
 replicaCount: 1
 
 image:
-  repository: docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes
+  repository: docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -29,7 +29,7 @@ image:
     create: true
     name: edb-pull-secret
     registry: docker.enterprisedb.com
-    username: ""
+    username: "k8s"
     password: ""
 
 imagePullSecrets:

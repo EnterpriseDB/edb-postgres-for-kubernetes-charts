@@ -40,9 +40,9 @@ EDB Postgres for Kubernetes Helm Chart
 | image.imageCredentials.name | string | `"edb-pull-secret"` |  |
 | image.imageCredentials.password | string | `""` |  |
 | image.imageCredentials.registry | string | `"docker.enterprisedb.com"` |  |
-| image.imageCredentials.username | string | `""` |  |
+| image.imageCredentials.username | string | `"k8s"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"docker.enterprisedb.com/k8s_enterprise/edb-postgres-for-kubernetes"` |  |
+| image.repository | string | `"docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg"` |  |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets[0].name | string | `"edb-pull-secret"` |  |
 | monitoring.podMonitorAdditionalLabels | object | `{}` | Additional labels for the podMonitor |
