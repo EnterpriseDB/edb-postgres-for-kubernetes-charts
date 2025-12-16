@@ -24,7 +24,7 @@ jobs:
         uses: repo-sync/pull-request@v2.12.1
         with:
           destination_branch: "main"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.REPO_GHA_PAT }}
           pr_body: "Automated PR. Will trigger the ${{ env.TAG }} release when approved."
           pr_label: release
           pr_title: "Release ${{ env.TAG }}"
