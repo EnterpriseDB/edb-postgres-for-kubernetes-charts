@@ -90,15 +90,15 @@ follow these steps:
 
         ```bash
         vimdiff \
-          "https://get.enterprisedb.io/cnp/postgresql-operator-${OLD_PG4K_VERSION}.yaml" \
-          "https://get.enterprisedb.io/cnp/postgresql-operator-${NEW_PG4K_VERSION}.yaml"
+          "https://get.enterprisedb.io/pg4k/pg4k-${OLD_PG4K_VERSION}.yaml" \
+          "https://get.enterprisedb.io/pg4k/pg4k-${NEW_PG4K_VERSION}.yaml"
         ```
 
         Or from the `cloudnative-pg` repo, with the desired release branch
         checked out:
 
         ```bash
-        vimdiff postgresql-operator-${OLD_PG4K_VERSION}.yaml postgresql-operator-${NEW_PG4K_VERSION}.yaml
+        vimdiff pg4k-${OLD_PG4K_VERSION}.yaml pg4k-${NEW_PG4K_VERSION}.yaml
         ```
 
     5. Update [values.yaml](./charts/edb-postgres-for-kubernetes/values.yaml) if needed
