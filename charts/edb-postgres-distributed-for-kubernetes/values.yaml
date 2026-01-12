@@ -24,7 +24,7 @@ global:
   repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
-  pgdImageName:  postgresql-pgd:17.7-pgd591-ubi9
+  pgdImageName: postgresql-pgd:17.7-pgd591-ubi9
   # -- Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from
   # global repository
   proxyImageName: edb-pgd-proxy:5.9.1-ubi9
@@ -34,7 +34,7 @@ image:
   # -- Specifies the repository of the pgd operator image, this will overwrite the global repository
   repository: ""
   # -- Specifies the name of the operator image to be pulled from repository
-  imageName: pg4k-pgd
+  imageName: edb-postgres-for-cloudnativepg-global-cluster
   # -- Specifies the tag of the operator image to be pulled from repository
   # -- Overrides the image tag whose default is the chart appVersion.
   imageTag: ""
