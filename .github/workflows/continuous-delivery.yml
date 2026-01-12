@@ -107,7 +107,6 @@ jobs:
           helm dependency build charts/edb-postgres-distributed-for-kubernetes
           helm upgrade --install edb-pg4k-pgd --namespace pgd-operator-system \
           --create-namespace charts/edb-postgres-distributed-for-kubernetes  \
-          --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
 
@@ -140,7 +139,6 @@ jobs:
           helm upgrade --install edb-pg4k --namespace single-install \
           --create-namespace charts/edb-postgres-for-kubernetes \
           --set config.clusterWide=false \
-          --set image.imageCredentials.username=${{ secrets.CS_USER }} \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
 
