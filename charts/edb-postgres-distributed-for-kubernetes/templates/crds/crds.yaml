@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -90,7 +90,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -176,7 +176,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -236,9 +236,18 @@ spec:
           status:
             description: PGDGroupCleanupStatus defines the observed state of PGDGroupCleanup
             properties:
+              isNodeGroupExists:
+                description: IsNodeGroupExists indicates if the target group is still
+                  not dropped yet
+                type: boolean
+              nodesToPart:
+                description: NodesToPart shows nodes that are not parted in the target
+                  group
+                items:
+                  type: string
+                type: array
               phase:
-                description: OperatorPhaseCleanup it represents a phase of the PGDGroupCleanup
-                  controller
+                description: Phase the phase of current cleanup cr
                 type: string
             type: object
         type: object
@@ -251,7 +260,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.2
+    controller-gen.kubebuilder.io/version: v0.19.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -767,6 +776,7 @@ spec:
                   cron:
                     description: |-
                       The scheduled backup for the data.
+
                       Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       backupOwnerReference:
@@ -1949,9 +1959,10 @@ spec:
                             operator:
                               description: |-
                                 Operator represents a key's relationship to the value.
-                                Valid operators are Exists and Equal. Defaults to Equal.
+                                Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                 Exists is equivalent to wildcard for value, so that a pod can
                                 tolerate all taints of a particular category.
+                                Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                               type: string
                             tolerationSeconds:
                               description: |-
@@ -2895,11 +2906,26 @@ spec:
                         type: boolean
                       enablePodMonitor:
                         default: false
-                        description: Enable or disable the `PodMonitor`
+                        description: |-
+                          Enable or disable the `PodMonitor`
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         type: boolean
+                      metricsQueriesTTL:
+                        description: |-
+                          The interval during which metrics computed from queries are considered current.
+                          Once it is exceeded, a new scrape will trigger a rerun
+                          of the queries.
+                          If not set, defaults to 30 seconds, in line with Prometheus scraping defaults.
+                          Setting this to zero disables the caching mechanism and can cause heavy load on the PostgreSQL server.
+                        type: string
                       podMonitorMetricRelabelings:
-                        description: The list of metric relabelings for the `PodMonitor`.
-                          Applied to samples before ingestion.
+                        description: |-
+                          The list of metric relabelings for the `PodMonitor`. Applied to samples before ingestion.
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         items:
                           description: |-
                             RelabelConfig allows dynamic rewriting of the label set for targets, alerts,
@@ -2910,7 +2936,7 @@ spec:
                             action:
                               default: replace
                               description: |-
-                                Action to perform based on the regex matching.
+                                action to perform based on the regex matching.
 
                                 `Uppercase` and `Lowercase` actions require Prometheus >= v2.36.0.
                                 `DropEqual` and `KeepEqual` actions require Prometheus >= v2.41.0.
@@ -2942,41 +2968,41 @@ spec:
                               type: string
                             modulus:
                               description: |-
-                                Modulus to take of the hash of the source label values.
+                                modulus to take of the hash of the source label values.
 
                                 Only applicable when the action is `HashMod`.
                               format: int64
                               type: integer
                             regex:
-                              description: Regular expression against which the extracted
-                                value is matched.
+                              description: regex defines the regular expression against
+                                which the extracted value is matched.
                               type: string
                             replacement:
                               description: |-
-                                Replacement value against which a Replace action is performed if the
+                                replacement value against which a Replace action is performed if the
                                 regular expression matches.
 
                                 Regex capture groups are available.
                               type: string
                             separator:
-                              description: Separator is the string between concatenated
+                              description: separator defines the string between concatenated
                                 SourceLabels.
                               type: string
                             sourceLabels:
                               description: |-
-                                The source labels select values from existing labels. Their content is
+                                sourceLabels defines the source labels select values from existing labels. Their content is
                                 concatenated using the configured Separator and matched against the
                                 configured regular expression.
                               items:
                                 description: |-
-                                  LabelName is a valid Prometheus label name which may only contain ASCII
-                                  letters, numbers, as well as underscores.
-                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  LabelName is a valid Prometheus label name.
+                                  For Prometheus 3.x, a label name is valid if it contains UTF-8 characters.
+                                  For Prometheus 2.x, a label name is only valid if it contains ASCII characters, letters, numbers, as well as underscores.
                                 type: string
                               type: array
                             targetLabel:
                               description: |-
-                                Label to which the resulting string is written in a replacement.
+                                targetLabel defines the label to which the resulting string is written in a replacement.
 
                                 It is mandatory for `Replace`, `HashMod`, `Lowercase`, `Uppercase`,
                                 `KeepEqual` and `DropEqual` actions.
@@ -2986,8 +3012,11 @@ spec:
                           type: object
                         type: array
                       podMonitorRelabelings:
-                        description: The list of relabelings for the `PodMonitor`.
-                          Applied to samples before scraping.
+                        description: |-
+                          The list of relabelings for the `PodMonitor`. Applied to samples before scraping.
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         items:
                           description: |-
                             RelabelConfig allows dynamic rewriting of the label set for targets, alerts,
@@ -2998,7 +3027,7 @@ spec:
                             action:
                               default: replace
                               description: |-
-                                Action to perform based on the regex matching.
+                                action to perform based on the regex matching.
 
                                 `Uppercase` and `Lowercase` actions require Prometheus >= v2.36.0.
                                 `DropEqual` and `KeepEqual` actions require Prometheus >= v2.41.0.
@@ -3030,41 +3059,41 @@ spec:
                               type: string
                             modulus:
                               description: |-
-                                Modulus to take of the hash of the source label values.
+                                modulus to take of the hash of the source label values.
 
                                 Only applicable when the action is `HashMod`.
                               format: int64
                               type: integer
                             regex:
-                              description: Regular expression against which the extracted
-                                value is matched.
+                              description: regex defines the regular expression against
+                                which the extracted value is matched.
                               type: string
                             replacement:
                               description: |-
-                                Replacement value against which a Replace action is performed if the
+                                replacement value against which a Replace action is performed if the
                                 regular expression matches.
 
                                 Regex capture groups are available.
                               type: string
                             separator:
-                              description: Separator is the string between concatenated
+                              description: separator defines the string between concatenated
                                 SourceLabels.
                               type: string
                             sourceLabels:
                               description: |-
-                                The source labels select values from existing labels. Their content is
+                                sourceLabels defines the source labels select values from existing labels. Their content is
                                 concatenated using the configured Separator and matched against the
                                 configured regular expression.
                               items:
                                 description: |-
-                                  LabelName is a valid Prometheus label name which may only contain ASCII
-                                  letters, numbers, as well as underscores.
-                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  LabelName is a valid Prometheus label name.
+                                  For Prometheus 3.x, a label name is valid if it contains UTF-8 characters.
+                                  For Prometheus 2.x, a label name is only valid if it contains ASCII characters, letters, numbers, as well as underscores.
                                 type: string
                               type: array
                             targetLabel:
                               description: |-
-                                Label to which the resulting string is written in a replacement.
+                                targetLabel defines the label to which the resulting string is written in a replacement.
 
                                 It is mandatory for `Replace`, `HashMod`, `Lowercase`, `Uppercase`,
                                 `KeepEqual` and `DropEqual` actions.
@@ -3089,22 +3118,26 @@ spec:
                   otel:
                     description: |-
                       OpenTelemetry Configuration
+
                       Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       metricsURL:
                         description: |-
                           The OpenTelemetry HTTP endpoint URL to accept metrics data
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                       tls:
                         description: |-
                           TLSConfiguration provides the TLS certificate configuration when MetricsURL and TraceURL are using HTTPS
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         properties:
                           caBundleSecretRef:
                             description: |-
                               CABundleSecretRef is a reference to a secret field containing the CA bundle
                               to verify the openTelemetry server certificate
+
                               Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               key:
@@ -3122,6 +3155,7 @@ spec:
                               ClientCertSecret is the name of the secret containing the client certificate used to connect
                               to openTelemetry. It must contain both the standard "tls.crt" and "tls.key" files,
                               encoded in PEM format.
+
                               Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               name:
@@ -3134,11 +3168,13 @@ spec:
                       traceEnable:
                         description: |-
                           Whether to push trace data to OpenTelemetry traceUrl
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: boolean
                       traceURL:
                         description: |-
                           The OpenTelemetry HTTP endpoint URL to accept trace data
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                     required:
@@ -3160,8 +3196,9 @@ spec:
                         isWALArchiver:
                           default: false
                           description: |-
-                            Only one plugin can be declared as WALArchiver.
-                            Cannot be active if ".spec.backup.barmanObjectStore" configuration is present.
+                            Marks the plugin as the WAL archiver. At most one plugin can be
+                            designated as a WAL archiver. This cannot be enabled if the
+                            `.spec.backup.barmanObjectStore` configuration is present.
                           type: boolean
                         name:
                           description: Name is the plugin name
@@ -3466,6 +3503,67 @@ spec:
                                 x-kubernetes-map-type: atomic
                             type: object
                         type: object
+                      extensions:
+                        description: The configuration of the extensions to be added
+                        items:
+                          description: |-
+                            ExtensionConfiguration is the configuration used to add
+                            PostgreSQL extensions to the Cluster.
+                          properties:
+                            dynamic_library_path:
+                              description: |-
+                                The list of directories inside the image which should be added to dynamic_library_path.
+                                If not defined, defaults to "/lib".
+                              items:
+                                type: string
+                              type: array
+                            extension_control_path:
+                              description: |-
+                                The list of directories inside the image which should be added to extension_control_path.
+                                If not defined, defaults to "/share".
+                              items:
+                                type: string
+                              type: array
+                            image:
+                              description: The image containing the extension, required
+                              properties:
+                                pullPolicy:
+                                  description: |-
+                                    Policy for pulling OCI objects. Possible values are:
+                                    Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+                                    Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+                                    IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+                                    Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+                                  type: string
+                                reference:
+                                  description: |-
+                                    Required: Image or artifact reference to be used.
+                                    Behaves in the same way as pod.spec.containers[*].image.
+                                    Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+                                    More info: https://kubernetes.io/docs/concepts/containers/images
+                                    This field is optional to allow higher level config management to default or override
+                                    container images in workload controllers like Deployments and StatefulSets.
+                                  type: string
+                              type: object
+                              x-kubernetes-validations:
+                              - message: An image reference is required
+                                rule: has(self.reference)
+                            ld_library_path:
+                              description: The list of directories inside the image
+                                which should be added to ld_library_path.
+                              items:
+                                type: string
+                              type: array
+                            name:
+                              description: The name of the extension, required
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                          - image
+                          - name
+                          type: object
+                        type: array
                       ldap:
                         description: Options to specify LDAP configuration
                         properties:
@@ -3608,6 +3706,12 @@ spec:
                             - required
                             - preferred
                             type: string
+                          failoverQuorum:
+                            description: |-
+                              FailoverQuorum enables a quorum-based check before failover, improving
+                              data durability and safety during failover events in EDB Postgres for Kubernetes-managed
+                              PostgreSQL clusters.
+                            type: boolean
                           maxStandbyNamesFromCluster:
                             description: |-
                               Specifies the maximum number of local cluster pods that can be
@@ -4013,6 +4117,24 @@ spec:
                                   description: Kubelet's generated CSRs will be addressed
                                     to this signer.
                                   type: string
+                                userAnnotations:
+                                  additionalProperties:
+                                    type: string
+                                  description: |-
+                                    userAnnotations allow pod authors to pass additional information to
+                                    the signer implementation.  Kubernetes does not restrict or validate this
+                                    metadata in any way.
+
+                                    These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                    the PodCertificateRequest objects that Kubelet creates.
+
+                                    Entries are subject to the same validation as object metadata annotations,
+                                    with the addition that all keys must be domain-prefixed. No restrictions
+                                    are placed on values, except an overall size limitation on the entire field.
+
+                                    Signers should document the keys and values they support. Signers should
+                                    deny requests that contain keys they do not recognize.
+                                  type: object
                               required:
                               - keyType
                               - signerName
@@ -4344,7 +4466,7 @@ spec:
                           resources:
                             description: |-
                               resources represents the minimum resources the volume should have.
-                              If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                              Users are allowed to specify resource requirements
                               that are lower than previous value but must still be higher than capacity recorded in the
                               status field of the claim.
                               More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -4594,7 +4716,7 @@ spec:
                                 resources:
                                   description: |-
                                     resources represents the minimum resources the volume should have.
-                                    If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                    Users are allowed to specify resource requirements
                                     that are lower than previous value but must still be higher than capacity recorded in the
                                     status field of the claim.
                                     More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -5002,7 +5124,7 @@ spec:
                           resources:
                             description: |-
                               resources represents the minimum resources the volume should have.
-                              If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                              Users are allowed to specify resource requirements
                               that are lower than previous value but must still be higher than capacity recorded in the
                               status field of the claim.
                               More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -8830,9 +8952,10 @@ spec:
                         operator:
                           description: |-
                             Operator represents a key's relationship to the value.
-                            Valid operators are Exists and Equal. Defaults to Equal.
+                            Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                             Exists is equivalent to wildcard for value, so that a pod can
                             tolerate all taints of a particular category.
+                            Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                           type: string
                         tolerationSeconds:
                           description: |-
@@ -9238,8 +9361,9 @@ spec:
                         description: The target timeline ("latest" or a positive integer)
                         type: string
                       targetTime:
-                        description: The target time as a timestamp in the RFC3339
-                          standard
+                        description: |-
+                          The target time as a timestamp in RFC3339 format or PostgreSQL timestamp format.
+                          Timestamps without an explicit timezone are interpreted as UTC.
                         type: string
                       targetXID:
                         description: The target transaction ID
@@ -10276,9 +10400,10 @@ spec:
                             operator:
                               description: |-
                                 Operator represents a key's relationship to the value.
-                                Valid operators are Exists and Equal. Defaults to Equal.
+                                Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                 Exists is equivalent to wildcard for value, so that a pod can
                                 tolerate all taints of a particular category.
+                                Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                               type: string
                             tolerationSeconds:
                               description: |-
@@ -11200,11 +11325,26 @@ spec:
                         type: boolean
                       enablePodMonitor:
                         default: false
-                        description: Enable or disable the `PodMonitor`
+                        description: |-
+                          Enable or disable the `PodMonitor`
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         type: boolean
+                      metricsQueriesTTL:
+                        description: |-
+                          The interval during which metrics computed from queries are considered current.
+                          Once it is exceeded, a new scrape will trigger a rerun
+                          of the queries.
+                          If not set, defaults to 30 seconds, in line with Prometheus scraping defaults.
+                          Setting this to zero disables the caching mechanism and can cause heavy load on the PostgreSQL server.
+                        type: string
                       podMonitorMetricRelabelings:
-                        description: The list of metric relabelings for the `PodMonitor`.
-                          Applied to samples before ingestion.
+                        description: |-
+                          The list of metric relabelings for the `PodMonitor`. Applied to samples before ingestion.
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         items:
                           description: |-
                             RelabelConfig allows dynamic rewriting of the label set for targets, alerts,
@@ -11215,7 +11355,7 @@ spec:
                             action:
                               default: replace
                               description: |-
-                                Action to perform based on the regex matching.
+                                action to perform based on the regex matching.
 
                                 `Uppercase` and `Lowercase` actions require Prometheus >= v2.36.0.
                                 `DropEqual` and `KeepEqual` actions require Prometheus >= v2.41.0.
@@ -11247,41 +11387,41 @@ spec:
                               type: string
                             modulus:
                               description: |-
-                                Modulus to take of the hash of the source label values.
+                                modulus to take of the hash of the source label values.
 
                                 Only applicable when the action is `HashMod`.
                               format: int64
                               type: integer
                             regex:
-                              description: Regular expression against which the extracted
-                                value is matched.
+                              description: regex defines the regular expression against
+                                which the extracted value is matched.
                               type: string
                             replacement:
                               description: |-
-                                Replacement value against which a Replace action is performed if the
+                                replacement value against which a Replace action is performed if the
                                 regular expression matches.
 
                                 Regex capture groups are available.
                               type: string
                             separator:
-                              description: Separator is the string between concatenated
+                              description: separator defines the string between concatenated
                                 SourceLabels.
                               type: string
                             sourceLabels:
                               description: |-
-                                The source labels select values from existing labels. Their content is
+                                sourceLabels defines the source labels select values from existing labels. Their content is
                                 concatenated using the configured Separator and matched against the
                                 configured regular expression.
                               items:
                                 description: |-
-                                  LabelName is a valid Prometheus label name which may only contain ASCII
-                                  letters, numbers, as well as underscores.
-                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  LabelName is a valid Prometheus label name.
+                                  For Prometheus 3.x, a label name is valid if it contains UTF-8 characters.
+                                  For Prometheus 2.x, a label name is only valid if it contains ASCII characters, letters, numbers, as well as underscores.
                                 type: string
                               type: array
                             targetLabel:
                               description: |-
-                                Label to which the resulting string is written in a replacement.
+                                targetLabel defines the label to which the resulting string is written in a replacement.
 
                                 It is mandatory for `Replace`, `HashMod`, `Lowercase`, `Uppercase`,
                                 `KeepEqual` and `DropEqual` actions.
@@ -11291,8 +11431,11 @@ spec:
                           type: object
                         type: array
                       podMonitorRelabelings:
-                        description: The list of relabelings for the `PodMonitor`.
-                          Applied to samples before scraping.
+                        description: |-
+                          The list of relabelings for the `PodMonitor`. Applied to samples before scraping.
+
+                          Deprecated: This feature will be removed in an upcoming release. If
+                          you need this functionality, you can create a PodMonitor manually.
                         items:
                           description: |-
                             RelabelConfig allows dynamic rewriting of the label set for targets, alerts,
@@ -11303,7 +11446,7 @@ spec:
                             action:
                               default: replace
                               description: |-
-                                Action to perform based on the regex matching.
+                                action to perform based on the regex matching.
 
                                 `Uppercase` and `Lowercase` actions require Prometheus >= v2.36.0.
                                 `DropEqual` and `KeepEqual` actions require Prometheus >= v2.41.0.
@@ -11335,41 +11478,41 @@ spec:
                               type: string
                             modulus:
                               description: |-
-                                Modulus to take of the hash of the source label values.
+                                modulus to take of the hash of the source label values.
 
                                 Only applicable when the action is `HashMod`.
                               format: int64
                               type: integer
                             regex:
-                              description: Regular expression against which the extracted
-                                value is matched.
+                              description: regex defines the regular expression against
+                                which the extracted value is matched.
                               type: string
                             replacement:
                               description: |-
-                                Replacement value against which a Replace action is performed if the
+                                replacement value against which a Replace action is performed if the
                                 regular expression matches.
 
                                 Regex capture groups are available.
                               type: string
                             separator:
-                              description: Separator is the string between concatenated
+                              description: separator defines the string between concatenated
                                 SourceLabels.
                               type: string
                             sourceLabels:
                               description: |-
-                                The source labels select values from existing labels. Their content is
+                                sourceLabels defines the source labels select values from existing labels. Their content is
                                 concatenated using the configured Separator and matched against the
                                 configured regular expression.
                               items:
                                 description: |-
-                                  LabelName is a valid Prometheus label name which may only contain ASCII
-                                  letters, numbers, as well as underscores.
-                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  LabelName is a valid Prometheus label name.
+                                  For Prometheus 3.x, a label name is valid if it contains UTF-8 characters.
+                                  For Prometheus 2.x, a label name is only valid if it contains ASCII characters, letters, numbers, as well as underscores.
                                 type: string
                               type: array
                             targetLabel:
                               description: |-
-                                Label to which the resulting string is written in a replacement.
+                                targetLabel defines the label to which the resulting string is written in a replacement.
 
                                 It is mandatory for `Replace`, `HashMod`, `Lowercase`, `Uppercase`,
                                 `KeepEqual` and `DropEqual` actions.
@@ -11394,22 +11537,26 @@ spec:
                   otel:
                     description: |-
                       OpenTelemetry Configuration
+
                       Deprecated: This field is deprecated and will be removed in future versions.
                     properties:
                       metricsURL:
                         description: |-
                           The OpenTelemetry HTTP endpoint URL to accept metrics data
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                       tls:
                         description: |-
                           TLSConfiguration provides the TLS certificate configuration when MetricsURL and TraceURL are using HTTPS
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         properties:
                           caBundleSecretRef:
                             description: |-
                               CABundleSecretRef is a reference to a secret field containing the CA bundle
                               to verify the openTelemetry server certificate
+
                               Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               key:
@@ -11427,6 +11574,7 @@ spec:
                               ClientCertSecret is the name of the secret containing the client certificate used to connect
                               to openTelemetry. It must contain both the standard "tls.crt" and "tls.key" files,
                               encoded in PEM format.
+
                               Deprecated: This field is deprecated and will be removed in future versions.
                             properties:
                               name:
@@ -11439,11 +11587,13 @@ spec:
                       traceEnable:
                         description: |-
                           Whether to push trace data to OpenTelemetry traceUrl
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: boolean
                       traceURL:
                         description: |-
                           The OpenTelemetry HTTP endpoint URL to accept trace data
+
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
                     required:
@@ -11465,8 +11615,9 @@ spec:
                         isWALArchiver:
                           default: false
                           description: |-
-                            Only one plugin can be declared as WALArchiver.
-                            Cannot be active if ".spec.backup.barmanObjectStore" configuration is present.
+                            Marks the plugin as the WAL archiver. At most one plugin can be
+                            designated as a WAL archiver. This cannot be enabled if the
+                            `.spec.backup.barmanObjectStore` configuration is present.
                           type: boolean
                         name:
                           description: Name is the plugin name
@@ -11771,6 +11922,67 @@ spec:
                                 x-kubernetes-map-type: atomic
                             type: object
                         type: object
+                      extensions:
+                        description: The configuration of the extensions to be added
+                        items:
+                          description: |-
+                            ExtensionConfiguration is the configuration used to add
+                            PostgreSQL extensions to the Cluster.
+                          properties:
+                            dynamic_library_path:
+                              description: |-
+                                The list of directories inside the image which should be added to dynamic_library_path.
+                                If not defined, defaults to "/lib".
+                              items:
+                                type: string
+                              type: array
+                            extension_control_path:
+                              description: |-
+                                The list of directories inside the image which should be added to extension_control_path.
+                                If not defined, defaults to "/share".
+                              items:
+                                type: string
+                              type: array
+                            image:
+                              description: The image containing the extension, required
+                              properties:
+                                pullPolicy:
+                                  description: |-
+                                    Policy for pulling OCI objects. Possible values are:
+                                    Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+                                    Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+                                    IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+                                    Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+                                  type: string
+                                reference:
+                                  description: |-
+                                    Required: Image or artifact reference to be used.
+                                    Behaves in the same way as pod.spec.containers[*].image.
+                                    Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+                                    More info: https://kubernetes.io/docs/concepts/containers/images
+                                    This field is optional to allow higher level config management to default or override
+                                    container images in workload controllers like Deployments and StatefulSets.
+                                  type: string
+                              type: object
+                              x-kubernetes-validations:
+                              - message: An image reference is required
+                                rule: has(self.reference)
+                            ld_library_path:
+                              description: The list of directories inside the image
+                                which should be added to ld_library_path.
+                              items:
+                                type: string
+                              type: array
+                            name:
+                              description: The name of the extension, required
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                          - image
+                          - name
+                          type: object
+                        type: array
                       ldap:
                         description: Options to specify LDAP configuration
                         properties:
@@ -11913,6 +12125,12 @@ spec:
                             - required
                             - preferred
                             type: string
+                          failoverQuorum:
+                            description: |-
+                              FailoverQuorum enables a quorum-based check before failover, improving
+                              data durability and safety during failover events in EDB Postgres for Kubernetes-managed
+                              PostgreSQL clusters.
+                            type: boolean
                           maxStandbyNamesFromCluster:
                             description: |-
                               Specifies the maximum number of local cluster pods that can be
@@ -12318,6 +12536,24 @@ spec:
                                   description: Kubelet's generated CSRs will be addressed
                                     to this signer.
                                   type: string
+                                userAnnotations:
+                                  additionalProperties:
+                                    type: string
+                                  description: |-
+                                    userAnnotations allow pod authors to pass additional information to
+                                    the signer implementation.  Kubernetes does not restrict or validate this
+                                    metadata in any way.
+
+                                    These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                    the PodCertificateRequest objects that Kubelet creates.
+
+                                    Entries are subject to the same validation as object metadata annotations,
+                                    with the addition that all keys must be domain-prefixed. No restrictions
+                                    are placed on values, except an overall size limitation on the entire field.
+
+                                    Signers should document the keys and values they support. Signers should
+                                    deny requests that contain keys they do not recognize.
+                                  type: object
                               required:
                               - keyType
                               - signerName
@@ -12649,7 +12885,7 @@ spec:
                           resources:
                             description: |-
                               resources represents the minimum resources the volume should have.
-                              If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                              Users are allowed to specify resource requirements
                               that are lower than previous value but must still be higher than capacity recorded in the
                               status field of the claim.
                               More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -12886,7 +13122,7 @@ spec:
                                 resources:
                                   description: |-
                                     resources represents the minimum resources the volume should have.
-                                    If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                    Users are allowed to specify resource requirements
                                     that are lower than previous value but must still be higher than capacity recorded in the
                                     status field of the claim.
                                     More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -13294,7 +13530,7 @@ spec:
                           resources:
                             description: |-
                               resources represents the minimum resources the volume should have.
-                              If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                              Users are allowed to specify resource requirements
                               that are lower than previous value but must still be higher than capacity recorded in the
                               status field of the claim.
                               More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -13468,6 +13704,7 @@ spec:
                       type: string
                     description: |-
                       The recoverability points, keyed per CNP clusterName, as a date in RFC3339 format
+
                       Deprecated: the field is not set for backup plugins.
                     type: object
                   firstRecoverabilityPointsByMethod:
@@ -13481,6 +13718,7 @@ spec:
                     description: |-
                       The recoverability points by method, keyed per CNP clusterName
                       nolint: lll
+
                       Deprecated: the field is not set for backup plugins.
                     type: object
                   podDisruptionBudgetIsPresent:
@@ -13632,12 +13870,14 @@ spec:
                   scheduledBackupHash:
                     description: |-
                       ScheduledBackupHash is the hash of the scheduled backup configuration.
+
                       Deprecated: This field is deprecated and will be removed in future versions.
                       Please use ScheduledBackupStatus instead
                     type: string
                   scheduledBackupName:
                     description: |-
                       ScheduledBackupName is the name of the scheduled backup.
+
                       Deprecated: This field is deprecated and will be removed in future versions.
                       Please use ScheduledBackupStatus instead
                     type: string
