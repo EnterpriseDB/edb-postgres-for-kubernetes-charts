@@ -1,6 +1,6 @@
 # edb-postgres-distributed-for-kubernetes
 
-![Version: 1.1.3](https://img.shields.io/badge/Version-1.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.3](https://img.shields.io/badge/AppVersion-1.1.3-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 EDB Postgres Distributed for Kubernetes Helm Chart
 
@@ -24,7 +24,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | edb-postgres-for-kubernetes-lts | 0.26.1 |
+|  | edb-postgres-for-kubernetes-lts | 0.28.0 |
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
 
 ## Values
@@ -50,9 +50,9 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.image.repository | string | `""` | Specifies the repository of the pg4k operator image, this will overwrite the global repository |
 | fullnameOverride | string | `""` |  |
-| global | object | `{"pgdImageName":"postgresql-pgd:17.6-pgd590-ubi9","proxyImageName":"edb-pgd-proxy:5.9.0-ubi9","repository":"docker.enterprisedb.com/k8s"}` | Global values |
-| global.pgdImageName | string | `"postgresql-pgd:17.6-pgd590-ubi9"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
-| global.proxyImageName | string | `"edb-pgd-proxy:5.9.0-ubi9"` | Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from global repository |
+| global | object | `{"pgdImageName":"postgresql-pgd:17.7-pgd591-ubi9","proxyImageName":"edb-pgd-proxy:5.9.1-ubi9","repository":"docker.enterprisedb.com/k8s"}` | Global values |
+| global.pgdImageName | string | `"postgresql-pgd:17.7-pgd591-ubi9"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
+| global.proxyImageName | string | `"edb-pgd-proxy:5.9.1-ubi9"` | Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from global repository |
 | global.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the operator and operand image to be downloaded from |
 | hostNetwork | bool | `false` |  |
 | image | object | `{"imageCredentials":{"create":true,"name":"edb-pull-secret","password":"","registry":"docker.enterprisedb.com","username":"k8s"},"imageName":"pg4k-pgd","imagePullPolicy":"IfNotPresent","imageTag":"","repository":""}` | operator image configuration |
