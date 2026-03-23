@@ -34,7 +34,7 @@ jobs:
           git checkout origin/main README.md LICENSE CODEOWNERS CODE-OF-CONDUCT.md
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v10
         with:
           author_name: EnterpriseDB Automated Updates
           author_email: noreply@enterprisedb.com
