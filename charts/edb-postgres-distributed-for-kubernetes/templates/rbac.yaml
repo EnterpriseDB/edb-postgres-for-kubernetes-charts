@@ -265,6 +265,18 @@ rules:
   - get
   - update
 - apiGroups:
+  - klio.enterprisedb.io
+  resources:
+  - pluginconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - pgd.k8s.enterprisedb.io
   resources:
   - pgdgroupcleanups

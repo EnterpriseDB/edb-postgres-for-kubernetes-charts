@@ -24,10 +24,7 @@ global:
   repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
-  pgdImageName: postgresql-pgd:17.7-pgd591-ubi9
-  # -- Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from
-  # global repository
-  proxyImageName: edb-pgd-proxy:5.9.1-ubi9
+  pgdImageName: postgresql-pgd:18.1-pgd620-expanded-ubi9
 
 # -- operator image configuration
 image:
@@ -72,8 +69,8 @@ webhook:
     initialDelaySeconds: 15
     periodSeconds: 20
   readinessProbe:
-    initialDelaySeconds: 15
-    periodSeconds: 20
+    initialDelaySeconds:
+    periodSeconds:
   startupProbe:
     failureThreshold: 6
     periodSeconds: 5
@@ -102,10 +99,14 @@ config:
     # -- Specifies the location of the pgd image (include path) to be used for the operator
     # this will overwrite the global repository/pgdImageName
     PGD_IMAGE_NAME: ""
-    # -- Specifies the location of the pgd-proxy image (include path) to be used for the operator
-    #  this will overwrite the global repository/proxyImageName
-    PGD_PROXY_IMAGE_NAME: ""
   name: pgd-operator-controller-manager-config
+
+# -- Monitoring queries ConfigMap configuration
+monitoringQueriesConfigMap:
+  # -- Specifies whether the default monitoring queries ConfigMap should be created
+  create: true
+  # -- Name of the monitoring queries ConfigMap
+  name: pgd-operator-default-monitoring
 
 # -- Additional arguments to be added to the operator's args list
 additionalArgs: []

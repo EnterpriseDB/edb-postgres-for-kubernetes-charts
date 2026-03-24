@@ -342,6 +342,9 @@ monitoringQueriesConfigMap:
             description: "Replication lag in bytes"
 
     pg_stat_archiver:
+      predicate_query: |
+        SELECT NOT pg_catalog.pg_is_in_recovery()
+          OR pg_catalog.current_setting('archive_mode') = 'always'
       query: |
         SELECT archived_count
           , failed_count

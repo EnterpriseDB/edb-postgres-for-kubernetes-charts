@@ -80,6 +80,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        {{- if .Values.monitoringQueriesConfigMap.name }}
+        - name: MONITORING_QUERIES_CONFIGMAP
+          value: {{ .Values.monitoringQueriesConfigMap.name }}
+        {{- end }}
         {{- if .Values.additionalEnv }}
         {{- tpl (.Values.additionalEnv | toYaml) . | nindent 8 }}
         {{- end }}
