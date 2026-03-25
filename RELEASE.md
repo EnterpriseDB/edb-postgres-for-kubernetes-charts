@@ -220,8 +220,8 @@ follow these steps:
 
         ```bash
         vimdiff \
-          "https://get.enterprisedb.io/pg4k-pgd/pg4k-pgd-enterprise-${OLD_PGD4K_VERSION}.yaml" \
-          "https://get.enterprisedb.io/pg4k-pgd/pg4k-pgd-enterprise-${NEW_PGD4K_VERSION}.yaml"
+          "https://get.enterprisedb.io/pg4k-pgd/pg4k-pgd-${OLD_PGD4K_VERSION}.yaml" \
+          "https://get.enterprisedb.io/pg4k-pgd/pg4k-pgd-${NEW_PGD4K_VERSION}.yaml"
         ```
 
         Or from the `pg4k-pgd` repo, with the desired release branch
