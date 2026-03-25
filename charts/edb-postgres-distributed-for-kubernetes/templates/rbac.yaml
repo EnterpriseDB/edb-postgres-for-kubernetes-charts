@@ -86,6 +86,8 @@ rules:
   - ""
   resources:
   - configmaps
+  - secrets
+  - services
   verbs:
   - create
   - delete
@@ -94,14 +96,6 @@ rules:
   - patch
   - update
   - watch
-- apiGroups:
-  - ""
-  resources:
-  - configmaps/status
-  verbs:
-  - get
-  - patch
-  - update
 - apiGroups:
   - ""
   resources:
@@ -131,18 +125,6 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - secrets
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - serviceaccounts
   verbs:
   - create
@@ -152,29 +134,9 @@ rules:
   - update
   - watch
 - apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - admissionregistration.k8s.io
   resources:
   - mutatingwebhookconfigurations
-  verbs:
-  - get
-  - list
-  - patch
-  - update
-- apiGroups:
-  - admissionregistration.k8s.io
-  resources:
   - validatingwebhookconfigurations
   verbs:
   - get
@@ -195,12 +157,8 @@ rules:
   resources:
   - deployments
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - apps
@@ -265,9 +223,24 @@ rules:
   - get
   - update
 - apiGroups:
+  - klio.enterprisedb.io
+  resources:
+  - pluginconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - pgd.k8s.enterprisedb.io
   resources:
+  - clusterimagecatalogs
+  - imagecatalogs
   - pgdgroupcleanups
+  - pgdgroups
   verbs:
   - create
   - delete
@@ -280,6 +253,7 @@ rules:
   - pgd.k8s.enterprisedb.io
   resources:
   - pgdgroupcleanups/finalizers
+  - pgdgroups/finalizers
   verbs:
   - update
 - apiGroups:
@@ -293,45 +267,11 @@ rules:
 - apiGroups:
   - pgd.k8s.enterprisedb.io
   resources:
-  - pgdgroups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - pgd.k8s.enterprisedb.io
-  resources:
-  - pgdgroups/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - pgd.k8s.enterprisedb.io
-  resources:
   - pgdgroups/status
   verbs:
   - get
   - patch
   - update
-  - watch
-- apiGroups:
-  - pgd.k8s.enterprisedb.io
-  resources:
-  - clusterimagecatalogs
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - pgd.k8s.enterprisedb.io
-  resources:
-  - imagecatalogs
-  verbs:
-  - get
-  - list
   - watch
 - apiGroups:
   - policy
@@ -348,6 +288,7 @@ rules:
   - postgresql.k8s.enterprisedb.io
   resources:
   - clusters
+  - scheduledbackups
   verbs:
   - create
   - delete
@@ -372,31 +313,9 @@ rules:
   - update
   - watch
 - apiGroups:
-  - postgresql.k8s.enterprisedb.io
-  resources:
-  - scheduledbackups
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - rbac.authorization.k8s.io
   resources:
   - rolebindings
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - rbac.authorization.k8s.io
-  resources:
   - roles
   verbs:
   - create

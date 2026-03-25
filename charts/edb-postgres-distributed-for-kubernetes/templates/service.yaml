@@ -27,7 +27,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: webhook-server
-      name: webhook-server
+      protocol: TCP
+      targetPort: {{ .Values.webhook.port }}
   selector:
     {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 4 }}

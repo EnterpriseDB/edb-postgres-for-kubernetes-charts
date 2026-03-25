@@ -20,7 +20,7 @@ metadata:
   name: pgd-operator-validating-webhook-configuration
   labels:
     {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
-  {{- with .Values.rbac.annotations }}
+  {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -32,7 +32,6 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroup
-      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vpgdgroup.kb.io
   rules:
@@ -53,7 +52,6 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroupcleanup
-      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
   name: vpgdgroupcleanup.kb.io
   rules:

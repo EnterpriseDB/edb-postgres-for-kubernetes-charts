@@ -32,7 +32,6 @@ webhooks:
       name: {{ .Values.service.name }}
       namespace: {{ .Release.Namespace }}
       path: /mutate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroup
-      port: {{ .Values.service.port }}
   failurePolicy: {{ .Values.webhook.mutating.failurePolicy }}
   name: mpgdgroup.kb.io
   rules:
