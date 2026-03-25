@@ -36,12 +36,6 @@
                     "properties": {
                         "PGD_IMAGE_NAME": {
                             "type": "string"
-                        },
-                        "PGD_PROXY_IMAGE_NAME": {
-                            "type": "string"
-                        },
-                        "PULL_SECRET_NAME": {
-                            "type": "string"
                         }
                     }
                 },
@@ -123,9 +117,6 @@
             "type": "object",
             "properties": {
                 "pgdImageName": {
-                    "type": "string"
-                },
-                "proxyImageName": {
                     "type": "string"
                 },
                 "repository": {
@@ -220,6 +211,20 @@
                     }
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "monitoringQueriesConfigMap": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "queries": {
                     "type": "string"
                 }
             }
