@@ -18,7 +18,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.managerConfig.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

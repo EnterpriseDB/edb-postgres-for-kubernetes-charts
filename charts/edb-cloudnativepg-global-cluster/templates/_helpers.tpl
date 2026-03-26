@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.name" -}}
+{{- define "edb-cloudnativepg-global-cluster.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.fullname" -}}
+{{- define "edb-cloudnativepg-global-cluster.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,14 +26,14 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.chart" -}}
+{{- define "edb-cloudnativepg-global-cluster.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create the pg4k-pgd operator image name
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.operatorImageName" }}
+{{- define "edb-cloudnativepg-global-cluster.operatorImageName" }}
 {{- if .Values.image.repository }}
 {{- printf "%s/%s:%s" .Values.image.repository  ( .Values.image.imageName | default "edb-postgres-for-cloudnativepg-global-cluster" ) ( .Values.image.imageTag | default .Chart.AppVersion ) }}
 {{- else }}
@@ -45,7 +45,7 @@ Create the pg4k-pgd operator image name
 {{/*
 Create the pgd operand image name in configmap
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.configData" }}
+{{- define "edb-cloudnativepg-global-cluster.configData" }}
 {{- if not .Values.config.data.PGD_IMAGE_NAME }}
 {{-  $_ := set .Values.config.data "PGD_IMAGE_NAME" (printf "%s/%s" .Values.global.repository  .Values.global.pgdImageName) }}
 {{- end }}
@@ -58,9 +58,9 @@ Create the pgd operand image name in configmap
 {{/*
 Common labels
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.labels" -}}
-helm.sh/chart: {{ include "edb-postgres-distributed-for-kubernetes.chart" . }}
-{{ include "edb-postgres-distributed-for-kubernetes.selectorLabels" . }}
+{{- define "edb-cloudnativepg-global-cluster.labels" -}}
+helm.sh/chart: {{ include "edb-cloudnativepg-global-cluster.chart" . }}
+{{ include "edb-cloudnativepg-global-cluster.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -70,7 +70,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.selectorLabels" -}}
+{{- define "edb-cloudnativepg-global-cluster.selectorLabels" -}}
 app.kubernetes.io/name: pgd-operator
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
@@ -78,9 +78,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "edb-postgres-distributed-for-kubernetes.serviceAccountName" -}}
+{{- define "edb-cloudnativepg-global-cluster.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "edb-postgres-distributed-for-kubernetes.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "edb-cloudnativepg-global-cluster.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

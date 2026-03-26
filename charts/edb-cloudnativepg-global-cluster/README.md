@@ -1,8 +1,8 @@
-# edb-postgres-distributed-for-kubernetes
+# edb-cloudnativepg-global-cluster
 
 ![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0-rc1](https://img.shields.io/badge/AppVersion-2.0.0--rc1-informational?style=flat-square)
 
-EDB Postgres Distributed for Kubernetes Helm Chart
+EDB CloudNativePG Global Cluster Helm Chart
 
 **Homepage:** <https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable>
 

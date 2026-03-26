@@ -18,7 +18,7 @@ kind: Service
 metadata:
   name: {{ .Values.service.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -30,4 +30,4 @@ spec:
       targetPort: webhook-server
       name: webhook-server
   selector:
-    {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.selectorLabels" . | nindent 4 }}

@@ -16,3 +16,7 @@ endif
 	helm schema-gen charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/values.yaml \
 		> charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/values.schema.json
 	helm schema-gen charts/edb-postgres-distributed-for-kubernetes/values.yaml > charts/edb-postgres-distributed-for-kubernetes/values.schema.json
+	helm schema-gen charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts/values.yaml \
+		> charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts/values.schema.json
+	helm schema-gen charts/edb-cloudnativepg-global-cluster/values.yaml \
+		> charts/edb-cloudnativepg-global-cluster/values.schema.json

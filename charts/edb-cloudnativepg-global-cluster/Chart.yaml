@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: edb-postgres-distributed-for-kubernetes
-description: EDB Postgres Distributed for Kubernetes Helm Chart
+name: edb-cloudnativepg-global-cluster
+description: EDB CloudNativePG Global Cluster Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
 version: "2.0.0"

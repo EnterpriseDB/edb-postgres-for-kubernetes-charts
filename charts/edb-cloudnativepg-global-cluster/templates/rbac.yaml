@@ -17,9 +17,9 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.serviceAccountName" . }}
+  name: {{ include "edb-cloudnativepg-global-cluster.serviceAccountName" . }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -31,9 +31,9 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-leader-election-role
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-leader-election-role
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -74,9 +74,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-manager-role
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-manager-role
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -431,9 +431,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-leader-election-rolebinding
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-leader-election-rolebinding
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -441,18 +441,18 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-leader-election-role
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-leader-election-role
 subjects:
 - kind: ServiceAccount
-  name: {{ include "edb-postgres-distributed-for-kubernetes.serviceAccountName" . }}
+  name: {{ include "edb-cloudnativepg-global-cluster.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-manager-clusterrolebinding
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-manager-clusterrolebinding
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -460,18 +460,18 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-manager-role
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-manager-role
 subjects:
 - kind: ServiceAccount
-  name: {{ include "edb-postgres-distributed-for-kubernetes.serviceAccountName" . }}
+  name: {{ include "edb-cloudnativepg-global-cluster.serviceAccountName" . }}
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-view
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-view
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
     {{- if .Values.rbac.aggregateClusterRoles }}
     rbac.authorization.k8s.io/aggregate-to-view: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
@@ -507,9 +507,9 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}-edit
+  name: {{ include "edb-cloudnativepg-global-cluster.fullname" . }}-edit
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
     {{- if .Values.rbac.aggregateClusterRoles }}
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-admin: "true"

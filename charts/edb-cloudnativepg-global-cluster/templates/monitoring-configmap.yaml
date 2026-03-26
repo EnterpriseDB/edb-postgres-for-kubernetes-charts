@@ -19,7 +19,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.monitoringConfigMap.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
     k8s.enterprisedb.io/reload: ""
   {{- with .Values.commonAnnotations }}
   annotations:

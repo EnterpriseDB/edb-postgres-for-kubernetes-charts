@@ -16,7 +16,7 @@ EDB Postgres for Kubernetes LTS release Helm Chart
 
 ## Source Code
 
-* <https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/tree/main/charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts>
+* <https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts/tree/main/charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts>
 
 ## Values
 

@@ -19,13 +19,13 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.config.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
-  {{- include "edb-postgres-distributed-for-kubernetes.configData" . | nindent 2 }}
+  {{- include "edb-cloudnativepg-global-cluster.configData" . | nindent 2 }}
 {{- else }}
 apiVersion: v1
 kind: Secret
@@ -33,12 +33,12 @@ type: Opaque
 metadata:
   name: {{ .Values.config.name }}
   labels:
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-cloudnativepg-global-cluster.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 stringData:
-  {{- include "edb-postgres-distributed-for-kubernetes.configData" . | nindent 2 }}
+  {{- include "edb-cloudnativepg-global-cluster.configData" . | nindent 2 }}
 {{- end }}
 {{- end }}
