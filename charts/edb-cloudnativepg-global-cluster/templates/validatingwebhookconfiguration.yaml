@@ -1,0 +1,70 @@
+# Copyright 2021 EnterpriseDB Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if .Values.webhook.validating.create }}
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: pgd-operator-validating-webhook-configuration
+  labels:
+    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+  {{- with .Values.rbac.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroup
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vpgdgroup.kb.io
+  rules:
+  - apiGroups:
+    - pgd.k8s.enterprisedb.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pgdgroups
+  sideEffects: None
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-pgd-k8s-enterprisedb-io-v1beta1-pgdgroupcleanup
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.validating.failurePolicy }}
+  name: vpgdgroupcleanup.kb.io
+  rules:
+  - apiGroups:
+    - pgd.k8s.enterprisedb.io
+    apiVersions:
+    - v1beta1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - pgdgroupcleanups
+  sideEffects: None
+{{- end }}

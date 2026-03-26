@@ -74,6 +74,8 @@ spec:
         command:
         - /manager
         env:
+        - name: MONITORING_QUERIES_CONFIGMAP
+          value: {{ .Values.monitoringConfigMap.name }}
         - name: OPERATOR_IMAGE_NAME
           value: "{{- include "edb-postgres-distributed-for-kubernetes.operatorImageName" . }}"
         - name: OPERATOR_NAMESPACE

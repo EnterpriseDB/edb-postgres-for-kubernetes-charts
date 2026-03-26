@@ -17,18 +17,13 @@
 # Declare variables to be passed into your templates.
 
 replicaCount: 1
-
 # -- Global values
 global:
   # -- Specifies the repository where the operator and operand image to be downloaded from
   repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
-  pgdImageName: postgresql-pgd:17.7-pgd591-ubi9
-  # -- Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from
-  # global repository
-  proxyImageName: edb-pgd-proxy:5.9.1-ubi9
-
+  pgdImageName: postgresql-pgd:18.1-pgd620-expanded-ubi9
 # -- operator image configuration
 image:
   # -- Specifies the repository of the pgd operator image, this will overwrite the global repository
@@ -47,19 +42,14 @@ image:
     registry: docker.enterprisedb.com
     username: "k8s"
     password: ""
-
 imagePullSecrets:
   - name: edb-pull-secret
-
 nameOverride: ""
 fullnameOverride: ""
-
 hostNetwork: false
 dnsPolicy: ""
-
 crds:
   create: true
-
 webhook:
   port: 9443
   mutating:
@@ -77,7 +67,6 @@ webhook:
   startupProbe:
     failureThreshold: 6
     periodSeconds: 5
-
 # Manager configuration
 managerConfig:
   name: pgd-operator-manager-config
@@ -89,7 +78,6 @@ managerConfig:
     leaderElection:
       enabled: true
       resourceName: "e72f3162.k8s.enterprisedb.io"
-
 # Operator configuration
 config:
   # -- Specifies whether to enable the operator's configuration.
@@ -102,14 +90,15 @@ config:
     # -- Specifies the location of the pgd image (include path) to be used for the operator
     # this will overwrite the global repository/pgdImageName
     PGD_IMAGE_NAME: ""
-    # -- Specifies the location of the pgd-proxy image (include path) to be used for the operator
-    #  this will overwrite the global repository/proxyImageName
-    PGD_PROXY_IMAGE_NAME: ""
   name: pgd-operator-controller-manager-config
-
+# Default monitoring ConfigMap
+monitoringConfigMap:
+  # -- Specifies whether the default monitoring ConfigMap should be created
+  create: true
+  # -- Name of the monitoring queries ConfigMap
+  name: pgd-operator-default-monitoring
 # -- Additional arguments to be added to the operator's args list
 additionalArgs: []
-
 # -- Array containing extra environment variables which can be templated.
 # For example:
 #  - name: RELEASE_NAME
@@ -117,80 +106,70 @@ additionalArgs: []
 #  - name: MY_VAR
 #    value: "mySpecialKey"
 additionalEnv: []
-
 serviceAccount:
   # -- Specifies whether the service account should be created
   create: true
   # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 rbac:
   # -- Specifies whether ClusterRole, ClusterRoleBinding, RoleBinding and Role should be created
   create: true
   # -- Aggregate ClusterRoles to Kubernetes default user-facing roles.
   # Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
   aggregateClusterRoles: false
-
 # -- Annotations to be added to all other resources
 commonAnnotations: {}
 # -- Annotations to be added to the pod
 podAnnotations: {}
 # -- Labels to be added to the pod
 podLabels: {}
-
 # -- Container Security Context
 containerSecurityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsUser: 10001
   runAsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
   capabilities:
     drop:
       - "ALL"
-
 # -- Security Context for the whole pod
 podSecurityContext:
   runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
   # fsGroup: 2000
-
 # -- Priority indicates the importance of a Pod relative to other Pods.
 priorityClassName: ""
-
 service:
   type: ClusterIP
   # -- DO NOT CHANGE THE SERVICE NAME as it is currently used to generate the certificate
   # and can not be configured
   name: pgd-operator-webhook-service
   port: 443
-
 resources: {}
-  # If you want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  #
-  # limits:
-  #   cpu: 500m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 10m
-  #   memory: 64Mi
+# If you want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+#
+# limits:
+#   cpu: 500m
+#   memory: 256Mi
+# requests:
+#   cpu: 100m
+#   memory: 100Mi
 
 # -- Nodeselector for the operator to be installed
 nodeSelector: {}
-
 # -- Tolerations for the operator to be installed
 tolerations: []
-
 # -- Affinity for the operator to be installed
 affinity: {}
-
 # cert-manager
 cert-manager:
   enabled: true
   installCRDs: true
-
 # edb-postgres-for-kubernetes-lts subcharts
 edb-postgres-for-kubernetes-lts:
   enabled: true

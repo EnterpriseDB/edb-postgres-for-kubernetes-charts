@@ -16,10 +16,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "edb-postgres-distributed-for-kubernetes.fullname" . }}
+  name: {{ include "edb-postgres-for-kubernetes-lts.fullname" . }}
   labels:
-    control-plane: controller-manager
-    {{- include "edb-postgres-distributed-for-kubernetes.labels" . | nindent 4 }}
+    {{- include "edb-postgres-for-kubernetes-lts.labels" . | nindent 4 }}
   {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -28,22 +27,20 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      control-plane: controller-manager
-      {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 6 }}
+      {{- include "edb-postgres-for-kubernetes-lts.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: manager
         checksum/rbac: {{ include (print $.Template.BasePath "/rbac.yaml") . | sha256sum }}
         checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+        checksum/monitoring-config: {{ include (print $.Template.BasePath "/monitoring-configmap.yaml") . | sha256sum }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        control-plane: controller-manager
-        {{- include "edb-postgres-distributed-for-kubernetes.selectorLabels" . | nindent 8 }}
+        {{- include "edb-postgres-for-kubernetes-lts.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
-          {{- toYaml . | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -75,15 +72,21 @@ spec:
         - /manager
         env:
         - name: OPERATOR_IMAGE_NAME
-          value: "{{- include "edb-postgres-distributed-for-kubernetes.operatorImageName" . }}"
+          value: "{{- include "edb-postgres-for-kubernetes-lts.operatorImageName" . }}"
         - name: OPERATOR_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: MONITORING_QUERIES_CONFIGMAP
+          value: "{{ .Values.monitoringQueriesConfigMap.name }}"
         {{- if .Values.additionalEnv }}
         {{- tpl (.Values.additionalEnv | toYaml) . | nindent 8 }}
         {{- end }}
-        image: "{{- include "edb-postgres-distributed-for-kubernetes.operatorImageName" . }}"
+        {{ if not .Values.config.clusterWide -}}
+        - name: WATCH_NAMESPACE
+          value: "{{ .Release.Namespace }}"
+        {{- end }}
+        image: "{{- include "edb-postgres-for-kubernetes-lts.operatorImageName" . }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         livenessProbe:
           httpGet:
@@ -92,9 +95,6 @@ spec:
             scheme: HTTPS
           {{- if .Values.webhook.livenessProbe.initialDelaySeconds }}
           initialDelaySeconds: {{ .Values.webhook.livenessProbe.initialDelaySeconds }}
-          {{- end }}
-          {{- if .Values.webhook.livenessProbe.periodSeconds }}
-          periodSeconds: {{ .Values.webhook.livenessProbe.periodSeconds }}
           {{- end }}
         name: manager
         ports:
@@ -111,9 +111,6 @@ spec:
             scheme: HTTPS
           {{- if .Values.webhook.readinessProbe.initialDelaySeconds }}
           initialDelaySeconds: {{ .Values.webhook.readinessProbe.initialDelaySeconds }}
-          {{- end }}
-          {{- if .Values.webhook.readinessProbe.periodSeconds }}
-          periodSeconds: {{ .Values.webhook.readinessProbe.periodSeconds }}
           {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
@@ -140,7 +137,7 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      serviceAccountName: {{ include "edb-postgres-distributed-for-kubernetes.serviceAccountName" . }}
+      serviceAccountName: {{ include "edb-postgres-for-kubernetes-lts.serviceAccountName" . }}
       terminationGracePeriodSeconds: 10
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -161,4 +158,5 @@ spec:
         secret:
           defaultMode: 420
           optional: true
-          secretName: pgd-operator-webhook-cert
+          secretName: postgresql-operator-webhook-cert
+

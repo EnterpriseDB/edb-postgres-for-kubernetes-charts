@@ -11,35 +11,21 @@
         "affinity": {
             "type": "object"
         },
-        "cert-manager": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "installCRDs": {
-                    "type": "boolean"
-                }
-            }
-        },
         "commonAnnotations": {
             "type": "object"
         },
         "config": {
             "type": "object",
             "properties": {
+                "clusterWide": {
+                    "type": "boolean"
+                },
                 "create": {
                     "type": "boolean"
                 },
                 "data": {
                     "type": "object",
                     "properties": {
-                        "PGD_IMAGE_NAME": {
-                            "type": "string"
-                        },
-                        "PGD_PROXY_IMAGE_NAME": {
-                            "type": "string"
-                        },
                         "PULL_SECRET_NAME": {
                             "type": "string"
                         }
@@ -78,6 +64,14 @@
                 },
                 "runAsUser": {
                     "type": "integer"
+                },
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -92,46 +86,8 @@
         "dnsPolicy": {
             "type": "string"
         },
-        "edb-postgres-for-kubernetes-lts": {
-            "type": "object",
-            "properties": {
-                "crds": {
-                    "type": "object",
-                    "properties": {
-                        "create": {
-                            "type": "boolean"
-                        }
-                    }
-                },
-                "enabled": {
-                    "type": "boolean"
-                },
-                "image": {
-                    "type": "object",
-                    "properties": {
-                        "repository": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "fullnameOverride": {
             "type": "string"
-        },
-        "global": {
-            "type": "object",
-            "properties": {
-                "pgdImageName": {
-                    "type": "string"
-                },
-                "proxyImageName": {
-                    "type": "string"
-                },
-                "repository": {
-                    "type": "string"
-                }
-            }
         },
         "hostNetwork": {
             "type": "boolean"
@@ -162,13 +118,13 @@
                 "imageName": {
                     "type": "string"
                 },
-                "imagePullPolicy": {
-                    "type": "string"
-                },
-                "imageTag": {
+                "pullPolicy": {
                     "type": "string"
                 },
                 "repository": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }
@@ -184,42 +140,33 @@
                 }
             }
         },
-        "managerConfig": {
+        "installCRDs": {
+            "type": "boolean"
+        },
+        "monitoring": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "object",
-                    "properties": {
-                        "health": {
-                            "type": "object",
-                            "properties": {
-                                "healthProbeBindAddress": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "leaderElection": {
-                            "type": "object",
-                            "properties": {
-                                "enabled": {
-                                    "type": "boolean"
-                                },
-                                "resourceName": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "metrics": {
-                            "type": "object",
-                            "properties": {
-                                "bindAddress": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
+                "podMonitorAdditionalLabels": {
+                    "type": "object"
                 },
+                "podMonitorEnabled": {
+                    "type": "boolean"
+                },
+                "podMonitorMetricRelabelings": {
+                    "type": "array"
+                },
+                "podMonitorRelabelings": {
+                    "type": "array"
+                }
+            }
+        },
+        "monitoringQueriesConfigMap": {
+            "type": "object",
+            "properties": {
                 "name": {
+                    "type": "string"
+                },
+                "queries": {
                     "type": "string"
                 }
             }
@@ -308,9 +255,6 @@
                     "properties": {
                         "initialDelaySeconds": {
                             "type": "integer"
-                        },
-                        "periodSeconds": {
-                            "type": "integer"
                         }
                     }
                 },
@@ -332,9 +276,6 @@
                     "type": "object",
                     "properties": {
                         "initialDelaySeconds": {
-                            "type": "integer"
-                        },
-                        "periodSeconds": {
                             "type": "integer"
                         }
                     }
