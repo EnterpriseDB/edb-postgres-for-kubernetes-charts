@@ -406,6 +406,18 @@ rules:
   - update
   - watch
 - apiGroups:
+  - klio.enterprisedb.io
+  resources:
+  - pluginconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - snapshot.storage.k8s.io
   resources:
   - volumesnapshots
