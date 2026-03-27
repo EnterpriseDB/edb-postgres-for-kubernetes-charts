@@ -1,7 +1,8 @@
 # Release Process
 
-This repo contains two helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
-and [edb-postgres-distributed-for-kubernetes](./charts/edb-postgres-distributed-for-kubernetes).
+This repo contains three helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
+, [edb-postgres-distributed-for-kubernetes](./charts/edb-postgres-distributed-for-kubernetes), and
+[edb-cloudnativepg-global-cluster](./charts/edb-cloudnativepg-global-cluster).
 Both the charts are available through a single [repository](http://enterprisedb.github.io/edb-postgres-for-kubernetes-charts),
 but should be released separately as their versioning might be unlinked, and the
 latter depends on the former.
@@ -14,7 +15,7 @@ branches, we will only target the most advanced point release.
 ## Charts
 
 1. [Releasing the `edb-postgres-for-kubernetes` chart](#releasing-the-edb-postgres-for-kubernetes-chart)
-2. [Releasing the `edb-postgres-distributed-for-kubernetes` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
+2. [Releasing the `edb-postgres-distributed-for-kubernetes` or `edb-cloudnativepg-global-cluster` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
 
 ## Releasing the `edb-postgres-for-kubernetes` chart
 
@@ -148,6 +149,10 @@ follow these steps:
     and be able to see the new version `X.Y.Z` as `CHART VERSION` for `edb-postgres-for-kubernetes`
 
 ## Releasing the `edb-postgres-distributed-for-kubernetes` chart
+
+This section includes the release of `edb-postgres-distributed-for-kubernetes` and `edb-cloudnativepg-global-cluster` charts,
+as they both target the same PG4K-PGD operator, the steps are the same for both charts, and the only difference is the name of
+the chart to be replaced accordingly.
 
 To create a new release of the `edb-postgres-distributed-for-kubernetes` chart,
 follow these steps:
