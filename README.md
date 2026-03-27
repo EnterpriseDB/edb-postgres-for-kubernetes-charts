@@ -7,13 +7,13 @@ Helm charts to install the following Operators:
    supported Kubernetes cluster running in private, public, or hybrid cloud
    environments. Derived from CloudNativePG's Helm chart.
 
-- [EDB Postgres Distributed for Kubernetes (PG4K-PGD) 1.x](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
+- [EDB Postgres Distributed for Kubernetes (PG4K-PGD) version 1.x](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
    designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
    on Kubernetes, with traffic routed by PGD Proxy.
 
-- [EDB CloudNativePG Global Cluster (PG4K-PGD 2.x)](https://docs.enterprisedb.io/edb-postgres-distributed-for-kubernetes/),
-   the next generation of the PG4K-PGD operator, designed to manage
-   EDB Postgres Distributed v6 workloads on Kubernetes.
+- [EDB CloudNativePG Global Cluster (PG4K-PGD version 2.x)](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
+   designed by EnterpriseDB to manage EDB Postgres Distributed v6 workloads
+   on Kubernete
 
 ## Available Charts
 
@@ -21,7 +21,7 @@ Helm charts to install the following Operators:
 |-------|----------|---------|-------------|
 | `edb-postgres-for-kubernetes` | PG4K | EDB Postgres | Single-cluster PostgreSQL |
 | `edb-postgres-distributed-for-kubernetes` | PG4K-PGD 1.x | PGD 5 + PGD Proxy | Multi-region distributed PostgreSQL |
-| `edb-cloudnativepg-global-cluster` | PG4K-PGD 2.x | PGD 6 | Next-gen multi-region distributed PostgreSQL |
+| `edb-cloudnativepg-global-cluster` | PG4K-PGD 2.x | PGD 6 | Multi-region distributed PostgreSQL |
 
 ## Usage
 
@@ -108,7 +108,7 @@ For example, to deploy the operator:
 
 ```console
 helm upgrade --dependency-update \
-  --install edb-ecgc \
+  --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
   --set image.imageCredentials.password=<THE-TOKEN> \
@@ -121,11 +121,11 @@ created, with several deployments, including the two operators.
 ```sh
 $ kubectl get deployments -n pgd-operator-system
 NAME                                               READY   UP-TO-DATE   AVAILABLE   AGE
-edb-ecgc-cert-manager                              1/1     1            1           7m46s
-edb-ecgc-cert-manager-cainjector                   1/1     1            1           7m46s
-edb-ecgc-cert-manager-webhook                      1/1     1            1           7m46s
-edb-ecgc-edb-cloudnativepg-global-cluster          1/1     1            1           7m46s
-edb-ecgc-edb-postgres-for-kubernetes-lts           1/1     1            1           7m46s
+edb-pg4k-pgd-cert-manager                          1/1     1            1           7m46s
+edb-pg4k-pgd-cert-manager-cainjector               1/1     1            1           7m46s
+edb-pg4k-pgd-cert-manager-webhook                  1/1     1            1           7m46s
+edb-pg4k-pgd-cloudnativepg-global-cluster          1/1     1            1           7m46s
+edb-pg4k-pgd-postgres-for-kubernetes-lts           1/1     1            1           7m46s
 ```
 
 When the deployments are ready, you can verify that the steps suggested by the
@@ -147,7 +147,7 @@ This example changes the default PGD image:
 
 ```console
 helm upgrade --dependency-update \
-  --install edb-ecgc \
+  --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
   --set image.imageCredentials.password=<THE-TOKEN> \
@@ -160,22 +160,18 @@ helm upgrade --dependency-update \
 
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD 1.x)
 
-The `edb-postgres-distributed-for-kubernetes` chart deploys the PG4K-PGD 1.x operator
-for managing EDB Postgres Distributed v5 workloads with PGD Proxy.
+The PG4K-PGD operator helm chart 1.x and 2.x are designed to manage different versions of PGD,
+and they can't be installed together in the same cluster. The main difference between the two charts are:
 
-Similar to the PG4K helm chart installation, both the operator and the operand images
-required by PG4K-PGD are pulled from the `docker.enterprisedb.com/k8s` repository,
-access to these images requires an active EDB subscription. See: [obtaining an EDB subscription token](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/installation_upgrade/#obtaining-an-edb-subscription-token)
+- PG4K-PGD 1.x chart supports PGD Proxy image, which PG4K-PGD 2.x chart does not support.
+- Chart name difference
+  - 1.x: `edb-postgres-distributed-for-kubernetes`
+  - 2.x: `edb-cloudnativepg-global-cluster`
+- The nested PG4K subchart version difference.
 
-The PG4K-PGD chart installs both the PG4K-PGD and PG4K operators in the
-same namespace. The PG4K operator installed is a stable version that is
-part of the latest long-term support release of PG4K.
+So the installation of the PG4K-PGD 1.x is similar to the PG4K-PGD 2.x, but with a different chart name and image names.
 
-The PG4K-PGD chart also installs the cert-manager operator as a dependency.
-You can avoid this if necessary. See the sub-section
-[on deploying individually](#deploying-the-operators-and-cert-manager-individually-1).
-
-For example, to deploy the operator:
+For example, to deploy the PG4K-PGD 1.x operator chart:
 
 ```console
 helm upgrade --dependency-update \
@@ -199,17 +195,29 @@ edb-pg4k-pgd-edb-postgres-distributed-for-kubernetes   1/1     1            1   
 edb-pg4k-pgd-edb-postgres-for-kubernetes-lts           1/1     1            1           7m46s
 ```
 
-When the deployments are ready, you can verify that the steps suggested by the
-helm chart are working:
+We can also customize default PGD and PGD proxy image names by setting the following values in the Helm chart.
+PGD groups created without `spec.imageName` and `spec.pgdProxy.imageName` will use those defaults.
 
-- set up a cert-manager issuer
-- deploy an example 3-region PGD cluster
+- `pgdImageName`: the default PGD image name to be used by the operator.
+- `proxyImageName`: the default PGD proxy image name to be used by the operator.
+
+This example changes the default PGD and PGD proxy image:
+
+```console
+helm upgrade --dependency-update \
+  --install edb-pg4k-pgd \
+  --namespace pgd-operator-system \
+  --create-namespace \
+  --set image.imageCredentials.password=<THE-TOKEN> \
+  --set global.pgdImageName=edb-postgres-advanced-pgd:17.6-pgd590-ubi9 \
+  --set global.proxyImageName=edb-pgd-proxy:5.9.0-ubi9  \
+  edb/edb-postgres-distributed-for-kubernetes
+```
 
 ### Deploying the operators and cert-manager individually
 
-The PG4K-PGD charts are set by default to
-also install the cert-manager operator, which they depend on.
-When following this route, all operators will be installed in the same
+The PG4K-PGD charts are set by default to also install the cert-manager operator,
+which they depend on. When following this route, all operators will be installed in the same
 namespace. This is in contrast with other installation paths, where we
 may want the two operators reside in dedicated namespaces.
 
@@ -246,22 +254,22 @@ helm chart in the next section.
 #### 2. Setup the PG4K-PGD operator
 
 Once the above deployments are ready, you can deploy the PG4K-PGD
-helm chart taking care to set `cert-manager.enabled`
-to false if cert-manager is installed separately.
+helm chart taking care to set `cert-manager.enabled` to false if cert-manager is
+installed separately.
 
-For the 2.x operator (PGD 6):
+
+For example, deploy chart `edb-cloudnativepg-global-cluster` for PG4K-PGD 2.x operator:
 
 ```console
 helm upgrade --dependency-update \
-  --install edb-ecgc \
+  --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
   --set image.imageCredentials.password=<THE-TOKEN> \
   --set cert-manager.enabled=false \
   edb/edb-cloudnativepg-global-cluster
 ```
-
-For the 1.x operator (PGD 5):
+or deploy chart `edb-postgres-distributed-for-kubernetes` for PG4K-PGD 1.x operator:
 
 ```console
 helm upgrade --dependency-update \
@@ -282,32 +290,6 @@ NAME                         STATUS   AGE
 cert-manager                 Active   24m
 pgd-operator-system          Active   55s
 ```
-
-### Customizing the PGD image (1.x)
-
-By default, the Helm chart-installed operator adds default PGD and PGD proxy image
-names to the configuration file. PGD groups created without `spec.imageName` and
-`spec.pgdProxy.imageName` will use those defaults. You can customize the defaults
-by setting them in the Helm values.
-
-- `pgdImageName`: the default PGD image name to be used by the operator.
-- `proxyImageName`: the default PGD proxy image name to be used by the operator.
-
-This example changes the default PGD and PGD proxy image:
-
-```console
-helm upgrade --dependency-update \
-  --install edb-pg4k-pgd \
-  --namespace pgd-operator-system \
-  --create-namespace \
-  --set image.imageCredentials.password=<THE-TOKEN> \
-  --set global.pgdImageName=edb-postgres-advanced-pgd:17.6-pgd590-ubi9 \
-  --set global.proxyImageName=edb-pgd-proxy:5.9.0-ubi9  \
-  edb/edb-postgres-distributed-for-kubernetes
-```
-
-**Note:** You can find the latest released image catalogs for operand from
-[PGD Operand images](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/supported_versions/#pgd-operand-images)
 
 ## Migrating existing deployments to the unified `k8s` repository
 
@@ -349,10 +331,9 @@ helm upgrade --install edb-pg4k \
   charts/edb-postgres-for-kubernetes
 ```
 
-### Deployment PG4K-PGD 2.x (CloudNativePG Global Cluster) using local chart
+### Deployment PG4K-PGD using local chart
 
 Navigate to the charts directory of local chart or source code,
-To deploy PG4K-PGD 2.x with all dependencies together
 
 ```console
 helm upgrade --install edb-ecgc \
@@ -361,11 +342,7 @@ helm upgrade --install edb-ecgc \
   --set image.imageCredentials.password=<THE-TOKEN> \
   charts/edb-cloudnativepg-global-cluster
 ```
-
-### Deployment PG4K-PGD 1.x using local chart
-
-Navigate to the charts directory of local chart or source code,
-To deploy PG4K-PGD 1.x with all dependencies together
+or
 
 ```console
 helm upgrade --install edb-pg4k-pgd \
