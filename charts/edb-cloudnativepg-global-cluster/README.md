@@ -1,6 +1,6 @@
 # edb-cloudnativepg-global-cluster
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0-rc1](https://img.shields.io/badge/AppVersion-2.0.0--rc1-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-2.0.0-informational?style=flat-square)
 
 EDB CloudNativePG Global Cluster Helm Chart
 
@@ -11,7 +11,6 @@ EDB CloudNativePG Global Cluster Helm Chart
 | Name | Email | Url |
 | ---- | ------ | --- |
 | gbartolini | <gabriele.bartolini@enterprisedb.com> |  |
-| jsilvela | <jaime.silvela@enterprisedb.com> |  |
 | litaocdl | <tao.li@enterprisedb.com> |  |
 | NiccoloFei | <niccolo.fei@enterprisedb.com> |  |
 | YanniHu1996 | <yantian.hu@enterprisedb.com> |  |
