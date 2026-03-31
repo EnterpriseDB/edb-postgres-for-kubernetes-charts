@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       pg4k-pgd-changed: ${{ steps.filter.outputs.pg4k-pgd-changed }}
+      cnpg-gc-changed: ${{ steps.filter.outputs.cnpg-gc-changed }}
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
       ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-changed }}
+      cnpg-gc-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -25,10 +27,14 @@ jobs:
           filters: |
             pg4k-pgd-changed:
               - 'charts/edb-postgres-distributed-for-kubernetes/**'
+            cnpg-gc-changed:
+              - 'charts/edb-cloudnativepg-global-cluster/**'
             ep4k-changed:
               - 'charts/edb-postgres-for-kubernetes/**'
             ep4k-lts-changed:
               - 'charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/**'
+            cnpg-gc-lts-changed:
+              - 'charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts/**'
 
   deploy-ep4k:
     runs-on: ubuntu-22.04
@@ -119,6 +125,68 @@ jobs:
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
+
+  deploy-cnpg-gc:
+    runs-on: ubuntu-22.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.cnpg-gc-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
+
+      - name: Deploy using helm chart
+        run: |
+          helm dependency build charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts
+          helm dependency build charts/edb-cloudnativepg-global-cluster
+          helm upgrade --install edb-cnpg-gc --namespace pgd-operator-system \
+          --create-namespace charts/edb-cloudnativepg-global-cluster  \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+
+      - name: Deploy a cluster
+        run: |
+          kubectl apply -f hack/samples/issuer-selfsigned.yaml
+          kubectl apply -f hack/samples/pg4k-pgd-cluster.yaml
+
+          PHASE="PGDGroup - Healthy"
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
+          kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
+
+  deploy-cnpg-gc-subcharts:
+    runs-on: ubuntu-22.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.cnpg-gc-lts-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
+
+      - name: Deploy using helm chart
+        run: |
+          helm upgrade --install edb-pg4k-lts --namespace postgresql-operator-system \
+          --create-namespace charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts \
+          --set image.imageCredentials.create=true \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+
+      - name: Deploy a cluster
+        run: |
+          kubectl apply -f hack/samples/ep4k-cluster.yaml
+
+          PHASE="Cluster in healthy state"
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
   deploy-ep4k-single-namespace:
     runs-on: ubuntu-22.04

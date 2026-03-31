@@ -1,8 +1,9 @@
 # Release Process
 
-This repo contains two helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
-and [edb-postgres-distributed-for-kubernetes](./charts/edb-postgres-distributed-for-kubernetes).
-Both the charts are available through a single [repository](http://enterprisedb.github.io/edb-postgres-for-kubernetes-charts),
+This repo contains three helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
+, [edb-postgres-distributed-for-kubernetes](./charts/edb-postgres-distributed-for-kubernetes), and
+[edb-cloudnativepg-global-cluster](./charts/edb-cloudnativepg-global-cluster).
+All the charts are available through a single [repository](http://enterprisedb.github.io/edb-postgres-for-kubernetes-charts),
 but should be released separately as their versioning might be unlinked, and the
 latter depends on the former.
 
@@ -14,7 +15,7 @@ branches, we will only target the most advanced point release.
 ## Charts
 
 1. [Releasing the `edb-postgres-for-kubernetes` chart](#releasing-the-edb-postgres-for-kubernetes-chart)
-2. [Releasing the `edb-postgres-distributed-for-kubernetes` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
+2. [Releasing the `edb-postgres-distributed-for-kubernetes` or `edb-cloudnativepg-global-cluster` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
 
 ## Releasing the `edb-postgres-for-kubernetes` chart
 
@@ -149,6 +150,10 @@ follow these steps:
 
 ## Releasing the `edb-postgres-distributed-for-kubernetes` chart
 
+This section includes the release of `edb-postgres-distributed-for-kubernetes` and `edb-cloudnativepg-global-cluster` charts,
+as they both target the same PG4K-PGD operator but different versions. The steps are the same for both charts, the only difference
+is the name of the chart to be replaced accordingly.
+
 To create a new release of the `edb-postgres-distributed-for-kubernetes` chart,
 follow these steps:
 
@@ -186,7 +191,11 @@ follow these steps:
     `edb-postgres-distributed-for-kubernetes` version being released, you might
     want to:
 
-    1. Find the latest `edb-postgres-distributed-for-kubernetes` version by running:
+    1. Find out the correct release branch in pg4k-pgd repository, `edb-postgres-distributed-for-kubernetes` chart
+    is for `release-1.x` branch, `edb-cloudnativepg-global-cluster` is for release in `release-2.x` branch of
+    pg4k-pgd repository.
+
+    2. Find the latest `edb-postgres-distributed-for-kubernetes` version by running:
 
         ```bash
         NEW_PGD4K_VERSION=$(
@@ -195,7 +204,7 @@ follow these steps:
         echo $NEW_PGD4K_VERSION
         ```
 
-    2. Update `.appVersion` in [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
+    3. Update `.appVersion` in [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
         file
 
         ```bash
@@ -203,7 +212,7 @@ follow these steps:
           charts/edb-postgres-distributed-for-kubernetes/Chart.yaml
         ```
 
-    3. Update [crds.yaml](./charts/edb-postgres-distributed-for-kubernetes/templates/crds/crds.yaml),
+    4. Update [crds.yaml](./charts/edb-postgres-distributed-for-kubernetes/templates/crds/crds.yaml),
         which can be built using
         [kustomize](https://kustomize.io/) from the [PGD4K repo](https://github.com/EnterpriseDB/pg4k-pgd)
         using kustomize [remoteBuild](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/remoteBuild.md)
@@ -215,7 +224,7 @@ follow these steps:
         echo '{{- end }}' >> ./charts/edb-postgres-distributed-for-kubernetes/templates/crds/crds.yaml
         ```
 
-    4. To update the files in the [templates](./charts/edb-postgres-distributed-for-kubernetes/templates) directory, you can diff the previous
+    5. To update the files in the [templates](./charts/edb-postgres-distributed-for-kubernetes/templates) directory, you can diff the previous
         PGD4K release YAML against the new one to find what should be updated. E.g.,
 
         ```bash
@@ -231,24 +240,24 @@ follow these steps:
         vimdiff ./releases/pg4k-pgd-enterprise-${OLD_PGD4K_VERSION}.yaml ./releases/pg4k-pgd-enterprise-${NEW_PGD4K_VERSION}.yaml
         ```
 
-    5. Update [values.yaml](./charts/edb-postgres-distributed-for-kubernetes/values.yaml) if needed
+    6. Update [values.yaml](./charts/edb-postgres-distributed-for-kubernetes/values.yaml) if needed
 
        NOTE: updating `values.yaml` just for the PGD4K version (`imageTag` attribute) is not
        necessary, as the value should default to the `appVersion` in `Chart.yaml`
 
-    6. Update `pgdImageName` and `proxyImageName` defaults inside
+    7. Update `pgdImageName` and `proxyImageName` defaults inside
         [values.yaml](./charts/edb-postgres-distributed-for-kubernetes/values.yaml)
         according to the default versions present in the release.
 
-    7. Update dependent `cert-manager` version in
+    8. Update dependent `cert-manager` version in
        [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml) if needed
 
-    8. Update the `.appVersion` and `.version` in subchart
+    9. Update the `.appVersion` and `.version` in subchart
        [edb-postgres-for-kubernetes-lts](./charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts)
        and follow the [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart)
        to update the subchart to latest PG4K lts release if needed
 
-    9. Update dependent `edb-postgres-for-kubernetes-lts` version in
+    10. Update dependent `edb-postgres-for-kubernetes-lts` version in
        [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
 
 6. From here onward, you can follow the steps of [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart),

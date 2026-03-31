@@ -16,6 +16,7 @@ spec:
       - host: region-b-group
       - host: region-c-group
   cnp:
+    joinMethod: logical
     storage:
       size: 1Gi
   connectivity:
@@ -52,6 +53,7 @@ spec:
   proxyInstances: 2
   witnessInstances: 1
   pgd:
+    groupJoinMethod: logical
     parentGroup:
       name: world
     discovery:
@@ -59,6 +61,7 @@ spec:
       - host: region-b-group
       - host: region-c-group
   cnp:
+    joinMethod: logical
     storage:
       size: 1Gi
   connectivity:
@@ -90,6 +93,7 @@ spec:
   proxyInstances: 0
   witnessInstances: 1
   pgd:
+    groupJoinMethod: logical
     parentGroup:
       name: world
     discovery:
