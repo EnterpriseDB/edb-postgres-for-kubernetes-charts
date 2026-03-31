@@ -158,6 +158,19 @@ helm upgrade --dependency-update \
 **Note:** You can find the latest released image catalogs for operand from
 [PGD Operand images](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/supported_versions/#pgd-operand-images)
 
+### Migrate from PG4K-PGD 1.x to PG4K-PGD 2.x
+
+The helm chart `edb-postgres-distributed-for-kubernetes` and `edb-cloudnativepg-global-cluster` is
+not backword compatible, and they can't be installed together in the same cluster. If you have an
+existing `edb-postgres-distributed-for-kubernetes` chart managing the PGD v5.x workloads,
+and want to migrate to PGD v6.x workloads, you need uninstall the `edb-postgres-distributed-for-kubernetes` chart
+and then install the `edb-cloudnativepg-global-cluster` chart first.
+
+Before migration, you need to make sure the `edb-postgres-distributed-for-kubernetes` chart is v1.2.0 or above, and PGD
+operand image is 5.9.1 or above.
+
+**Note:** You can find more information of the migration in the [migration guide](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/migrating_from_pgd_v5_to_pgd_v6/).
+
 ## Deployment of the EDB Postgres Distributed for Kubernetes operator (PG4K-PGD 1.x)
 
 The PG4K-PGD operator helm chart 1.x and 2.x are designed to manage different versions of PGD,
@@ -335,14 +348,16 @@ helm upgrade --install edb-pg4k \
 
 Navigate to the charts directory of local chart or source code,
 
+for PG4K-PGD v2.x
+
 ```console
-helm upgrade --install edb-ecgc \
+helm upgrade --install edb-pg4k-pgd \
   --namespace pgd-operator-system \
   --create-namespace \
   --set image.imageCredentials.password=<THE-TOKEN> \
   charts/edb-cloudnativepg-global-cluster
 ```
-or
+or for PG4K-PGD v1.x
 
 ```console
 helm upgrade --install edb-pg4k-pgd \
