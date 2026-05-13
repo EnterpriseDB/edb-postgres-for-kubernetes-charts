@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: backups.postgresql.k8s.enterprisedb.io
 spec:
@@ -215,6 +215,11 @@ spec:
                     - key
                     - name
                     type: object
+                  useDefaultAzureCredentials:
+                    description: |-
+                      Use the default Azure authentication flow, which includes DefaultAzureCredential.
+                      This allows authentication using environment variables and managed identities.
+                    type: boolean
                 type: object
               backupId:
                 description: The ID of the Barman backup
@@ -311,6 +316,13 @@ spec:
                     type: string
                   podName:
                     description: The pod name
+                    type: string
+                  sessionID:
+                    description: |-
+                      The instance manager session ID. This is a unique identifier generated at instance manager
+                      startup and changes on every restart (including container reboots). Used to detect if
+                      the instance manager was restarted during long-running operations like backups, which
+                      would terminate any running backup process.
                     type: string
                 type: object
               majorVersion:
@@ -454,7 +466,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: clusterimagecatalogs.postgresql.k8s.enterprisedb.io
 spec:
@@ -503,6 +515,112 @@ spec:
                 items:
                   description: CatalogImage defines the image and major version
                   properties:
+                    extensions:
+                      description: The configuration of the extensions to be added
+                      items:
+                        description: |-
+                          ExtensionConfiguration is the configuration used to add
+                          PostgreSQL extensions to the Cluster.
+                        properties:
+                          bin_path:
+                            description: |-
+                              A list of directories within the image to be appended to the
+                              PostgreSQL process's `PATH` environment variable.
+                            items:
+                              type: string
+                            type: array
+                          dynamic_library_path:
+                            description: |-
+                              The list of directories inside the image which should be added to dynamic_library_path.
+                              If not defined, defaults to "/lib".
+                            items:
+                              type: string
+                            type: array
+                          env:
+                            description: |-
+                              Env is a list of custom environment variables to be set in the
+                              PostgreSQL process for this extension. It is the responsibility of the
+                              cluster administrator to ensure the variables are correct for the
+                              specific extension. Note that changes to these variables require
+                              a manual cluster restart to take effect.
+                            items:
+                              description: |-
+                                ExtensionEnvVar defines an environment variable for a specific extension
+                                image volume.
+                              properties:
+                                name:
+                                  description: |-
+                                    Name of the environment variable to be injected into the
+                                    PostgreSQL process.
+                                  minLength: 1
+                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  type: string
+                                value:
+                                  description: |-
+                                    Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                    replacement of this value, with support for placeholder expansion.
+                                    The ${`image_root`} placeholder resolves to the absolute mount path
+                                    of the extension's volume (e.g., `/extensions/my-extension`). This
+                                    is particularly useful for allowing applications or libraries to
+                                    locate specific directories within the mounted image.
+                                    Unrecognized placeholders are rejected. To include a literal ${...}
+                                    in the value, escape it as $${...}.
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          extension_control_path:
+                            description: |-
+                              The list of directories inside the image which should be added to extension_control_path.
+                              If not defined, defaults to "/share".
+                            items:
+                              type: string
+                            type: array
+                          image:
+                            description: The image containing the extension.
+                            properties:
+                              pullPolicy:
+                                description: |-
+                                  Policy for pulling OCI objects. Possible values are:
+                                  Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+                                  Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+                                  IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+                                  Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+                                type: string
+                              reference:
+                                description: |-
+                                  Required: Image or artifact reference to be used.
+                                  Behaves in the same way as pod.spec.containers[*].image.
+                                  Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+                                  More info: https://kubernetes.io/docs/concepts/containers/images
+                                  This field is optional to allow higher level config management to default or override
+                                  container images in workload controllers like Deployments and StatefulSets.
+                                type: string
+                            type: object
+                          ld_library_path:
+                            description: The list of directories inside the image
+                              which should be added to ld_library_path.
+                            items:
+                              type: string
+                            type: array
+                          name:
+                            description: The name of the extension, required
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - name
+                      x-kubernetes-list-type: map
                     image:
                       description: The image reference
                       type: string
@@ -536,7 +654,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: clusters.postgresql.k8s.enterprisedb.io
 spec:
@@ -1554,9 +1672,10 @@ spec:
                         operator:
                           description: |-
                             Operator represents a key's relationship to the value.
-                            Valid operators are Exists and Equal. Defaults to Equal.
+                            Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                             Exists is equivalent to wildcard for value, so that a pod can
                             tolerate all taints of a particular category.
+                            Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                           type: string
                         tolerationSeconds:
                           description: |-
@@ -1649,6 +1768,11 @@ spec:
                             - key
                             - name
                             type: object
+                          useDefaultAzureCredentials:
+                            description: |-
+                              Use the default Azure authentication flow, which includes DefaultAzureCredential.
+                              This allows authentication using environment variables and managed identities.
+                            type: boolean
                         type: object
                       data:
                         description: |-
@@ -2516,8 +2640,9 @@ spec:
                               integer)
                             type: string
                           targetTime:
-                            description: The target time as a timestamp in the RFC3339
-                              standard
+                            description: |-
+                              The target time as a timestamp in RFC3339 format or PostgreSQL timestamp format.
+                              Timestamps without an explicit timezone are interpreted as UTC.
                             type: string
                           targetXID:
                             description: The target transaction ID
@@ -3035,7 +3160,7 @@ spec:
                           resources:
                             description: |-
                               resources represents the minimum resources the volume should have.
-                              If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                              Users are allowed to specify resource requirements
                               that are lower than previous value but must still be higher than capacity recorded in the
                               status field of the claim.
                               More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -3239,6 +3364,11 @@ spec:
                               - key
                               - name
                               type: object
+                            useDefaultAzureCredentials:
+                              description: |-
+                                Use the default Azure authentication flow, which includes DefaultAzureCredential.
+                                This allows authentication using environment variables and managed identities.
+                              type: boolean
                           type: object
                         data:
                           description: |-
@@ -5042,6 +5172,13 @@ spec:
                         ExtensionConfiguration is the configuration used to add
                         PostgreSQL extensions to the Cluster.
                       properties:
+                        bin_path:
+                          description: |-
+                            A list of directories within the image to be appended to the
+                            PostgreSQL process's `PATH` environment variable.
+                          items:
+                            type: string
+                          type: array
                         dynamic_library_path:
                           description: |-
                             The list of directories inside the image which should be added to dynamic_library_path.
@@ -5049,6 +5186,45 @@ spec:
                           items:
                             type: string
                           type: array
+                        env:
+                          description: |-
+                            Env is a list of custom environment variables to be set in the
+                            PostgreSQL process for this extension. It is the responsibility of the
+                            cluster administrator to ensure the variables are correct for the
+                            specific extension. Note that changes to these variables require
+                            a manual cluster restart to take effect.
+                          items:
+                            description: |-
+                              ExtensionEnvVar defines an environment variable for a specific extension
+                              image volume.
+                            properties:
+                              name:
+                                description: |-
+                                  Name of the environment variable to be injected into the
+                                  PostgreSQL process.
+                                minLength: 1
+                                pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                type: string
+                              value:
+                                description: |-
+                                  Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                  replacement of this value, with support for placeholder expansion.
+                                  The ${`image_root`} placeholder resolves to the absolute mount path
+                                  of the extension's volume (e.g., `/extensions/my-extension`). This
+                                  is particularly useful for allowing applications or libraries to
+                                  locate specific directories within the mounted image.
+                                  Unrecognized placeholders are rejected. To include a literal ${...}
+                                  in the value, escape it as $${...}.
+                                minLength: 1
+                                type: string
+                            required:
+                            - name
+                            - value
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
                         extension_control_path:
                           description: |-
                             The list of directories inside the image which should be added to extension_control_path.
@@ -5057,7 +5233,7 @@ spec:
                             type: string
                           type: array
                         image:
-                          description: The image containing the extension, required
+                          description: The image containing the extension.
                           properties:
                             pullPolicy:
                               description: |-
@@ -5077,9 +5253,6 @@ spec:
                                 container images in workload controllers like Deployments and StatefulSets.
                               type: string
                           type: object
-                          x-kubernetes-validations:
-                          - message: An image reference is required
-                            rule: has(self.reference)
                         ld_library_path:
                           description: The list of directories inside the image which
                             should be added to ld_library_path.
@@ -5089,10 +5262,9 @@ spec:
                         name:
                           description: The name of the extension, required
                           minLength: 1
-                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          pattern: ^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$
                           type: string
                       required:
-                      - image
                       - name
                       type: object
                     type: array
@@ -5876,6 +6048,24 @@ spec:
                               description: Kubelet's generated CSRs will be addressed
                                 to this signer.
                               type: string
+                            userAnnotations:
+                              additionalProperties:
+                                type: string
+                              description: |-
+                                userAnnotations allow pod authors to pass additional information to
+                                the signer implementation.  Kubernetes does not restrict or validate this
+                                metadata in any way.
+
+                                These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                the PodCertificateRequest objects that Kubelet creates.
+
+                                Entries are subject to the same validation as object metadata annotations,
+                                with the addition that all keys must be domain-prefixed. No restrictions
+                                are placed on values, except an overall size limitation on the entire field.
+
+                                Signers should document the keys and values they support. Signers should
+                                deny requests that contain keys they do not recognize.
+                              type: object
                           required:
                           - keyType
                           - signerName
@@ -6236,7 +6426,6 @@ spec:
                       procMount denotes the type of proc mount to use for the containers.
                       The default value is Default which uses the container runtime defaults for
                       readonly paths and masked paths.
-                      This requires the ProcMountType feature flag to be enabled.
                       Note that this field cannot be set when spec.os.name is windows.
                     type: string
                   readOnlyRootFilesystem:
@@ -6512,7 +6701,7 @@ spec:
                       resources:
                         description: |-
                           resources represents the minimum resources the volume should have.
-                          If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                          Users are allowed to specify resource requirements
                           that are lower than previous value but must still be higher than capacity recorded in the
                           status field of the claim.
                           More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -6768,7 +6957,7 @@ spec:
                             resources:
                               description: |-
                                 resources represents the minimum resources the volume should have.
-                                If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                Users are allowed to specify resource requirements
                                 that are lower than previous value but must still be higher than capacity recorded in the
                                 status field of the claim.
                                 More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -7176,7 +7365,7 @@ spec:
                       resources:
                         description: |-
                           resources represents the minimum resources the volume should have.
-                          If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                          Users are allowed to specify resource requirements
                           that are lower than previous value but must still be higher than capacity recorded in the
                           status field of the claim.
                           More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -7925,7 +8114,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: databases.postgresql.k8s.enterprisedb.io
 spec:
@@ -8520,7 +8709,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: failoverquorums.postgresql.k8s.enterprisedb.io
 spec:
@@ -8598,7 +8787,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: imagecatalogs.postgresql.k8s.enterprisedb.io
 spec:
@@ -8646,6 +8835,112 @@ spec:
                 items:
                   description: CatalogImage defines the image and major version
                   properties:
+                    extensions:
+                      description: The configuration of the extensions to be added
+                      items:
+                        description: |-
+                          ExtensionConfiguration is the configuration used to add
+                          PostgreSQL extensions to the Cluster.
+                        properties:
+                          bin_path:
+                            description: |-
+                              A list of directories within the image to be appended to the
+                              PostgreSQL process's `PATH` environment variable.
+                            items:
+                              type: string
+                            type: array
+                          dynamic_library_path:
+                            description: |-
+                              The list of directories inside the image which should be added to dynamic_library_path.
+                              If not defined, defaults to "/lib".
+                            items:
+                              type: string
+                            type: array
+                          env:
+                            description: |-
+                              Env is a list of custom environment variables to be set in the
+                              PostgreSQL process for this extension. It is the responsibility of the
+                              cluster administrator to ensure the variables are correct for the
+                              specific extension. Note that changes to these variables require
+                              a manual cluster restart to take effect.
+                            items:
+                              description: |-
+                                ExtensionEnvVar defines an environment variable for a specific extension
+                                image volume.
+                              properties:
+                                name:
+                                  description: |-
+                                    Name of the environment variable to be injected into the
+                                    PostgreSQL process.
+                                  minLength: 1
+                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  type: string
+                                value:
+                                  description: |-
+                                    Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                    replacement of this value, with support for placeholder expansion.
+                                    The ${`image_root`} placeholder resolves to the absolute mount path
+                                    of the extension's volume (e.g., `/extensions/my-extension`). This
+                                    is particularly useful for allowing applications or libraries to
+                                    locate specific directories within the mounted image.
+                                    Unrecognized placeholders are rejected. To include a literal ${...}
+                                    in the value, escape it as $${...}.
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          extension_control_path:
+                            description: |-
+                              The list of directories inside the image which should be added to extension_control_path.
+                              If not defined, defaults to "/share".
+                            items:
+                              type: string
+                            type: array
+                          image:
+                            description: The image containing the extension.
+                            properties:
+                              pullPolicy:
+                                description: |-
+                                  Policy for pulling OCI objects. Possible values are:
+                                  Always: the kubelet always attempts to pull the reference. Container creation will fail If the pull fails.
+                                  Never: the kubelet never pulls the reference and only uses a local image or artifact. Container creation will fail if the reference isn't present.
+                                  IfNotPresent: the kubelet pulls if the reference isn't already present on disk. Container creation will fail if the reference isn't present and the pull fails.
+                                  Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+                                type: string
+                              reference:
+                                description: |-
+                                  Required: Image or artifact reference to be used.
+                                  Behaves in the same way as pod.spec.containers[*].image.
+                                  Pull secrets will be assembled in the same way as for the container image by looking up node credentials, SA image pull secrets, and pod spec image pull secrets.
+                                  More info: https://kubernetes.io/docs/concepts/containers/images
+                                  This field is optional to allow higher level config management to default or override
+                                  container images in workload controllers like Deployments and StatefulSets.
+                                type: string
+                            type: object
+                          ld_library_path:
+                            description: The list of directories inside the image
+                              which should be added to ld_library_path.
+                            items:
+                              type: string
+                            type: array
+                          name:
+                            description: The name of the extension, required
+                            minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - name
+                      x-kubernetes-list-type: map
                     image:
                       description: The image reference
                       type: string
@@ -8679,7 +8974,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: poolers.postgresql.k8s.enterprisedb.io
 spec:
@@ -11311,7 +11606,9 @@ spec:
                                   type: integer
                               type: object
                             resizePolicy:
-                              description: Resources resize policy for the container.
+                              description: |-
+                                Resources resize policy for the container.
+                                This field cannot be set on ephemeral containers.
                               items:
                                 description: ContainerResizePolicy represents resource
                                   resize policy for the container.
@@ -11541,7 +11838,6 @@ spec:
                                     procMount denotes the type of proc mount to use for the containers.
                                     The default value is Default which uses the container runtime defaults for
                                     readonly paths and masked paths.
-                                    This requires the ProcMountType feature flag to be enabled.
                                     Note that this field cannot be set when spec.os.name is windows.
                                   type: string
                                 readOnlyRootFilesystem:
@@ -13112,7 +13408,6 @@ spec:
                                     procMount denotes the type of proc mount to use for the containers.
                                     The default value is Default which uses the container runtime defaults for
                                     readonly paths and masked paths.
-                                    This requires the ProcMountType feature flag to be enabled.
                                     Note that this field cannot be set when spec.os.name is windows.
                                   type: string
                                 readOnlyRootFilesystem:
@@ -13596,7 +13891,6 @@ spec:
                           When set to false, a new userns is created for the pod. Setting false is useful for
                           mitigating container breakout vulnerabilities even allowing users to run their
                           containers as root without actually having root privileges on the host.
-                          This field is alpha-level and is only honored by servers that enable the UserNamespacesSupport feature.
                         type: boolean
                       hostname:
                         description: |-
@@ -14534,7 +14828,9 @@ spec:
                                   type: integer
                               type: object
                             resizePolicy:
-                              description: Resources resize policy for the container.
+                              description: |-
+                                Resources resize policy for the container.
+                                This field cannot be set on ephemeral containers.
                               items:
                                 description: ContainerResizePolicy represents resource
                                   resize policy for the container.
@@ -14764,7 +15060,6 @@ spec:
                                     procMount denotes the type of proc mount to use for the containers.
                                     The default value is Default which uses the container runtime defaults for
                                     readonly paths and masked paths.
-                                    This requires the ProcMountType feature flag to be enabled.
                                     Note that this field cannot be set when spec.os.name is windows.
                                   type: string
                                 readOnlyRootFilesystem:
@@ -15321,8 +15616,8 @@ spec:
                           will be made available to those containers which consume them
                           by name.
 
-                          This is an alpha field and requires enabling the
-                          DynamicResourceAllocation feature gate.
+                          This is a stable field but requires that the
+                          DynamicResourceAllocation feature gate is enabled.
 
                           This field is immutable.
                         items:
@@ -15333,6 +15628,14 @@ spec:
 
                             It adds a name to it that uniquely identifies the ResourceClaim inside the Pod.
                             Containers that need access to the ResourceClaim reference it with this name.
+
+                            When the DRAWorkloadResourceClaims feature gate is enabled and this Pod
+                            belongs to a PodGroup, a PodResourceClaim is matched to a
+                            PodGroupResourceClaim if all of their fields are equal (Name,
+                            ResourceClaimName, and ResourceClaimTemplateName). A matched claim references
+                            a single ResourceClaim shared across all Pods in the PodGroup, reserved for
+                            the PodGroup in ResourceClaimStatus.ReservedFor rather than for individual
+                            Pods.
                           properties:
                             name:
                               description: |-
@@ -15357,6 +15660,16 @@ spec:
                                 will also be deleted. The pod name and resource name, along with a
                                 generated component, will be used to form a unique name for the
                                 ResourceClaim, which will be recorded in pod.status.resourceClaimStatuses.
+
+                                When the DRAWorkloadResourceClaims feature gate is enabled and the pod
+                                belongs to a PodGroup that defines a PodGroupResourceClaim with the same
+                                Name and ResourceClaimTemplateName, this PodResourceClaim resolves to the
+                                ResourceClaim generated for the PodGroup. All pods in the group that
+                                define an equivalent PodResourceClaim matching the
+                                PodGroupResourceClaim's Name and ResourceClaimTemplateName share the same
+                                generated ResourceClaim. ResourceClaims generated for a PodGroup are
+                                owned by the PodGroup and their lifecycles are tied to the PodGroup
+                                instead of any individual pod.
 
                                 This field is immutable and no changes will be made to the
                                 corresponding ResourceClaim by the control plane after creating the
@@ -15483,6 +15796,28 @@ spec:
                         x-kubernetes-list-map-keys:
                         - name
                         x-kubernetes-list-type: map
+                      schedulingGroup:
+                        description: |-
+                          SchedulingGroup provides a reference to the immediate scheduling runtime
+                          grouping object that this Pod belongs to.
+                          This field is used by the scheduler to identify the group and apply the
+                          correct group scheduling policies. The association with a group also
+                          impacts other lifecycle aspects of a Pod that are relevant in a wider context
+                          of scheduling like preemption, resource attachment, etc. If not specified,
+                          the Pod is treated as a single unit in all of these aspects.
+                          The group object referenced by this field may not exist at the time the
+                          Pod is created.
+                          This field is immutable, but a group object with the same name may be
+                          recreated with different policies. Doing this during pod scheduling
+                          may result in the placement not conforming to the expected policies.
+                        properties:
+                          podGroupName:
+                            description: |-
+                              PodGroupName specifies the name of the standalone PodGroup object
+                              that represents the runtime instance of this group.
+                              Must be a DNS subdomain.
+                            type: string
+                        type: object
                       securityContext:
                         description: |-
                           SecurityContext holds pod-level security attributes and common container settings.
@@ -15781,9 +16116,10 @@ spec:
                             operator:
                               description: |-
                                 Operator represents a key's relationship to the value.
-                                Valid operators are Exists and Equal. Defaults to Equal.
+                                Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
                                 Exists is equivalent to wildcard for value, so that a pod can
                                 tolerate all taints of a particular category.
+                                Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
                               type: string
                             tolerationSeconds:
                               description: |-
@@ -16577,7 +16913,7 @@ spec:
                                         resources:
                                           description: |-
                                             resources represents the minimum resources the volume should have.
-                                            If RecoverVolumeExpansionFailure feature is enabled users are allowed to specify resource requirements
+                                            Users are allowed to specify resource requirements
                                             that are lower than previous value but must still be higher than capacity recorded in the
                                             status field of the claim.
                                             More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#resources
@@ -16910,7 +17246,7 @@ spec:
                                 A failure to resolve or pull the image during pod startup will block containers from starting and may add significant latency. Failures will be retried using normal volume backoff and will be reported on the pod reason and message.
                                 The types of objects that may be mounted by this volume are defined by the container runtime implementation on a host machine and at minimum must include all valid types supported by the container image field.
                                 The OCI object gets mounted in a single directory (spec.containers[*].volumeMounts.mountPath) by merging the manifest layers in the same way as for container images.
-                                The volume will be mounted read-only (ro) and non-executable files (noexec).
+                                The volume will be mounted read-only (ro).
                                 Sub path mounts for containers are not supported (spec.containers[*].volumeMounts.subpath) before 1.33.
                                 The field spec.securityContext.fsGroupChangePolicy has no effect on this volume type.
                               properties:
@@ -17082,8 +17418,7 @@ spec:
                               description: |-
                                 portworxVolume represents a portworx volume attached and mounted on kubelets host machine.
                                 Deprecated: PortworxVolume is deprecated. All operations for the in-tree portworxVolume type
-                                are redirected to the pxd.portworx.com CSI driver when the CSIMigrationPortworx feature-gate
-                                is on.
+                                are redirected to the pxd.portworx.com CSI driver.
                               properties:
                                 fsType:
                                   description: |-
@@ -17463,6 +17798,24 @@ spec:
                                             description: Kubelet's generated CSRs
                                               will be addressed to this signer.
                                             type: string
+                                          userAnnotations:
+                                            additionalProperties:
+                                              type: string
+                                            description: |-
+                                              userAnnotations allow pod authors to pass additional information to
+                                              the signer implementation.  Kubernetes does not restrict or validate this
+                                              metadata in any way.
+
+                                              These values are copied verbatim into the `spec.unverifiedUserAnnotations` field of
+                                              the PodCertificateRequest objects that Kubelet creates.
+
+                                              Entries are subject to the same validation as object metadata annotations,
+                                              with the addition that all keys must be domain-prefixed. No restrictions
+                                              are placed on values, except an overall size limitation on the entire field.
+
+                                              Signers should document the keys and values they support. Signers should
+                                              deny requests that contain keys they do not recognize.
+                                            type: object
                                         required:
                                         - keyType
                                         - signerName
@@ -17989,7 +18342,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: publications.postgresql.k8s.enterprisedb.io
 spec:
@@ -18185,7 +18538,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: scheduledbackups.postgresql.k8s.enterprisedb.io
 spec:
@@ -18377,7 +18730,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   name: subscriptions.postgresql.k8s.enterprisedb.io
 spec:
