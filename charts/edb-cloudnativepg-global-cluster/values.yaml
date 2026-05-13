@@ -23,7 +23,7 @@ global:
   repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
-  pgdImageName: postgresql-pgd:18.1-pgd620-expanded-ubi9
+  pgdImageName: postgresql-pgd:18.3-pgd631-expanded-ubi9
 # -- operator image configuration
 image:
   # -- Specifies the repository of the pgd operator image, this will overwrite the global repository
