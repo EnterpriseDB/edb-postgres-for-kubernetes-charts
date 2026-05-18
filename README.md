@@ -7,13 +7,13 @@ Helm charts to install the following Operators:
    supported Kubernetes cluster running in private, public, or hybrid cloud
    environments. Derived from CloudNativePG's Helm chart.
 
-- [EDB Postgres Distributed for Kubernetes (PG4K-PGD) version 1.x](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
-   designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
-   on Kubernetes, with traffic routed by PGD Proxy.
-
 - [EDB CloudNativePG Global Cluster (PG4K-PGD version 2.x)](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
    designed by EnterpriseDB to manage EDB Postgres Distributed v6 workloads
    on Kubernete
+
+- [EDB Postgres Distributed for Kubernetes (PG4K-PGD) version 1.x](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
+   designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
+   on Kubernetes, with traffic routed by PGD Proxy.
 
 ## Available Charts
 
@@ -151,7 +151,7 @@ helm upgrade --dependency-update \
   --namespace pgd-operator-system \
   --create-namespace \
   --set image.imageCredentials.password=<THE-TOKEN> \
-  --set global.pgdImageName=postgresql-pgd:18.1-pgd620-expanded-ubi9 \
+  --set global.pgdImageName=postgresql-pgd:18.3-pgd631-expanded-ubi9 \
   edb/edb-cloudnativepg-global-cluster
 ```
 
