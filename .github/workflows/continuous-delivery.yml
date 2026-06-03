@@ -17,7 +17,7 @@ jobs:
       cnpg-gc-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Check for changes
         uses: dorny/paths-filter@v4.0.1
@@ -43,7 +43,7 @@ jobs:
     if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -71,7 +71,7 @@ jobs:
     if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -100,7 +100,7 @@ jobs:
     if: needs.change-triage.outputs.pg4k-pgd-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -133,7 +133,7 @@ jobs:
     if: needs.change-triage.outputs.cnpg-gc-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -166,7 +166,7 @@ jobs:
     if: needs.change-triage.outputs.cnpg-gc-lts-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -195,7 +195,7 @@ jobs:
     if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
@@ -229,7 +229,7 @@ jobs:
     if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 0
 
