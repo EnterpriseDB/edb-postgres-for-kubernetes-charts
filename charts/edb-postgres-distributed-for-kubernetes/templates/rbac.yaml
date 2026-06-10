@@ -265,6 +265,18 @@ rules:
   - get
   - update
 - apiGroups:
+  - pg4k.enterprisedb.io
+  resources:
+  - transparentdataencryptions
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - pgd.k8s.enterprisedb.io
   resources:
   - pgdgroupcleanups
@@ -345,6 +357,7 @@ rules:
   - update
   - watch
 - apiGroups:
+  - postgresql.cnpg.io
   - postgresql.k8s.enterprisedb.io
   resources:
   - clusters
@@ -357,12 +370,14 @@ rules:
   - update
   - watch
 - apiGroups:
+  - postgresql.cnpg.io
   - postgresql.k8s.enterprisedb.io
   resources:
   - clusters/finalizers
   verbs:
   - update
 - apiGroups:
+  - postgresql.cnpg.io
   - postgresql.k8s.enterprisedb.io
   resources:
   - clusters/status
@@ -372,6 +387,7 @@ rules:
   - update
   - watch
 - apiGroups:
+  - postgresql.cnpg.io
   - postgresql.k8s.enterprisedb.io
   resources:
   - scheduledbackups

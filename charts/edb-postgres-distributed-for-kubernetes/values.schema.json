@@ -224,6 +224,17 @@
                 }
             }
         },
+        "monitoringConfigMap": {
+            "type": "object",
+            "properties": {
+                "create": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "nameOverride": {
             "type": "string"
         },
