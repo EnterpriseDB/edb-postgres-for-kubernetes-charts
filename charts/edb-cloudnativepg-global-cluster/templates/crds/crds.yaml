@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -94,7 +94,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -184,7 +184,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -268,7 +268,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.20.1
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -445,10 +445,11 @@ spec:
                                 description: |-
                                   Compress a backup file (a tar file per tablespace) while streaming it
                                   to the object store. Available options are empty string (no
-                                  compression, default), `gzip`, `bzip2`, and `snappy`.
+                                  compression, default), `gzip`, `bzip2`, `lz4`, and `snappy`.
                                 enum:
                                 - bzip2
                                 - gzip
+                                - lz4
                                 - snappy
                                 type: string
                               encryption:
@@ -3848,7 +3849,6 @@ spec:
                                             procMount denotes the type of proc mount to use for the containers.
                                             The default value is Default which uses the container runtime defaults for
                                             readonly paths and masked paths.
-                                            This requires the ProcMountType feature flag to be enabled.
                                             Note that this field cannot be set when spec.os.name is windows.
                                           type: string
                                         readOnlyRootFilesystem:
@@ -5244,9 +5244,8 @@ spec:
                       The plugins configuration, containing
                       any plugin to be loaded with the corresponding configuration
                     items:
-                      description: |-
-                        PluginConfiguration specifies a plugin that need to be loaded for this
-                        cluster to be reconciled
+                      description: PluginConfiguration specifies a plugin that need
+                        to be loaded for this cluster to be reconciled
                       properties:
                         enabled:
                           default: true
@@ -5585,6 +5584,13 @@ spec:
                             ExtensionConfiguration is the configuration used to add
                             PostgreSQL extensions to the Cluster.
                           properties:
+                            bin_path:
+                              description: |-
+                                A list of directories within the image to be appended to the
+                                PostgreSQL process's `PATH` environment variable.
+                              items:
+                                type: string
+                              type: array
                             dynamic_library_path:
                               description: |-
                                 The list of directories inside the image which should be added to dynamic_library_path.
@@ -5592,6 +5598,45 @@ spec:
                               items:
                                 type: string
                               type: array
+                            env:
+                              description: |-
+                                Env is a list of custom environment variables to be set in the
+                                PostgreSQL process for this extension. It is the responsibility of the
+                                cluster administrator to ensure the variables are correct for the
+                                specific extension. Note that changes to these variables require
+                                a manual cluster restart to take effect.
+                              items:
+                                description: |-
+                                  ExtensionEnvVar defines an environment variable for a specific extension
+                                  image volume.
+                                properties:
+                                  name:
+                                    description: |-
+                                      Name of the environment variable to be injected into the
+                                      PostgreSQL process.
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    type: string
+                                  value:
+                                    description: |-
+                                      Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                      replacement of this value, with support for placeholder expansion.
+                                      The ${`image_root`} placeholder resolves to the absolute mount path
+                                      of the extension's volume (e.g., `/extensions/my-extension`). This
+                                      is particularly useful for allowing applications or libraries to
+                                      locate specific directories within the mounted image.
+                                      Unrecognized placeholders are rejected. To include a literal ${...}
+                                      in the value, escape it as $${...}.
+                                    minLength: 1
+                                    type: string
+                                required:
+                                - name
+                                - value
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - name
+                              x-kubernetes-list-type: map
                             extension_control_path:
                               description: |-
                                 The list of directories inside the image which should be added to extension_control_path.
@@ -5635,9 +5680,6 @@ spec:
                           - name
                           type: object
                         type: array
-                        x-kubernetes-list-map-keys:
-                        - name
-                        x-kubernetes-list-type: map
                       ldap:
                         description: Options to specify LDAP configuration
                         properties:
@@ -6425,11 +6467,11 @@ spec:
                     - metadata
                     type: object
                   smartShutdownTimeout:
-                    default: 180
+                    default: 15
                     description: |-
                       The time in seconds that controls the window of time reserved for the smart shutdown of Postgres to complete.
                       Make sure you reserve enough time for the operator to request a fast shutdown of Postgres
-                      (that is: `stopDelay` - `smartShutdownTimeout`). Default is 180 seconds.
+                      (that is: `stopDelay` - `smartShutdownTimeout`).
                     format: int32
                     type: integer
                   startDelay:
@@ -6440,10 +6482,10 @@ spec:
                     format: int32
                     type: integer
                   stopDelay:
-                    default: 1800
+                    default: 180
                     description: |-
                       The time in seconds that is allowed for a PostgreSQL instance node to
-                      gracefully shutdown (default 1800)
+                      gracefully shutdown (default 180)
                     format: int32
                     type: integer
                   storage:
@@ -6680,8 +6722,8 @@ spec:
                     description: The tablespaces configuration
                     items:
                       description: |-
-                        TablespaceConfiguration is the configuration of a tablespace, and includes
-                        the storage specification for the tablespace
+                        TablespaceConfiguration is the configuration of a tablespace, and includes the storage
+                        specification for the tablespace
                       properties:
                         name:
                           description: The name of the tablespace
@@ -11232,10 +11274,11 @@ spec:
                             description: |-
                               Compress a backup file (a tar file per tablespace) while streaming it
                               to the object store. Available options are empty string (no
-                              compression, default), `gzip`, `bzip2`, and `snappy`.
+                              compression, default), `gzip`, `bzip2`, `lz4`, and `snappy`.
                             enum:
                             - bzip2
                             - gzip
+                            - lz4
                             - snappy
                             type: string
                           encryption:
@@ -13716,9 +13759,8 @@ spec:
                       The plugins configuration, containing
                       any plugin to be loaded with the corresponding configuration
                     items:
-                      description: |-
-                        PluginConfiguration specifies a plugin that need to be loaded for this
-                        cluster to be reconciled
+                      description: PluginConfiguration specifies a plugin that need
+                        to be loaded for this cluster to be reconciled
                       properties:
                         enabled:
                           default: true
@@ -14041,6 +14083,13 @@ spec:
                             ExtensionConfiguration is the configuration used to add
                             PostgreSQL extensions to the Cluster.
                           properties:
+                            bin_path:
+                              description: |-
+                                A list of directories within the image to be appended to the
+                                PostgreSQL process's `PATH` environment variable.
+                              items:
+                                type: string
+                              type: array
                             dynamic_library_path:
                               description: |-
                                 The list of directories inside the image which should be added to dynamic_library_path.
@@ -14048,6 +14097,45 @@ spec:
                               items:
                                 type: string
                               type: array
+                            env:
+                              description: |-
+                                Env is a list of custom environment variables to be set in the
+                                PostgreSQL process for this extension. It is the responsibility of the
+                                cluster administrator to ensure the variables are correct for the
+                                specific extension. Note that changes to these variables require
+                                a manual cluster restart to take effect.
+                              items:
+                                description: |-
+                                  ExtensionEnvVar defines an environment variable for a specific extension
+                                  image volume.
+                                properties:
+                                  name:
+                                    description: |-
+                                      Name of the environment variable to be injected into the
+                                      PostgreSQL process.
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    type: string
+                                  value:
+                                    description: |-
+                                      Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                      replacement of this value, with support for placeholder expansion.
+                                      The ${`image_root`} placeholder resolves to the absolute mount path
+                                      of the extension's volume (e.g., `/extensions/my-extension`). This
+                                      is particularly useful for allowing applications or libraries to
+                                      locate specific directories within the mounted image.
+                                      Unrecognized placeholders are rejected. To include a literal ${...}
+                                      in the value, escape it as $${...}.
+                                    minLength: 1
+                                    type: string
+                                required:
+                                - name
+                                - value
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - name
+                              x-kubernetes-list-type: map
                             extension_control_path:
                               description: |-
                                 The list of directories inside the image which should be added to extension_control_path.
@@ -14091,9 +14179,6 @@ spec:
                           - name
                           type: object
                         type: array
-                        x-kubernetes-list-map-keys:
-                        - name
-                        x-kubernetes-list-type: map
                       ldap:
                         description: Options to specify LDAP configuration
                         properties:
@@ -14881,11 +14966,11 @@ spec:
                     - metadata
                     type: object
                   smartShutdownTimeout:
-                    default: 180
+                    default: 15
                     description: |-
                       The time in seconds that controls the window of time reserved for the smart shutdown of Postgres to complete.
                       Make sure you reserve enough time for the operator to request a fast shutdown of Postgres
-                      (that is: `stopDelay` - `smartShutdownTimeout`). Default is 180 seconds.
+                      (that is: `stopDelay` - `smartShutdownTimeout`).
                     format: int32
                     type: integer
                   startDelay:
@@ -14896,10 +14981,10 @@ spec:
                     format: int32
                     type: integer
                   stopDelay:
-                    default: 1800
+                    default: 180
                     description: |-
                       The time in seconds that is allowed for a PostgreSQL instance node to
-                      gracefully shutdown (default 1800)
+                      gracefully shutdown (default 180)
                     format: int32
                     type: integer
                   storage:
@@ -15123,8 +15208,8 @@ spec:
                     description: The tablespaces configuration
                     items:
                       description: |-
-                        TablespaceConfiguration is the configuration of a tablespace, and includes
-                        the storage specification for the tablespace
+                        TablespaceConfiguration is the configuration of a tablespace, and includes the storage
+                        specification for the tablespace
                       properties:
                         name:
                           description: The name of the tablespace
