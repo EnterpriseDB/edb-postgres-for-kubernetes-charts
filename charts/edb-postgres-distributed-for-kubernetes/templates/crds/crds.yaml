@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -90,7 +90,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -176,7 +176,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -260,7 +260,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.19.0
+    controller-gen.kubebuilder.io/version: v0.21.0
     helm.sh/resource-policy: keep
   labels:
     app.kubernetes.io/name: pgd-operator
@@ -401,6 +401,11 @@ spec:
                                 - key
                                 - name
                                 type: object
+                              useDefaultAzureCredentials:
+                                description: |-
+                                  Use the default Azure authentication flow, which includes DefaultAzureCredential.
+                                  This allows authentication using environment variables and managed identities.
+                                type: boolean
                             type: object
                           data:
                             description: |-
@@ -432,10 +437,11 @@ spec:
                                 description: |-
                                   Compress a backup file (a tar file per tablespace) while streaming it
                                   to the object store. Available options are empty string (no
-                                  compression, default), `gzip`, `bzip2`, and `snappy`.
+                                  compression, default), `gzip`, `bzip2`, `lz4`, and `snappy`.
                                 enum:
                                 - bzip2
                                 - gzip
+                                - lz4
                                 - snappy
                                 type: string
                               encryption:
@@ -3177,17 +3183,14 @@ spec:
 
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
-                    required:
-                    - traceEnable
                     type: object
                   plugins:
                     description: |-
                       The plugins configuration, containing
                       any plugin to be loaded with the corresponding configuration
                     items:
-                      description: |-
-                        PluginConfiguration specifies a plugin that need to be loaded for this
-                        cluster to be reconciled
+                      description: PluginConfiguration specifies a plugin that need
+                        to be loaded for this cluster to be reconciled
                       properties:
                         enabled:
                           default: true
@@ -3510,6 +3513,13 @@ spec:
                             ExtensionConfiguration is the configuration used to add
                             PostgreSQL extensions to the Cluster.
                           properties:
+                            bin_path:
+                              description: |-
+                                A list of directories within the image to be appended to the
+                                PostgreSQL process's `PATH` environment variable.
+                              items:
+                                type: string
+                              type: array
                             dynamic_library_path:
                               description: |-
                                 The list of directories inside the image which should be added to dynamic_library_path.
@@ -3517,6 +3527,45 @@ spec:
                               items:
                                 type: string
                               type: array
+                            env:
+                              description: |-
+                                Env is a list of custom environment variables to be set in the
+                                PostgreSQL process for this extension. It is the responsibility of the
+                                cluster administrator to ensure the variables are correct for the
+                                specific extension. Note that changes to these variables require
+                                a manual cluster restart to take effect.
+                              items:
+                                description: |-
+                                  ExtensionEnvVar defines an environment variable for a specific extension
+                                  image volume.
+                                properties:
+                                  name:
+                                    description: |-
+                                      Name of the environment variable to be injected into the
+                                      PostgreSQL process.
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    type: string
+                                  value:
+                                    description: |-
+                                      Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                      replacement of this value, with support for placeholder expansion.
+                                      The ${`image_root`} placeholder resolves to the absolute mount path
+                                      of the extension's volume (e.g., `/extensions/my-extension`). This
+                                      is particularly useful for allowing applications or libraries to
+                                      locate specific directories within the mounted image.
+                                      Unrecognized placeholders are rejected. To include a literal ${...}
+                                      in the value, escape it as $${...}.
+                                    minLength: 1
+                                    type: string
+                                required:
+                                - name
+                                - value
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - name
+                              x-kubernetes-list-type: map
                             extension_control_path:
                               description: |-
                                 The list of directories inside the image which should be added to extension_control_path.
@@ -3525,7 +3574,7 @@ spec:
                                 type: string
                               type: array
                             image:
-                              description: The image containing the extension, required
+                              description: The image containing the extension.
                               properties:
                                 pullPolicy:
                                   description: |-
@@ -3545,9 +3594,6 @@ spec:
                                     container images in workload controllers like Deployments and StatefulSets.
                                   type: string
                               type: object
-                              x-kubernetes-validations:
-                              - message: An image reference is required
-                                rule: has(self.reference)
                             ld_library_path:
                               description: The list of directories inside the image
                                 which should be added to ld_library_path.
@@ -3557,10 +3603,9 @@ spec:
                             name:
                               description: The name of the extension, required
                               minLength: 1
-                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              pattern: ^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$
                               type: string
                           required:
-                          - image
                           - name
                           type: object
                         type: array
@@ -4606,8 +4651,8 @@ spec:
                     description: The tablespaces configuration
                     items:
                       description: |-
-                        TablespaceConfiguration is the configuration of a tablespace, and includes
-                        the storage specification for the tablespace
+                        TablespaceConfiguration is the configuration of a tablespace, and includes the storage
+                        specification for the tablespace
                       properties:
                         name:
                           description: The name of the tablespace
@@ -7188,8 +7233,6 @@ spec:
                                 required:
                                 - issuerRef
                                 type: object
-                            required:
-                            - spec
                             type: object
                           preProvisioned:
                             description: PreProvisioned contains how to fetch the
@@ -7585,8 +7628,6 @@ spec:
                                 required:
                                 - issuerRef
                                 type: object
-                            required:
-                            - spec
                             type: object
                         required:
                         - caCertSecret
@@ -9050,6 +9091,11 @@ spec:
                             - key
                             - name
                             type: object
+                          useDefaultAzureCredentials:
+                            description: |-
+                              Use the default Azure authentication flow, which includes DefaultAzureCredential.
+                              This allows authentication using environment variables and managed identities.
+                            type: boolean
                         type: object
                       data:
                         description: |-
@@ -9081,10 +9127,11 @@ spec:
                             description: |-
                               Compress a backup file (a tar file per tablespace) while streaming it
                               to the object store. Available options are empty string (no
-                              compression, default), `gzip`, `bzip2`, and `snappy`.
+                              compression, default), `gzip`, `bzip2`, `lz4`, and `snappy`.
                             enum:
                             - bzip2
                             - gzip
+                            - lz4
                             - snappy
                             type: string
                           encryption:
@@ -11596,17 +11643,14 @@ spec:
 
                           Deprecated: This field is deprecated and will be removed in future versions.
                         type: string
-                    required:
-                    - traceEnable
                     type: object
                   plugins:
                     description: |-
                       The plugins configuration, containing
                       any plugin to be loaded with the corresponding configuration
                     items:
-                      description: |-
-                        PluginConfiguration specifies a plugin that need to be loaded for this
-                        cluster to be reconciled
+                      description: PluginConfiguration specifies a plugin that need
+                        to be loaded for this cluster to be reconciled
                       properties:
                         enabled:
                           default: true
@@ -11929,6 +11973,13 @@ spec:
                             ExtensionConfiguration is the configuration used to add
                             PostgreSQL extensions to the Cluster.
                           properties:
+                            bin_path:
+                              description: |-
+                                A list of directories within the image to be appended to the
+                                PostgreSQL process's `PATH` environment variable.
+                              items:
+                                type: string
+                              type: array
                             dynamic_library_path:
                               description: |-
                                 The list of directories inside the image which should be added to dynamic_library_path.
@@ -11936,6 +11987,45 @@ spec:
                               items:
                                 type: string
                               type: array
+                            env:
+                              description: |-
+                                Env is a list of custom environment variables to be set in the
+                                PostgreSQL process for this extension. It is the responsibility of the
+                                cluster administrator to ensure the variables are correct for the
+                                specific extension. Note that changes to these variables require
+                                a manual cluster restart to take effect.
+                              items:
+                                description: |-
+                                  ExtensionEnvVar defines an environment variable for a specific extension
+                                  image volume.
+                                properties:
+                                  name:
+                                    description: |-
+                                      Name of the environment variable to be injected into the
+                                      PostgreSQL process.
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    type: string
+                                  value:
+                                    description: |-
+                                      Value of the environment variable. EDB Postgres for Kubernetes performs a direct
+                                      replacement of this value, with support for placeholder expansion.
+                                      The ${`image_root`} placeholder resolves to the absolute mount path
+                                      of the extension's volume (e.g., `/extensions/my-extension`). This
+                                      is particularly useful for allowing applications or libraries to
+                                      locate specific directories within the mounted image.
+                                      Unrecognized placeholders are rejected. To include a literal ${...}
+                                      in the value, escape it as $${...}.
+                                    minLength: 1
+                                    type: string
+                                required:
+                                - name
+                                - value
+                                type: object
+                              type: array
+                              x-kubernetes-list-map-keys:
+                              - name
+                              x-kubernetes-list-type: map
                             extension_control_path:
                               description: |-
                                 The list of directories inside the image which should be added to extension_control_path.
@@ -11944,7 +12034,7 @@ spec:
                                 type: string
                               type: array
                             image:
-                              description: The image containing the extension, required
+                              description: The image containing the extension.
                               properties:
                                 pullPolicy:
                                   description: |-
@@ -11964,9 +12054,6 @@ spec:
                                     container images in workload controllers like Deployments and StatefulSets.
                                   type: string
                               type: object
-                              x-kubernetes-validations:
-                              - message: An image reference is required
-                                rule: has(self.reference)
                             ld_library_path:
                               description: The list of directories inside the image
                                 which should be added to ld_library_path.
@@ -11976,10 +12063,9 @@ spec:
                             name:
                               description: The name of the extension, required
                               minLength: 1
-                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              pattern: ^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$
                               type: string
                           required:
-                          - image
                           - name
                           type: object
                         type: array
@@ -13012,8 +13098,8 @@ spec:
                     description: The tablespaces configuration
                     items:
                       description: |-
-                        TablespaceConfiguration is the configuration of a tablespace, and includes
-                        the storage specification for the tablespace
+                        TablespaceConfiguration is the configuration of a tablespace, and includes the storage
+                        specification for the tablespace
                       properties:
                         name:
                           description: The name of the tablespace
@@ -13733,6 +13819,49 @@ spec:
               PGD:
                 description: Last known status of PGD
                 properties:
+                  extensionVersion:
+                    description: ExtensionVersion is the pgd extension version detected
+                      on the raft lead node
+                    type: string
+                  globalNodeGroup:
+                    description: GlobalNodeGroup is the status of the global node
+                      group associated with the PGDGroup
+                    properties:
+                      enableProxyRouting:
+                        description: EnableProxyRouting is true is the node group
+                          allows running PGD Proxies
+                        type: boolean
+                      enableRaft:
+                        description: EnableRaft is true if the node group has a subgroup
+                          raft instance
+                        type: boolean
+                      name:
+                        description: Name is the name of the node group
+                        type: string
+                      routeReaderMaxLag:
+                        description: |-
+                          RouteReaderMaxLag Maximum lag in bytes for node to be considered viable
+                           read-only node
+                        format: int64
+                        type: integer
+                      routeWriterMaxLag:
+                        description: |-
+                          RouteWriterMaxLag Maximum lag in bytes of the new write candidate to be
+                           selected as write leader, if no candidate passes this, there will be no writer
+                           selected automatically
+                        format: int64
+                        type: integer
+                      routeWriterWaitFlush:
+                        description: |-
+                          RouteWriterWaitFlush Whether to wait for replication queue flush before
+                           switching to new leader when using `bdr.routing_leadership_transfer()`
+                        type: boolean
+                      uuid:
+                        description: UUID is the UUID of the group
+                        type: string
+                    required:
+                    - name
+                    type: object
                   nodeGroup:
                     description: NodeGroup is the status of the node group associated
                       with the PGDGroup
@@ -13766,6 +13895,9 @@ spec:
                           RouteWriterWaitFlush Whether to wait for replication queue flush before
                            switching to new leader when using `bdr.routing_leadership_transfer()`
                         type: boolean
+                      uuid:
+                        description: UUID is the UUID of the group
+                        type: string
                     required:
                     - name
                     type: object
