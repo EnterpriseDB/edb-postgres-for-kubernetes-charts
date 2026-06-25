@@ -15,6 +15,7 @@ jobs:
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
       ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-changed }}
       cnpg-gc-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
+      ep4k-lts-standalone-changed: ${{ steps.filter.outputs.ep4k-lts-standalone-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -31,6 +32,8 @@ jobs:
               - 'charts/edb-cloudnativepg-global-cluster/**'
             ep4k-changed:
               - 'charts/edb-postgres-for-kubernetes/**'
+            ep4k-lts-standalone-changed:
+                - 'charts/edb-postgres-for-kubernetes-lts/**'
             ep4k-lts-changed:
               - 'charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/**'
             cnpg-gc-lts-changed:
@@ -256,3 +259,27 @@ jobs:
           kubectl create ns test-ignore
           kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
           kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
+
+  deploy-ep4k-lts-standalone:
+    runs-on: ubuntu-22.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.ep4k-lts-standalone-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: 0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
+      - name: Deploy using helm chart
+        run: |
+          helm upgrade --install edb-pg4k-lts-standalone --namespace postgresql-operator-system \
+          --create-namespace charts/edb-postgres-for-kubernetes-lts \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
+      - name: Deploy a cluster
+        run: |
+          kubectl apply -f hack/samples/ep4k-cluster.yaml
+          PHASE="Cluster in healthy state"
+          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
