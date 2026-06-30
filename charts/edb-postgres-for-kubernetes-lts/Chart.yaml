@@ -24,7 +24,7 @@ version: "0.27.3"
 # It is recommended to use it with quotes.
 appVersion: "1.28.3"
 sources:
-  - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts-lts
+  - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
 keywords:
   - postgresql
   - postgres

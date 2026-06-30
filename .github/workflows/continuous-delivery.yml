@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       pg4k-pgd-changed: ${{ steps.filter.outputs.pg4k-pgd-changed }}
+      pg4k-pgd-ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-changed }}
       cnpg-gc-changed: ${{ steps.filter.outputs.cnpg-gc-changed }}
+      cnpg-gc-ep4k-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
-      ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-changed }}
-      cnpg-gc-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
-      ep4k-lts-standalone-changed: ${{ steps.filter.outputs.ep4k-lts-standalone-changed }}
+      ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-standalone-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -33,7 +33,7 @@ jobs:
             ep4k-changed:
               - 'charts/edb-postgres-for-kubernetes/**'
             ep4k-lts-standalone-changed:
-                - 'charts/edb-postgres-for-kubernetes-lts/**'
+              - 'charts/edb-postgres-for-kubernetes-lts/**'
             ep4k-lts-changed:
               - 'charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/**'
             cnpg-gc-lts-changed:
@@ -67,11 +67,11 @@ jobs:
           PHASE="Cluster in healthy state"
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
-  deploy-ep4k-subcharts:
+  deploy-pg4k-pgd-ep4k-lts:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
-    if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
+    if: needs.change-triage.outputs.pg4k-pgd-ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -162,11 +162,11 @@ jobs:
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
 
-  deploy-cnpg-gc-subcharts:
+  deploy-cnpg-gc-ep4k-lts:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
-    if: needs.change-triage.outputs.cnpg-gc-lts-changed == 'true'
+    if: needs.change-triage.outputs.cnpg-gc-ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -225,11 +225,11 @@ jobs:
           kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
           kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
 
-  deploy-ep4k-subcharts-single-namespace:
+  deploy-pg4k-pgd-ep4k-lts-single-namespace:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
-    if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
+    if: needs.change-triage.outputs.pg4k-pgd-ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -260,11 +260,11 @@ jobs:
           kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
           kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
 
-  deploy-ep4k-lts-standalone:
+  deploy-ep4k-lts:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
-    if: needs.change-triage.outputs.ep4k-lts-standalone-changed == 'true'
+    if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
