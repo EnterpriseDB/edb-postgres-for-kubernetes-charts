@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: edb-postgres-for-kubernetes-lts
+name: edb-postgres-for-kubernetes-lts-1.28
 description: EDB Postgres for Kubernetes Helm Chart for lts version
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application

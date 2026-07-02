@@ -205,7 +205,7 @@ edb-pg4k-pgd-cert-manager                              1/1     1            1   
 edb-pg4k-pgd-cert-manager-cainjector                   1/1     1            1           7m46s
 edb-pg4k-pgd-cert-manager-webhook                      1/1     1            1           7m46s
 edb-pg4k-pgd-edb-postgres-distributed-for-kubernetes   1/1     1            1           7m46s
-edb-pg4k-pgd-edb-postgres-for-kubernetes-lts           1/1     1            1           7m46s
+edb-pg4k-pgd-edb-postgres-for-kubernetes-lts-1.28           1/1     1            1           7m46s
 ```
 
 We can also customize default PGD and PGD proxy image names by setting the following values in the Helm chart.
