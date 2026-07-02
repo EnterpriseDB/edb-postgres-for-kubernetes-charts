@@ -33,7 +33,7 @@ jobs:
             ep4k-changed:
               - 'charts/edb-postgres-for-kubernetes/**'
             ep4k-lts-standalone-changed:
-              - 'charts/edb-postgres-for-kubernetes-lts/**'
+              - 'charts/edb-postgres-for-kubernetes-lts-1.28/**'
             ep4k-lts-changed:
               - 'charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/**'
             cnpg-gc-lts-changed:
@@ -275,7 +275,7 @@ jobs:
       - name: Deploy using helm chart
         run: |
           helm upgrade --install edb-pg4k-lts-standalone --namespace postgresql-operator-system \
-          --create-namespace charts/edb-postgres-for-kubernetes-lts \
+          --create-namespace charts/edb-postgres-for-kubernetes-lts-1.28 \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
       - name: Deploy a cluster
