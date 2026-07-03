@@ -20,7 +20,7 @@ metadata:
   name: postgresql-operator-validating-webhook-configuration
   labels:
     {{- include "edb-postgres-for-kubernetes-lts.labels" . | nindent 4 }}
-  {{- with .Values.rbac.annotations }}
+  {{- with .Values.commonAnnotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
