@@ -20,12 +20,12 @@ type: application
 # The chart version continues the numbering of edb-postgres-for-kubernetes,
 # whose version was 0.27.1 (appVersion 1.28.1) at the point PG4K 1.28
 # branched off into its own LTS release line.
-version: "0.27.2"
+version: "0.27.3"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.28.3"
+appVersion: "1.28.4"
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
 keywords:
