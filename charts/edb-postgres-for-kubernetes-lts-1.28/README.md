@@ -1,8 +1,8 @@
-# edb-postgres-for-kubernetes-lts
+# edb-postgres-for-kubernetes-lts-1.28
 
-![Version: 0.27.3](https://img.shields.io/badge/Version-0.27.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.28.3](https://img.shields.io/badge/AppVersion-1.28.3-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.28.3](https://img.shields.io/badge/AppVersion-1.28.3-informational?style=flat-square)
 
-EDB Postgres for Kubernetes Helm Chart for lts version
+EDB Postgres for Kubernetes Helm Chart for LTS version 1.28
 
 **Homepage:** <https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable>
 
@@ -11,7 +11,7 @@ EDB Postgres for Kubernetes Helm Chart for lts version
 | Name | Email | Url |
 | ---- | ------ | --- |
 | gbartolini | <gabriele.bartolini@enterprisedb.com> |  |
-| jsilvela | <jaime.silvela@enterprisedb.com> |  |
+| mnencia | <marco.nenciarini@enterprisedb.com> |  |
 | litaocdl | <tao.li@enterprisedb.com> |  |
 
 ## Source Code
