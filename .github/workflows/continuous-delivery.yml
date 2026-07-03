@@ -13,8 +13,7 @@ jobs:
       pg4k-pgd-changed: ${{ steps.filter.outputs.pg4k-pgd-changed }}
       cnpg-gc-changed: ${{ steps.filter.outputs.cnpg-gc-changed }}
       ep4k-changed: ${{ steps.filter.outputs.ep4k-changed }}
-      ep4k-lts-changed: ${{ steps.filter.outputs.ep4k-lts-changed }}
-      cnpg-gc-lts-changed: ${{ steps.filter.outputs.cnpg-gc-lts-changed }}
+      ep4k-lts-v128-changed: ${{ steps.filter.outputs.ep4k-lts-v128-changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -31,10 +30,8 @@ jobs:
               - 'charts/edb-cloudnativepg-global-cluster/**'
             ep4k-changed:
               - 'charts/edb-postgres-for-kubernetes/**'
-            ep4k-lts-changed:
-              - 'charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts/**'
-            cnpg-gc-lts-changed:
-              - 'charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts/**'
+            ep4k-lts-v128-changed:
+              - 'charts/edb-postgres-for-kubernetes-lts-1-28/**'
 
   deploy-ep4k:
     runs-on: ubuntu-22.04
@@ -64,11 +61,11 @@ jobs:
           PHASE="Cluster in healthy state"
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
-  deploy-ep4k-subcharts:
+  deploy-ep4k-single-namespace:
     runs-on: ubuntu-22.04
     needs:
       - change-triage
-    if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
+    if: needs.change-triage.outputs.ep4k-changed == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
@@ -78,18 +75,47 @@ jobs:
       - name: Setup kind
         uses: ./.github/actions/setup-kind
 
-      - name: Deploy using helm chart
+      - name: Deploy in single-namespace mode using helm chart
         run: |
-          helm upgrade --install edb-pg4k-lts --namespace postgresql-operator-system \
-          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts \
-          --set image.imageCredentials.create=true \
+          helm upgrade --install edb-pg4k --namespace single-install \
+          --create-namespace charts/edb-postgres-for-kubernetes \
+          --set config.clusterWide=false \
           --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
           --wait --timeout 10m
 
+      - name: Deploy a cluster in the watched namespace
+        run: |
+          kubectl -n single-install apply -f hack/samples/ep4k-cluster.yaml
+          PHASE="Cluster in healthy state"
+          kubectl -n single-install wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
+
+      - name: Ignore deploying a cluster in another namespace
+        run: |
+          kubectl create ns test-ignore
+          kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
+          kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
+
+  deploy-ep4k-lts:
+    runs-on: ubuntu-22.04
+    needs:
+      - change-triage
+    if: needs.change-triage.outputs.ep4k-lts-v128-changed == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+        with:
+          fetch-depth: 0
+      - name: Setup kind
+        uses: ./.github/actions/setup-kind
+      - name: Deploy using helm chart
+        run: |
+          helm upgrade --install edb-pg4k-lts-standalone --namespace postgresql-operator-system \
+          --create-namespace charts/edb-postgres-for-kubernetes-lts-1-28 \
+          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
+          --wait --timeout 10m
       - name: Deploy a cluster
         run: |
           kubectl apply -f hack/samples/ep4k-cluster.yaml
-
           PHASE="Cluster in healthy state"
           kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
 
@@ -158,101 +184,3 @@ jobs:
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-a
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-b
           kubectl wait --timeout=8m --for=jsonpath='{.status.phase}'="$PHASE" pgdgroups/region-c
-
-  deploy-cnpg-gc-subcharts:
-    runs-on: ubuntu-22.04
-    needs:
-      - change-triage
-    if: needs.change-triage.outputs.cnpg-gc-lts-changed == 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
-        with:
-          fetch-depth: 0
-
-      - name: Setup kind
-        uses: ./.github/actions/setup-kind
-
-      - name: Deploy using helm chart
-        run: |
-          helm upgrade --install edb-pg4k-lts --namespace postgresql-operator-system \
-          --create-namespace charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts \
-          --set image.imageCredentials.create=true \
-          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
-          --wait --timeout 10m
-
-      - name: Deploy a cluster
-        run: |
-          kubectl apply -f hack/samples/ep4k-cluster.yaml
-
-          PHASE="Cluster in healthy state"
-          kubectl wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
-
-  deploy-ep4k-single-namespace:
-    runs-on: ubuntu-22.04
-    needs:
-      - change-triage
-    if: needs.change-triage.outputs.ep4k-changed == 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
-        with:
-          fetch-depth: 0
-
-      - name: Setup kind
-        uses: ./.github/actions/setup-kind
-
-      - name: Deploy in single-namespace mode using helm chart
-        run: |
-          helm upgrade --install edb-pg4k --namespace single-install \
-          --create-namespace charts/edb-postgres-for-kubernetes \
-          --set config.clusterWide=false \
-          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
-          --wait --timeout 10m
-
-      - name: Deploy a cluster in the watched namespace
-        run: |
-          kubectl -n single-install apply -f hack/samples/ep4k-cluster.yaml
-          PHASE="Cluster in healthy state"
-          kubectl -n single-install wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
-
-      - name: Ignore deploying a cluster in another namespace
-        run: |
-          kubectl create ns test-ignore
-          kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
-          kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'
-
-  deploy-ep4k-subcharts-single-namespace:
-    runs-on: ubuntu-22.04
-    needs:
-      - change-triage
-    if: needs.change-triage.outputs.ep4k-lts-changed == 'true'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
-        with:
-          fetch-depth: 0
-
-      - name: Setup kind
-        uses: ./.github/actions/setup-kind
-
-      - name: Deploy in single-namespace mode using helm chart use different namespace
-        run: |
-          helm upgrade --install edb-pg4k-lts --namespace single-install \
-          --set config.clusterWide=false \
-          --create-namespace charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts \
-          --set image.imageCredentials.create=true \
-          --set image.imageCredentials.password=${{ secrets.CS_PASSWORD }} \
-          --wait --timeout 10m
-
-      - name: Deploy a cluster in the watched namespace
-        run: |
-          kubectl -n single-install apply -f hack/samples/ep4k-cluster.yaml
-          PHASE="Cluster in healthy state"
-          kubectl -n single-install wait --timeout=5m --for=jsonpath='{.status.phase}'="$PHASE" clusters/cluster-example
-
-      - name: Ignore deploying a cluster in another namespace
-        run: |
-          kubectl create ns test-ignore
-          kubectl -n test-ignore apply -f hack/samples/ep4k-cluster.yaml
-          kubectl -n test-ignore get pods 2>&1 >/dev/null | grep 'No resources found'

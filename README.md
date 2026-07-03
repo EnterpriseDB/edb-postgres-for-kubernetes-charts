@@ -7,6 +7,11 @@ Helm charts to install the following Operators:
    supported Kubernetes cluster running in private, public, or hybrid cloud
    environments. Derived from CloudNativePG's Helm chart.
 
+- [EDB Postgres for Kubernetes operator for LTS version 1.28 (PG4K LTS v1.28)](https://docs.enterprisedb.io/edb-postgres-for-kubernetes/),
+   designed by EnterpriseDB to manage PostgreSQL workloads on any
+   supported Kubernetes cluster running in private, public, or hybrid cloud
+   environments. Derived from CloudNativePG's Helm chart.
+
 - [EDB CloudNativePG Global Cluster (PG4K-PGD version 2.x)](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
    designed by EnterpriseDB to manage EDB Postgres Distributed v6 workloads
    on Kubernete
@@ -20,6 +25,7 @@ Helm charts to install the following Operators:
 | Chart | Operator | Operand | Description |
 |-------|----------|---------|-------------|
 | `edb-postgres-for-kubernetes` | PG4K | EDB Postgres | Single-cluster PostgreSQL |
+| `edb-postgres-for-kubernetes-lts-1-28` | PG4K LTS v1.28 | EDB Postgres | Single-cluster PostgreSQL |
 | `edb-postgres-distributed-for-kubernetes` | PG4K-PGD 1.x | PGD 5 + PGD Proxy | Multi-region distributed PostgreSQL |
 | `edb-cloudnativepg-global-cluster` | PG4K-PGD 2.x | PGD 6 | Multi-region distributed PostgreSQL |
 
