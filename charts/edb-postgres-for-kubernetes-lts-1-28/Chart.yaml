@@ -17,6 +17,9 @@ name: edb-postgres-for-kubernetes-lts-1-28
 description: EDB Postgres for Kubernetes Helm Chart for LTS version 1.28
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
+# The chart version continues the numbering of edb-postgres-for-kubernetes,
+# whose version was 0.27.1 (appVersion 1.28.1) at the point PG4K 1.28
+# branched off into its own LTS release line.
 version: "0.27.2"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
