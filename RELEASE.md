@@ -1,6 +1,7 @@
 # Release Process
 
-This repo contains three helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
+This repo contains four helm charts: [edb-postgres-for-kubernetes](./charts/edb-postgres-for-kubernetes)
+, [edb-postgres-for-kubernetes-lts-1-28](./charts/edb-postgres-for-kubernetes-lts-1-28)
 , [edb-postgres-distributed-for-kubernetes](./charts/edb-postgres-distributed-for-kubernetes), and
 [edb-cloudnativepg-global-cluster](./charts/edb-cloudnativepg-global-cluster).
 All the charts are available through a single [repository](http://enterprisedb.github.io/edb-postgres-for-kubernetes-charts),
@@ -12,10 +13,16 @@ release of each EDB operator.
 I.e., even if we have several supported release
 branches, we will only target the most advanced point release.
 
+**Exception**: `edb-postgres-for-kubernetes-lts-1-28` tracks the PG4K `1.28.x`
+LTS line specifically, not the overall latest PG4K release. When releasing
+this chart, always target the latest point release **within the `1.28.x`
+series**, never the newest tag across all lines.
+
 ## Charts
 
 1. [Releasing the `edb-postgres-for-kubernetes` chart](#releasing-the-edb-postgres-for-kubernetes-chart)
-2. [Releasing the `edb-postgres-distributed-for-kubernetes` or `edb-cloudnativepg-global-cluster` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
+2. [Releasing the `edb-postgres-for-kubernetes-lts-1-28` chart](#releasing-the-edb-postgres-for-kubernetes-lts-1-28-chart)
+3. [Releasing the `edb-postgres-distributed-for-kubernetes` or `edb-cloudnativepg-global-cluster` chart](#releasing-the-edb-postgres-distributed-for-kubernetes-chart)
 
 ## Releasing the `edb-postgres-for-kubernetes` chart
 
@@ -147,6 +154,109 @@ follow these steps:
     ```
 
     and be able to see the new version `X.Y.Z` as `CHART VERSION` for `edb-postgres-for-kubernetes`
+
+## Releasing the `edb-postgres-for-kubernetes-lts-1-28` chart
+
+This chart packages the EDB Postgres for Kubernetes (PG4K) operator for the
+`1.28.x` LTS line specifically. Unlike `edb-postgres-for-kubernetes`, it must
+**never** track the overall latest PG4K release: only point releases within
+the `1.28.x` series.
+
+To create a new release of the `edb-postgres-for-kubernetes-lts-1-28` chart,
+follow these steps:
+
+1. Check the current chart version by inspecting the `version` field in
+   `charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml`.
+
+    ```bash
+    OLD_VERSION=$(yq -r '.version' charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml)
+    OLD_PG4K_VERSION=$(yq -r '.appVersion' charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml)
+    echo $OLD_VERSION
+    ```
+
+2. Determine the next chart version based on the type of update in the
+   PG4K `1.28.x` release, following semantic versioning best practices.
+   For reference, use `X.Y.Z` as the new version.
+
+    ```bash
+    NEW_VERSION="X.Y.Z"
+    ```
+
+3. Create a branch named `release/edb-postgres-for-kubernetes-lts-1-28-vX.Y.Z`
+    and switch to it
+
+    ```bash
+    git switch --create release/edb-postgres-for-kubernetes-lts-1-28-v$NEW_VERSION
+    ```
+
+4. Update the `.version` in `charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml` to `"X.Y.Z"`
+
+    ```bash
+    sed -i -E "s/^version: \"([0-9]+.?)+\"/version: \"$NEW_VERSION\"/" charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml
+    ```
+
+5. Update everything else as required, if releasing due to a new
+    PG4K `1.28.x` point release, you might want to:
+
+    1. Find the latest PG4K version **within the `1.28.x` line** by running:
+
+        ```bash
+        NEW_PG4K_VERSION=$(
+          gh api "https://api.github.com/repos/EnterpriseDB/cloud-native-postgres/tags" --paginate | \
+          jq -r '[.[] | select(.name | test("^v1\\.28\\.[0-9]+$"))][0].name | ltrimstr("v")')
+        echo $NEW_PG4K_VERSION
+        ```
+
+        Do **not** reuse the `edb-postgres-for-kubernetes` command above
+        unmodified: without the `1.28.x` filter it returns the newest tag
+        across all lines, which would silently jump this chart to a newer
+        minor version and defeat the purpose of having a dedicated LTS chart.
+
+    2. Update `.appVersion` in [Chart.yaml](./charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml)
+        file
+
+        ```bash
+        sed -i -E "s/^appVersion: \"([0-9]+.?)+\"/appVersion: \"$NEW_PG4K_VERSION\"/" \
+          charts/edb-postgres-for-kubernetes-lts-1-28/Chart.yaml
+        ```
+
+    3. Update [crds.yaml](./charts/edb-postgres-for-kubernetes-lts-1-28/templates/crds/crds.yaml),
+        which can be built using
+        [kustomize](https://kustomize.io/) from the [PG4K repo](https://github.com/EnterpriseDB/cloud-native-postgres)
+        using kustomize [remoteBuild](https://github.com/kubernetes-sigs/kustomize/blob/master/examples/remoteBuild.md)
+        running:
+
+        ```bash
+        echo '{{- if .Values.crds.create }}' > ./charts/edb-postgres-for-kubernetes-lts-1-28/templates/crds/crds.yaml
+        kustomize build https://github.com/EnterpriseDB/cloud-native-postgres/config/helm/\?ref\=v$NEW_PG4K_VERSION >> ./charts/edb-postgres-for-kubernetes-lts-1-28/templates/crds/crds.yaml
+        echo '{{- end }}' >> ./charts/edb-postgres-for-kubernetes-lts-1-28/templates/crds/crds.yaml
+        ```
+
+    4. To update the files in the [templates](./charts/edb-postgres-for-kubernetes-lts-1-28/templates)
+        directory, diff the RBAC/manager/webhook manifests between the old and
+        new PG4K version. The most reliable way is to check out the
+        `EnterpriseDB/cloud-native-postgres` repo at both tags and run
+        `kustomize build config/default` for each, then diff the two outputs
+        and apply only the genuine upstream differences.
+
+        Do not copy RBAC or values wholesale from the embedded
+        `edb-postgres-for-kubernetes-lts` subcharts in
+        `edb-postgres-distributed-for-kubernetes` or
+        `edb-cloudnativepg-global-cluster`: their RBAC has historically
+        diverged from what the operator itself actually requires.
+
+    5. Update [values.yaml](./charts/edb-postgres-for-kubernetes-lts-1-28/values.yaml) if needed
+
+       NOTE: updating `values.yaml` just for the PG4K version is not necessary,
+       as the value should default to the `appVersion` in `Chart.yaml`
+
+6. From here onward, you can follow the steps of [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart),
+   starting from step 6.
+
+**IMPORTANT**: Take care to replace `edb-postgres-for-kubernetes` with
+`edb-postgres-for-kubernetes-lts-1-28` accordingly before executing the commands,
+and to keep using the `1.28.x`-filtered tag lookup from step 5.1 above rather
+than the plain latest-tag lookup.
 
 ## Releasing the `edb-postgres-distributed-for-kubernetes` chart
 
