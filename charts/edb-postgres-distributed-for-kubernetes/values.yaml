@@ -174,11 +174,11 @@ affinity: {}
 cert-manager:
   enabled: true
   installCRDs: true
-# edb-postgres-for-kubernetes-lts subcharts
-edb-postgres-for-kubernetes-lts:
+# edb-postgres-for-kubernetes-lts-1-28 chart
+edb-postgres-for-kubernetes-lts-1-28:
   enabled: true
   image:
-    # -- Specifies the repository of the pg4k operator image, this will overwrite the global repository
-    repository: ""
+    imageCredentials:
+      create: false
   crds:
     create: true

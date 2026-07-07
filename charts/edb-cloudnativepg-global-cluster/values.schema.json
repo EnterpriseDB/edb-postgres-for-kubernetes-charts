@@ -97,7 +97,7 @@
         "dnsPolicy": {
             "type": "string"
         },
-        "edb-postgres-for-kubernetes-lts": {
+        "edb-postgres-for-kubernetes-lts-1-28": {
             "type": "object",
             "properties": {
                 "crds": {
@@ -114,8 +114,13 @@
                 "image": {
                     "type": "object",
                     "properties": {
-                        "repository": {
-                            "type": "string"
+                        "imageCredentials": {
+                            "type": "object",
+                            "properties": {
+                                "create": {
+                                    "type": "boolean"
+                                }
+                            }
                         }
                     }
                 }
