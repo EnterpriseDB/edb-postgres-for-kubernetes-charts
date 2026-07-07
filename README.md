@@ -14,7 +14,7 @@ Helm charts to install the following Operators:
 
 - [EDB CloudNativePG Global Cluster (PG4K-PGD version 2.x)](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
    designed by EnterpriseDB to manage EDB Postgres Distributed v6 workloads
-   on Kubernete
+   on Kubernetes
 
 - [EDB Postgres Distributed for Kubernetes (PG4K-PGD) version 1.x](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/),
    designed by EnterpriseDB to manage EDB Postgres Distributed v5 workloads
@@ -167,7 +167,7 @@ helm upgrade --dependency-update \
 ### Migrate from PG4K-PGD 1.x to PG4K-PGD 2.x
 
 The helm chart `edb-postgres-distributed-for-kubernetes` and `edb-cloudnativepg-global-cluster` is
-not backword compatible, and they can't be installed together in the same cluster. If you have an
+not backward compatible, and they can't be installed together in the same cluster. If you have an
 existing `edb-postgres-distributed-for-kubernetes` chart managing the PGD v5.x workloads,
 and want to migrate to PGD v6.x workloads, you need uninstall the `edb-postgres-distributed-for-kubernetes` chart
 and then install the `edb-cloudnativepg-global-cluster` chart first.

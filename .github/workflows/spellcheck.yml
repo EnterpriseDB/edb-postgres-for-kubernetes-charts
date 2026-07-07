@@ -1,0 +1,16 @@
+name: spellcheck
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  # Enforce en-us spell check
+  spellcheck:
+    name: Run spellcheck
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Spellcheck
+        uses: rojopolis/spellcheck-github-actions@0.60.0
