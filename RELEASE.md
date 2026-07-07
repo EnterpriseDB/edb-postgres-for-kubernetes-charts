@@ -250,13 +250,48 @@ follow these steps:
        NOTE: updating `values.yaml` just for the PG4K version is not necessary,
        as the value should default to the `appVersion` in `Chart.yaml`
 
-6. From here onward, you can follow the steps of [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart),
-   starting from step 6.
 
-**IMPORTANT**: Take care to replace `edb-postgres-for-kubernetes` with
-`edb-postgres-for-kubernetes-lts-1-28` accordingly before executing the commands,
-and to keep using the `1.28.x`-filtered tag lookup from step 5.1 above rather
-than the plain latest-tag lookup.
+6. Run `make docs schema` to regenerate the docs and the values schema as needed
+
+    ```bash
+    make docs schema
+    ```
+
+7. Commit and add the relevant information you wish in the commit message.
+
+    ```bash
+    git add -p .
+    git commit -S -s -m "Release edb-postgres-for-kubernetes-lts-1-28-v$NEW_VERSION" --edit
+    ```
+
+8. Push the new branch
+
+    ```bash
+    git push --set-upstream origin release/edb-postgres-for-kubernetes-lts-1-28-v$NEW_VERSION
+    ```
+
+9. A PR named `Release edb-postgres-for-kubernetes-lts-1-28-vX.Y.Z` should be
+   automatically created
+10. Wait for all the checks to pass
+11. Two approvals are required to merge the PR.
+    If you are a maintainer, you may approve the PR yourself and request an additional approval
+    from another maintainer.
+    Otherwise, request two approvals from maintainers.
+12. Merge the PR squashing all commits and **taking care to keep the commit message to be
+    `Release edb-postgres-for-kubernetes-lts-1-28-vX.Y.Z`**
+13. A release `edb-postgres-for-kubernetes-lts-1-28-vX.Y.Z` should be automatically created by an action,
+    which will then trigger the release action.
+    Verify they both are successful.
+14. Once done, you should be able to run:
+
+    ```bash
+    helm repo add edb https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts
+    helm repo update
+    helm search repo edb
+    ```
+
+    and be able to see the new version `X.Y.Z` as `CHART VERSION` for `edb-postgres-for-kubernetes-lts-1-28`
+
 
 ## Releasing the `edb-postgres-distributed-for-kubernetes` chart
 
