@@ -97,7 +97,7 @@
         "dnsPolicy": {
             "type": "string"
         },
-        "edb-postgres-for-kubernetes-lts-1-28": {
+        "edb-postgres-for-kubernetes-lts": {
             "type": "object",
             "properties": {
                 "crds": {

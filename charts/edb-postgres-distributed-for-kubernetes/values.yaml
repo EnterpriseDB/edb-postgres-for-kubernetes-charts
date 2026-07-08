@@ -174,8 +174,8 @@ affinity: {}
 cert-manager:
   enabled: true
   installCRDs: true
-# edb-postgres-for-kubernetes-lts-1-28 chart
-edb-postgres-for-kubernetes-lts-1-28:
+# edb-postgres-for-kubernetes-lts chart
+edb-postgres-for-kubernetes-lts:
   enabled: true
   image:
     imageCredentials:

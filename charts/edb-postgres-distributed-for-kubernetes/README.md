@@ -25,7 +25,7 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
-| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts | edb-postgres-for-kubernetes-lts-1-28 | 0.27.3 |
+| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts | edb-postgres-for-kubernetes-lts(edb-postgres-for-kubernetes-lts-1-28) | 0.27.3 |
 
 ## Values
 
@@ -46,9 +46,9 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":10001,"runAsUser":10001}` | Container Security Context |
 | crds.create | bool | `true` |  |
 | dnsPolicy | string | `""` |  |
-| edb-postgres-for-kubernetes-lts-1-28.crds.create | bool | `true` |  |
-| edb-postgres-for-kubernetes-lts-1-28.enabled | bool | `true` |  |
-| edb-postgres-for-kubernetes-lts-1-28.image.imageCredentials.create | bool | `false` |  |
+| edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
+| edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
+| edb-postgres-for-kubernetes-lts.image.imageCredentials.create | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"pgdImageName":"postgresql-pgd:17.10-pgd594-ubi9","proxyImageName":"edb-pgd-proxy:5.9.4-ubi9","repository":"docker.enterprisedb.com/k8s"}` | Global values |
 | global.pgdImageName | string | `"postgresql-pgd:17.10-pgd594-ubi9"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
