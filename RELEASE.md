@@ -239,12 +239,6 @@ follow these steps:
         `kustomize build config/default` for each, then diff the two outputs
         and apply only the genuine upstream differences.
 
-        Do not copy RBAC or values wholesale from the embedded
-        `edb-postgres-for-kubernetes-lts` subcharts in
-        `edb-postgres-distributed-for-kubernetes` or
-        `edb-cloudnativepg-global-cluster`: their RBAC has historically
-        diverged from what the operator itself actually requires.
-
     5. Update [values.yaml](./charts/edb-postgres-for-kubernetes-lts-1-28/values.yaml) if needed
 
        NOTE: updating `values.yaml` just for the PG4K version is not necessary,
