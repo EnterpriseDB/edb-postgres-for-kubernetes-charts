@@ -1,6 +1,6 @@
 ## Update chart's Docs and Schemas
 
-SPELL_CHECK_VERSION = 0.60.0
+SPELL_CHECK_VERSION = 0.63.0
 
 docs:
 ifeq (, $(shell which helm-docs))
