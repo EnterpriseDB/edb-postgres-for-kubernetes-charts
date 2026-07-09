@@ -47,10 +47,11 @@ EDB CloudNativePG Global Cluster Helm Chart
 | edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.image.imageCredentials.create | bool | `false` |  |
+| edb-postgres-for-kubernetes-lts.image.repository | string | `"docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg"` | Specifies the repository of the PG4K operator image |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"pgdImageName":"postgresql-pgd:18.4-pgd640-expanded-ubi9","repository":"docker.enterprisedb.com/k8s"}` | Global values |
 | global.pgdImageName | string | `"postgresql-pgd:18.4-pgd640-expanded-ubi9"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
-| global.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the operator and operand image to be downloaded from |
+| global.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the PG4K-PGD operator and operand image to be downloaded from |
 | hostNetwork | bool | `false` |  |
 | image | object | `{"imageCredentials":{"create":true,"name":"edb-pull-secret","password":"","registry":"docker.enterprisedb.com","username":"k8s"},"imageName":"edb-postgres-for-cloudnativepg-global-cluster","imagePullPolicy":"IfNotPresent","imageTag":"","repository":""}` | operator image configuration |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |

@@ -116,6 +116,9 @@
                                     "type": "boolean"
                                 }
                             }
+                        },
+                        "repository": {
+                            "type": "string"
                         }
                     }
                 }

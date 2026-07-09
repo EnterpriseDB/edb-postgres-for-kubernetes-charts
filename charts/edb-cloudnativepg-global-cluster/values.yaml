@@ -19,7 +19,7 @@
 replicaCount: 1
 # -- Global values
 global:
-  # -- Specifies the repository where the operator and operand image to be downloaded from
+  # -- Specifies the repository where the PG4K-PGD operator and operand image to be downloaded from
   repository: docker.enterprisedb.com/k8s
   # -- Specifies the pgd image name to be used for the operator, the image will be downloaded from
   # global repository
@@ -174,6 +174,8 @@ cert-manager:
 edb-postgres-for-kubernetes-lts:
   enabled: true
   image:
+    # -- Specifies the repository of the PG4K operator image
+    repository: docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg
     imageCredentials:
       create: false
   crds:

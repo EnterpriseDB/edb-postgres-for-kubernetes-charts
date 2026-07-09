@@ -179,9 +179,9 @@ edb-pg4k-pgd-edb-postgres-distributed-for-kubernetes   1/1     1            1   
 edb-pg4k-pgd-edb-postgres-for-kubernetes-lts-1-28           1/1     1            1           7m46s
 ```
 
-### Customizing default image names
+### Customizing default operand image names
 
-We can also customize default PGD and PGD proxy image names by setting the following values in the Helm chart.
+We can customize default PGD and PGD proxy image names by setting the following values in the Helm chart.
 PGD groups created without `spec.imageName` and `spec.pgdProxy.imageName` will use those defaults.
 
 - `pgdImageName`: the default PGD image name to be used by the operator.
@@ -202,6 +202,33 @@ helm upgrade --dependency-update \
 
 **Note:** You can find the latest released image catalogs for operand from
 [PGD Operand images](https://www.enterprisedb.com/docs/postgres_distributed_for_kubernetes/latest/supported_versions/#pgd-operand-images)
+
+### Customizing image repository for air-gapped environments
+
+When installing in the air-gapped environment, you can customize the image repository by setting
+the `global.repository` values in the Helm chart. Once this value is set, the PG4K-PGD operator image,
+PGD operand image, and PGD Proxy operand image will all be pulled from the specified repository.
+
+You can also customize the image repository for PG4K operator by setting the
+`edb-postgres-for-kubernetes-lts.image.repository` value in the Helm chart.
+
+
+```console
+helm upgrade --install edb-pg4k-pgd \
+  --namespace pgd-operator-system \
+  --create-namespace \
+  --set global.repository=another_registry \
+  --set edb-postgres-for-kubernetes-lts.image.repository=another_registry/edb-postgres-for-cloudnativepg \
+  --set image.imageCredentials.password=<THE-TOKEN> \
+  --set cert-manager.enabled=false \
+  charts/edb-postgres-distributed-for-kubernetes
+```
+
+**Note:** When customizing for air-gapped environments, ensure both repositories share the same base registry:
+- `global.repository` is used to set the repository for `PG4K-PGD operator image`, `PGD operand image`, and `PGD Proxy operand image`. You need to use the name of the repository only, without the image name. The default value is `docker.enterprisedb.com/k8s`.
+- `edb-postgres-for-kubernetes-lts.image.repository` is used to set the repository for `PG4K operator image`. You need to use the full path including the image name (e.g., `another_registry/edb-postgres-for-cloudnativepg`). The default value is `docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg`.
+
+The PG4K operator repository must be set separately because the subchart doesn't automatically inherit from `global.repository`.
 
 ### Migrate from PG4K-PGD 1.x to PG4K-PGD 2.x
 
