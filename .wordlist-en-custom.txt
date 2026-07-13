@@ -39,6 +39,7 @@ failureThreshold
 fullname
 fullnameOverride
 gbartolini
+gapped
 healthProbeBindAddress
 hostNetwork
 imageCredentials

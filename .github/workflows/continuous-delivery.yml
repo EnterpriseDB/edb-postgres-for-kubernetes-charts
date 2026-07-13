@@ -135,7 +135,6 @@ jobs:
 
       - name: Deploy using helm chart
         run: |
-          helm dependency build charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts
           helm dependency build charts/edb-postgres-distributed-for-kubernetes
           helm upgrade --install edb-pg4k-pgd --namespace pgd-operator-system \
           --create-namespace charts/edb-postgres-distributed-for-kubernetes  \
@@ -168,7 +167,6 @@ jobs:
 
       - name: Deploy using helm chart
         run: |
-          helm dependency build charts/edb-cloudnativepg-global-cluster/charts/edb-postgres-for-kubernetes-lts
           helm dependency build charts/edb-cloudnativepg-global-cluster
           helm upgrade --install edb-cnpg-gc --namespace pgd-operator-system \
           --create-namespace charts/edb-cloudnativepg-global-cluster  \
