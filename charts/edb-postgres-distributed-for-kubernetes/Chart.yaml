@@ -28,9 +28,11 @@ dependencies:
     condition: cert-manager.enabled
     version: "1.16.1"
     repository: "https://charts.jetstack.io"
-  - name: "edb-postgres-for-kubernetes-lts"
+  - name: "edb-postgres-for-kubernetes-lts-1-28"
+    alias: "edb-postgres-for-kubernetes-lts"
     condition: edb-postgres-for-kubernetes-lts.enabled
-    version: "0.28.3"
+    version: "0.27.3"
+    repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts"
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
 keywords:

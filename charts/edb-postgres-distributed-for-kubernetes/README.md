@@ -24,8 +24,8 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | edb-postgres-for-kubernetes-lts | 0.28.3 |
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
+| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts | edb-postgres-for-kubernetes-lts(edb-postgres-for-kubernetes-lts-1-28) | 0.27.3 |
 
 ## Values
 
@@ -48,12 +48,13 @@ EDB Postgres Distributed for Kubernetes Helm Chart
 | dnsPolicy | string | `""` |  |
 | edb-postgres-for-kubernetes-lts.crds.create | bool | `true` |  |
 | edb-postgres-for-kubernetes-lts.enabled | bool | `true` |  |
-| edb-postgres-for-kubernetes-lts.image.repository | string | `""` | Specifies the repository of the pg4k operator image, this will overwrite the global repository |
+| edb-postgres-for-kubernetes-lts.image.imageCredentials.create | bool | `false` |  |
+| edb-postgres-for-kubernetes-lts.image.repository | string | `"docker.enterprisedb.com/k8s/edb-postgres-for-cloudnativepg"` | Specifies the repository of the PG4K operator image |
 | fullnameOverride | string | `""` |  |
 | global | object | `{"pgdImageName":"postgresql-pgd:17.10-pgd594-ubi9","proxyImageName":"edb-pgd-proxy:5.9.4-ubi9","repository":"docker.enterprisedb.com/k8s"}` | Global values |
 | global.pgdImageName | string | `"postgresql-pgd:17.10-pgd594-ubi9"` | Specifies the pgd image name to be used for the operator, the image will be downloaded from global repository |
 | global.proxyImageName | string | `"edb-pgd-proxy:5.9.4-ubi9"` | Specifies the pgd-proxy image name to be used for the operator, the image will be downloaded from global repository |
-| global.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the operator and operand image to be downloaded from |
+| global.repository | string | `"docker.enterprisedb.com/k8s"` | Specifies the repository where the PG4K-PGD operator and operand image to be downloaded from |
 | hostNetwork | bool | `false` |  |
 | image | object | `{"imageCredentials":{"create":true,"name":"edb-pull-secret","password":"","registry":"docker.enterprisedb.com","username":"k8s"},"imageName":"edb-postgres-for-cloudnativepg-global-cluster","imagePullPolicy":"IfNotPresent","imageTag":"","repository":""}` | operator image configuration |
 | image.imageCredentials.create | bool | `true` | Specifies if an imagePullSecret should be created |

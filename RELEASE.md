@@ -391,13 +391,8 @@ follow these steps:
     8. Update dependent `cert-manager` version in
        [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml) if needed
 
-    9. Update the `.appVersion` and `.version` in subchart
-       [edb-postgres-for-kubernetes-lts](./charts/edb-postgres-distributed-for-kubernetes/charts/edb-postgres-for-kubernetes-lts)
-       and follow the [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart)
-       to update the subchart to latest PG4K lts release if needed
-
-    10. Update dependent `edb-postgres-for-kubernetes-lts` version in
-       [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml)
+    9. Update dependent `edb-postgres-for-kubernetes-lts-1-28` version in
+       [Chart.yaml](./charts/edb-postgres-distributed-for-kubernetes/Chart.yaml) if needed
 
 6. From here onward, you can follow the steps of [PG4K Release](#releasing-the-edb-postgres-for-kubernetes-chart),
    starting from step 6.

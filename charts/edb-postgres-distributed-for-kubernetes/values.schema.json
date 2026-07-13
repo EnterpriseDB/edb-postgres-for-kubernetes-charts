@@ -109,6 +109,14 @@
                 "image": {
                     "type": "object",
                     "properties": {
+                        "imageCredentials": {
+                            "type": "object",
+                            "properties": {
+                                "create": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
                         "repository": {
                             "type": "string"
                         }
