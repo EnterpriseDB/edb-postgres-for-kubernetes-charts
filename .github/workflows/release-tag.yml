@@ -27,12 +27,18 @@ jobs:
           enforce_admins: false
       -
         name: Create tag
-        if: github.event.pull_request.merged == true && startsWith(${{ github.head_ref }}, "release/")
+        id: create_tag
+        if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')
         uses: christophebedard/tag-version-commit@v1.7.0
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
-          version_regex: '^Release ([a-z-]+-v[0-9]+\.[0-9]+\.[0-9]+)'
+          version_regex: '^Release ([a-z0-9-]+-v[0-9]+\.[0-9]+\.[0-9]+)'
           dry_run: false
+      - name: Fail if tag was not created
+        if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/') && steps.create_tag.outputs.tag == ''
+        run: |
+          echo "::error::Commit title did not match version regex — no tag was created."
+          exit 1
       -
         name: Enable "include administrators" branch protection
         uses: benjefferies/branch-protection-bot@v1.1.2
