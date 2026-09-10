@@ -3,3 +3,5 @@
 # https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/about-code-owners
 
 * @EnterpriseDB/cloud-native-admins
+charts/edb-postgres-distributed-for-kubernetes/ @EnterpriseDB/pg4k-pgd-dev
+charts/edb-cloudnativepg-global-cluster/ @EnterpriseDB/pg4k-pgd-dev
