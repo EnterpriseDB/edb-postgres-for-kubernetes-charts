@@ -316,6 +316,47 @@ entries:
     version: 0.3.2
   edb-cloudnativepg-global-cluster:
   - apiVersion: v2
+    appVersion: 2.1.0
+    created: "2026-09-16T12:04:19.9885712Z"
+    dependencies:
+    - condition: cert-manager.enabled
+      name: cert-manager
+      repository: https://charts.jetstack.io
+      version: 1.16.1
+    - alias: edb-postgres-for-kubernetes-lts
+      condition: edb-postgres-for-kubernetes-lts.enabled
+      name: edb-postgres-for-kubernetes-lts-1-28
+      repository: https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts
+      version: 0.27.3
+    description: EDB CloudNativePG Global Cluster Helm Chart
+    digest: bb79bf5b5cf325dfaece09a5eda38c6a26d3b1f8f1bf2e0dfe593829b4355541
+    home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
+    icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
+    keywords:
+    - pgd
+    - distributed
+    - postgresql
+    - postgres
+    - database
+    - edb
+    - enterprisedb
+    maintainers:
+    - email: gabriele.bartolini@enterprisedb.com
+      name: gbartolini
+    - email: tao.li@enterprisedb.com
+      name: litaocdl
+    - email: niccolo.fei@enterprisedb.com
+      name: NiccoloFei
+    - email: yantian.hu@enterprisedb.com
+      name: YanniHu1996
+    name: edb-cloudnativepg-global-cluster
+    sources:
+    - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
+    type: application
+    urls:
+    - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-cloudnativepg-global-cluster-2.0.3.tgz
+    version: 2.0.3
+  - apiVersion: v2
     appVersion: 2.0.1
     created: "2026-09-16T11:49:04.493790403Z"
     dependencies:
@@ -439,7 +480,7 @@ entries:
   edb-postgres-distributed-for-kubernetes:
   - apiVersion: v2
     appVersion: 1.2.2
-    created: "2026-09-16T11:49:04.514010236Z"
+    created: "2026-09-16T12:04:20.009888345Z"
     dependencies:
     - condition: cert-manager.enabled
       name: cert-manager
@@ -451,7 +492,7 @@ entries:
       repository: https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts
       version: 0.27.3
     description: EDB Postgres Distributed for Kubernetes Helm Chart
-    digest: b2ec7e6f631db902f2c4ae18c13c004d4b929bc14339f1041ab9184761bd4f9e
+    digest: 80d1bb19273b70dfe4c113c768e3ef1c1200f339fa7be7f59472f70877eb88b7
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -1131,9 +1172,9 @@ entries:
   edb-postgres-for-kubernetes:
   - apiVersion: v2
     appVersion: 1.30.0
-    created: "2026-09-16T11:49:04.519547618Z"
+    created: "2026-09-16T12:04:20.015547225Z"
     description: EDB Postgres for Kubernetes Helm Chart
-    digest: 380c93f2feb0747cc88a6447a1683f49a12fb62b0679a69c4c95af43cd83cd51
+    digest: 0c2743924318a2a20744c5a9cdcfbf8306e8df270485292f29a08c7a11821b4e
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -1859,9 +1900,9 @@ entries:
   edb-postgres-for-kubernetes-lts-1-28:
   - apiVersion: v2
     appVersion: 1.28.4
-    created: "2026-09-16T11:49:04.525327845Z"
+    created: "2026-09-16T12:04:20.025685167Z"
     description: EDB Postgres for Kubernetes Helm Chart for LTS version 1.28
-    digest: f2bda335f20b3c049f80cda0260d830142019899d629055da9562ab7f59df1c1
+    digest: d5e0cfb14dbc5cc09c4613a24ed81be527c371e9d3bdf191ad2dabf93d8b5a1e
     home: https://www.enterprisedb.com/products/postgresql-on-kubernetes-ha-clusters-k8s-containers-scalable
     icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
     keywords:
@@ -1884,4 +1925,4 @@ entries:
     urls:
     - https://EnterpriseDB.github.io/edb-postgres-for-kubernetes-charts/edb-postgres-for-kubernetes-lts-1-28-0.27.3.tgz
     version: 0.27.3
-generated: "2026-09-16T11:49:04.468888622Z"
+generated: "2026-09-16T12:04:19.965364666Z"
