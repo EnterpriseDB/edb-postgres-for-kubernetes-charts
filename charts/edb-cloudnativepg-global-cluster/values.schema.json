@@ -346,6 +346,17 @@
                         }
                     }
                 },
+                "podEviction": {
+                    "type": "object",
+                    "properties": {
+                        "create": {
+                            "type": "boolean"
+                        },
+                        "failurePolicy": {
+                            "type": "string"
+                        }
+                    }
+                },
                 "port": {
                     "type": "integer"
                 },

@@ -86,7 +86,9 @@ spec:
         {{- tpl (.Values.additionalEnv | toYaml) . | nindent 8 }}
         {{- end }}
         image: "{{- include "edb-cloudnativepg-global-cluster.operatorImageName" . }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.image.pullPolicy }}
+        imagePullPolicy: {{ . }}
+        {{- end }}
         livenessProbe:
           httpGet:
             path: /readyz
@@ -148,9 +150,19 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
       affinity:
+      {{- with .Values.affinity }}
         {{- toYaml . | nindent 8 }}
+      {{- else }}
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  control-plane: controller-manager
+                  {{- include "edb-cloudnativepg-global-cluster.selectorLabels" . | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+            weight: 100
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:

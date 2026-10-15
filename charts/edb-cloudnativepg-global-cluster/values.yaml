@@ -16,7 +16,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+# -- Number of operator replicas. Leader election keeps one active; the others are on standby.
+replicaCount: 2
 # -- Global values
 global:
   # -- Specifies the repository where the PG4K-PGD operator and operand image to be downloaded from
@@ -58,6 +59,13 @@ webhook:
   validating:
     create: true
     failurePolicy: Fail
+  podEviction:
+    # -- Specifies whether the pod eviction webhook (`vpodeviction.kb.io`) should be created.
+    # Independent of `webhook.validating.create`.
+    create: true
+    # -- Failure policy of the pod eviction webhook.
+    # It intercepts every pod eviction in the cluster: with `Fail`, an unreachable operator blocks all evictions, including node drains.
+    failurePolicy: Ignore
   livenessProbe:
     initialDelaySeconds: 15
     periodSeconds: 20
@@ -164,7 +172,8 @@ resources: {}
 nodeSelector: {}
 # -- Tolerations for the operator to be installed
 tolerations: []
-# -- Affinity for the operator to be installed
+# -- Affinity for the operator to be installed.
+# When empty, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes.
 affinity: {}
 # cert-manager
 cert-manager:

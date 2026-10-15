@@ -17,12 +17,12 @@ name: edb-cloudnativepg-global-cluster
 description: EDB CloudNativePG Global Cluster Helm Chart
 icon: https://www.enterprisedb.com/themes/custom/edb_bootstrap_sass/edb-logo-disc-dark-2.svg
 type: application
-version: "2.0.3"
+version: "2.1.0"
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "2.1.0"
+appVersion: "2.2.0"
 dependencies:
   - name: "cert-manager"
     condition: cert-manager.enabled
@@ -31,7 +31,7 @@ dependencies:
   - name: "edb-postgres-for-kubernetes-lts-1-28"
     alias: "edb-postgres-for-kubernetes-lts"
     condition: edb-postgres-for-kubernetes-lts.enabled
-    version: "0.27.3"
+    version: "0.27.4"
     repository: "https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts"
 sources:
   - https://github.com/EnterpriseDB/edb-postgres-for-kubernetes-charts
