@@ -151,10 +151,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       affinity:
-      {{- with .Values.affinity }}
+        {{- with omit .Values.affinity "podAntiAffinity" }}
         {{- toYaml . | nindent 8 }}
-      {{- else }}
+        {{- end }}
         podAntiAffinity:
+        {{- with .Values.affinity.podAntiAffinity }}
+          {{- toYaml . | nindent 10 }}
+        {{- else }}
           preferredDuringSchedulingIgnoredDuringExecution:
           - podAffinityTerm:
               labelSelector:
@@ -163,7 +166,7 @@ spec:
                   {{- include "edb-cloudnativepg-global-cluster.selectorLabels" . | nindent 18 }}
               topologyKey: kubernetes.io/hostname
             weight: 100
-      {{- end }}
+        {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

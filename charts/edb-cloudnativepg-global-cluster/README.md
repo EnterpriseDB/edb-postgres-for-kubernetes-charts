@@ -32,7 +32,7 @@ EDB CloudNativePG Global Cluster Helm Chart
 |-----|------|---------|-------------|
 | additionalArgs | list | `[]` | Additional arguments to be added to the operator's args list |
 | additionalEnv | list | `[]` | Array containing extra environment variables which can be templated. For example:  - name: RELEASE_NAME    value: "{{ .Release.Name }}"  - name: MY_VAR    value: "mySpecialKey" |
-| affinity | object | `{}` | Affinity for the operator to be installed. When empty, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes. |
+| affinity | object | `{}` | Affinity for the operator to be installed. Unless `affinity.podAntiAffinity` is set, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes. |
 | cert-manager.enabled | bool | `true` |  |
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |

@@ -173,7 +173,7 @@ nodeSelector: {}
 # -- Tolerations for the operator to be installed
 tolerations: []
 # -- Affinity for the operator to be installed.
-# When empty, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes.
+# Unless `affinity.podAntiAffinity` is set, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes.
 affinity: {}
 # cert-manager
 cert-manager:
