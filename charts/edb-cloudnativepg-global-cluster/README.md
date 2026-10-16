@@ -1,6 +1,6 @@
 # edb-cloudnativepg-global-cluster
 
-![Version: 2.0.3](https://img.shields.io/badge/Version-2.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.1.0](https://img.shields.io/badge/AppVersion-2.1.0-informational?style=flat-square)
+![Version: 2.1.0](https://img.shields.io/badge/Version-2.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.0](https://img.shields.io/badge/AppVersion-2.2.0-informational?style=flat-square)
 
 EDB CloudNativePG Global Cluster Helm Chart
 
@@ -24,7 +24,7 @@ EDB CloudNativePG Global Cluster Helm Chart
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.jetstack.io | cert-manager | 1.16.1 |
-| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts | edb-postgres-for-kubernetes-lts(edb-postgres-for-kubernetes-lts-1-28) | 0.27.3 |
+| https://enterprisedb.github.io/edb-postgres-for-kubernetes-charts | edb-postgres-for-kubernetes-lts(edb-postgres-for-kubernetes-lts-1-28) | 0.27.4 |
 
 ## Values
 
@@ -32,7 +32,7 @@ EDB CloudNativePG Global Cluster Helm Chart
 |-----|------|---------|-------------|
 | additionalArgs | list | `[]` | Additional arguments to be added to the operator's args list |
 | additionalEnv | list | `[]` | Array containing extra environment variables which can be templated. For example:  - name: RELEASE_NAME    value: "{{ .Release.Name }}"  - name: MY_VAR    value: "mySpecialKey" |
-| affinity | object | `{}` | Affinity for the operator to be installed |
+| affinity | object | `{}` | Affinity for the operator to be installed. Unless `affinity.podAntiAffinity` is set, a soft pod anti-affinity on `kubernetes.io/hostname` spreads the replicas across nodes. |
 | cert-manager.enabled | bool | `true` |  |
 | cert-manager.installCRDs | bool | `true` |  |
 | commonAnnotations | object | `{}` | Annotations to be added to all other resources |
@@ -74,7 +74,7 @@ EDB CloudNativePG Global Cluster Helm Chart
 | priorityClassName | string | `""` | Priority indicates the importance of a Pod relative to other Pods. |
 | rbac.aggregateClusterRoles | bool | `false` | Aggregate ClusterRoles to Kubernetes default user-facing roles. Ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles |
 | rbac.create | bool | `true` | Specifies whether ClusterRole, ClusterRoleBinding, RoleBinding and Role should be created |
-| replicaCount | int | `1` |  |
+| replicaCount | int | `2` | Number of operator replicas. Leader election keeps one active; the others are on standby. |
 | resources | object | `{}` |  |
 | service.name | string | `"pgd-operator-webhook-service"` | DO NOT CHANGE THE SERVICE NAME as it is currently used to generate the certificate and can not be configured |
 | service.port | int | `443` |  |
@@ -86,6 +86,8 @@ EDB CloudNativePG Global Cluster Helm Chart
 | webhook.livenessProbe.periodSeconds | int | `20` |  |
 | webhook.mutating.create | bool | `true` |  |
 | webhook.mutating.failurePolicy | string | `"Fail"` |  |
+| webhook.podEviction.create | bool | `true` | Specifies whether the pod eviction webhook (`vpodeviction.kb.io`) should be created. Independent of `webhook.validating.create`. |
+| webhook.podEviction.failurePolicy | string | `"Ignore"` | Failure policy of the pod eviction webhook. It intercepts every pod eviction in the cluster: with `Fail`, an unreachable operator blocks all evictions, including node drains. |
 | webhook.port | int | `9443` |  |
 | webhook.readinessProbe.initialDelaySeconds | int | `15` |  |
 | webhook.readinessProbe.periodSeconds | int | `20` |  |

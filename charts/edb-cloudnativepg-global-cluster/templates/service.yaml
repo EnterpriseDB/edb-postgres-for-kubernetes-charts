@@ -30,4 +30,5 @@ spec:
       targetPort: webhook-server
       name: webhook-server
   selector:
+    control-plane: controller-manager
     {{- include "edb-cloudnativepg-global-cluster.selectorLabels" . | nindent 4 }}

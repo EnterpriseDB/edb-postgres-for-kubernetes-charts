@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if .Values.webhook.validating.create }}
+{{- if or .Values.webhook.validating.create .Values.webhook.podEviction.create }}
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -25,6 +25,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 webhooks:
+{{- if .Values.webhook.validating.create }}
 - admissionReviewVersions:
   - v1
   clientConfig:
@@ -67,4 +68,27 @@ webhooks:
     resources:
     - pgdgroupcleanups
   sideEffects: None
+{{- end }}
+{{- if .Values.webhook.podEviction.create }}
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: {{ .Values.service.name }}
+      namespace: {{ .Release.Namespace }}
+      path: /validate-v1-pod-eviction
+      port: {{ .Values.service.port }}
+  failurePolicy: {{ .Values.webhook.podEviction.failurePolicy }}
+  name: vpodeviction.kb.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods/eviction
+  sideEffects: NoneOnDryRun
+{{- end }}
 {{- end }}
