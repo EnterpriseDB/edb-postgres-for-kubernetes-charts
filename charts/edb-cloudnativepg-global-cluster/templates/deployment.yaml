@@ -150,12 +150,13 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- $affinity := .Values.affinity | default dict }}
       affinity:
-        {{- with omit .Values.affinity "podAntiAffinity" }}
+        {{- with omit $affinity "podAntiAffinity" }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         podAntiAffinity:
-        {{- with .Values.affinity.podAntiAffinity }}
+        {{- with $affinity.podAntiAffinity }}
           {{- toYaml . | nindent 10 }}
         {{- else }}
           preferredDuringSchedulingIgnoredDuringExecution:
